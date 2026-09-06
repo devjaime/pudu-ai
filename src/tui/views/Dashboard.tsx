@@ -16,6 +16,7 @@ export function Dashboard({ session }: { session: Session }): ReactElement {
           {t("appTitle")}
         </Text>
         <Text dimColor>{t("appSubtitle")}</Text>
+        <Text dimColor>{t("aboutDashboard")}</Text>
       </Box>
 
       <Text bold color="cyan">

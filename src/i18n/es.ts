@@ -3,6 +3,30 @@ import type { MessageId } from "./en.js";
 export const es: Record<MessageId, string> = {
   appTitle: "PUDU-AI",
   appSubtitle: "Laboratorio local de hardware y benchmarks de IA",
+  aboutDashboard:
+    "Abre el laboratorio en vivo: equipo, modelos instalados y estimaciones. Sirve para ver qué puede correr aquí antes de medir o lanzar una herramienta.",
+  aboutHardware:
+    "Detecta CPU, GPU y memoria unificada/RAM. Sirve para saber qué puede hospedar este equipo antes de descargar un modelo.",
+  aboutModels:
+    "Lista instalados frente al catálogo. FIT/EST. SPEED son estimados (CanIRun.ai de midudev); MEASURED es historial de llama-bench. Sirve para separar “ya está” de “podría correr”.",
+  aboutRecommend:
+    "Sugiere modelos por caso de uso para este hardware. Solo estimaciones, salvo que ya hayas medido. Sirve para elegir un tamaño, no una nota de calidad.",
+  aboutTasks:
+    "Pregunta qué quieres (código, vídeo, imagen, transcripción, chat) y devuelve harnesses pequeños estilo OpenCode por modelo, en este idioma. Sirve para probar un modelo en una tarea concreta.",
+  aboutBenchmark:
+    "Ejecuta llama-bench sobre un GGUF local y guarda t/s medidos más telemetría. Sirve cuando necesitas números reales, no estimaciones.",
+  aboutCompare:
+    "Compara corridas medidas (velocidad, memoria, potencia). La calidad no se infiere de la velocidad. Sirve después de dos o más benchmarks.",
+  aboutHistory:
+    "Muestra los JSON locales en ~/.pudu-ai/benchmarks. Sirve para ver qué hizo realmente esta máquina.",
+  aboutDoctor:
+    "Revisa Node, Apple Silicon/Metal, Ollama, llama-bench y la API de CanIRun. Sirve para ver qué falta antes de un bench o un launch.",
+  aboutReport:
+    "Exporta la última corrida medida en Markdown. Sirve para pegar resultados en GitHub o notas.",
+  aboutLaunch:
+    "Explica las integraciones de Ollama (OpenCode, OpenClaw, Hermes, Claude Code). Pull/launch solo con --yes si la nota es S–B y hay velocidad suficiente. Sirve para conectar un agente de código solo cuando el hardware lo aguanta.",
+  aboutAddPath:
+    "Añade una carpeta GGUF a escanear (no todo el disco). Sirve para que llama-bench encuentre modelos fuera de Ollama.",
   nav: "[B] Benchmark  [M] Modelos  [R] Recomendaciones  [T] Tareas  [H] Hardware  [C] Comparar  [L] Historial  [Q] Salir",
   machine: "EQUIPO",
   runtimes: "RUNTIMES DE IA LOCAL",

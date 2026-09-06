@@ -8,6 +8,7 @@ describe("i18n", () => {
     expect(t("doctorReady", { count: 2 })).toBe("Ready to benchmark 2 installed models.");
     expect(t("credits")).toContain("midudev");
     expect(t("credits")).toContain("CanIRun.ai");
+    expect(t("aboutDoctor").length).toBeGreaterThan(20);
   });
 
   it("switches to Spanish", () => {

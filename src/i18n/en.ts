@@ -1,6 +1,30 @@
 export const en = {
   appTitle: "PUDU-AI",
   appSubtitle: "Local AI Hardware & Benchmark Lab",
+  aboutDashboard:
+    "Opens the live lab: your machine, installed models, and estimates. Use it to see what can run here before you benchmark or launch a tool.",
+  aboutHardware:
+    "Detects CPU, GPU, and Unified Memory/RAM. Use it to know what this computer can host before pulling a model.",
+  aboutModels:
+    "Lists installed models vs catalog fits. FIT/EST. SPEED are estimated (CanIRun.ai by midudev); MEASURED is llama-bench history. Use it to separate “already here” from “might run”.",
+  aboutRecommend:
+    "Suggests models by use case for this hardware. Estimates only, unless you already measured. Use it to pick a size class, not a quality score.",
+  aboutTasks:
+    "Asks what you want (code, video, image, transcription, chat) and returns small OpenCode-style harnesses per model, in this language. Use it to try a model on one concrete job.",
+  aboutBenchmark:
+    "Runs llama-bench on a local GGUF and records measured t/s plus system telemetry. Use it when you need real numbers, not estimates.",
+  aboutCompare:
+    "Compares saved measured runs (speed, memory, power). Quality is never inferred from speed. Use it after two or more benchmarks.",
+  aboutHistory:
+    "Shows local benchmark files in ~/.pudu-ai/benchmarks. Use it to replay what this machine actually did.",
+  aboutDoctor:
+    "Checks Node, Apple Silicon/Metal, Ollama, llama-bench, and the CanIRun API. Use it to see what is missing before a bench or launch.",
+  aboutReport:
+    "Writes the latest measured run as Markdown. Use it to paste results into GitHub or notes.",
+  aboutLaunch:
+    "Explains Ollama integrations (OpenCode, OpenClaw, Hermes, Claude Code). Pull/launch only with --yes if the model grade is S–B and speed is enough. Use it to wire a coding agent only when this hardware can carry it.",
+  aboutAddPath:
+    "Adds a GGUF folder to scan (not the whole disk). Use it so llama-bench can find models outside Ollama.",
   nav: "[B] Benchmark  [M] Models  [R] Recommend  [T] Tasks  [H] Hardware  [C] Compare  [L] History  [Q] Quit",
   machine: "MACHINE",
   runtimes: "LOCAL AI RUNTIMES",

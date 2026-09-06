@@ -32,6 +32,10 @@ function print(value: unknown, json: boolean): void {
   process.stdout.write(`${typeof value === "string" ? value : JSON.stringify(value, null, 2)}\n`);
 }
 
+function explained(aboutKey: Parameters<typeof t>[0], body: string): string {
+  return `${t(aboutKey)}\n\n${body}`;
+}
+
 export async function run(args: CliArgs): Promise<number> {
   setLocale(resolveLocale(args.lang));
   if (args.help) {
@@ -51,7 +55,7 @@ export async function run(args: CliArgs): Promise<number> {
 
   if (args.addPath) {
     await addModelPath(args.addPath);
-    print(t("addedPath", { path: args.addPath }), args.json);
+    print(args.json ? { path: args.addPath } : explained("aboutAddPath", t("addedPath", { path: args.addPath })), args.json);
     return 0;
   }
 
@@ -62,19 +66,22 @@ export async function run(args: CliArgs): Promise<number> {
 
   switch (args.command) {
     case "hardware":
-      print(args.json ? session.hardware : `${hardwareText(session)}\n\n${runtimesText(session)}`, args.json);
+      print(
+        args.json ? session.hardware : explained("aboutHardware", `${hardwareText(session)}\n\n${runtimesText(session)}`),
+        args.json,
+      );
       return 0;
     case "models":
-      print(args.json ? session.rows : modelsText(session), args.json);
+      print(args.json ? session.rows : explained("aboutModels", modelsText(session)), args.json);
       return 0;
     case "recommend":
-      print(args.json ? session.recommendations : recommendText(session), args.json);
+      print(args.json ? session.recommendations : explained("aboutRecommend", recommendText(session)), args.json);
       return 0;
     case "launch": {
       const tool = parseIntegration(args.positional[0]);
       const decisions = tool ? [decideLaunch(session, tool)] : decideAll(session);
       if (!args.yes) {
-        print(args.json ? decisions : launchText(decisions), args.json);
+        print(args.json ? decisions : explained("aboutLaunch", launchText(decisions)), args.json);
         return 0;
       }
       if (!tool) {
@@ -83,11 +90,11 @@ export async function run(args: CliArgs): Promise<number> {
       }
       const decision = decisions[0]!;
       if (!decision.eligible) {
-        print(args.json ? decision : launchText([decision]), args.json);
+        print(args.json ? decision : explained("aboutLaunch", launchText([decision])), args.json);
         return 1;
       }
       const result = await executeLaunch(decision);
-      print(args.json ? { decision, result } : result.log, args.json);
+      print(args.json ? { decision, result } : explained("aboutLaunch", result.log), args.json);
       return result.ok ? 0 : 1;
     }
     case "tasks": {
@@ -97,7 +104,7 @@ export async function run(args: CliArgs): Promise<number> {
         priority: args.priority,
       });
       const plans = planTasks(session, answers);
-      print(args.json ? { answers, plans } : tasksText(plans, answers), args.json);
+      print(args.json ? { answers, plans } : explained("aboutTasks", tasksText(plans, answers)), args.json);
       return 0;
     }
     case "history": {
@@ -106,14 +113,14 @@ export async function run(args: CliArgs): Promise<number> {
         process.stdout.write(`${historyCsv(records)}\n`);
         return 0;
       }
-      print(args.json ? records : historyText(records), args.json);
+      print(args.json ? records : explained("aboutHistory", historyText(records)), args.json);
       return 0;
     }
     case "doctor":
-      print(args.json ? session : doctorText(session), args.json);
+      print(args.json ? session : explained("aboutDoctor", doctorText(session)), args.json);
       return 0;
     case "compare":
-      print(args.json ? session.history : compareText(session.history), args.json);
+      print(args.json ? session.history : explained("aboutCompare", compareText(session.history)), args.json);
       return 0;
     case "report": {
       const last = session.history.at(-1);
@@ -121,7 +128,7 @@ export async function run(args: CliArgs): Promise<number> {
         process.stderr.write(`${t("noHistory")}\n`);
         return 1;
       }
-      process.stdout.write(reportMarkdown(last));
+      process.stdout.write(`${explained("aboutReport", reportMarkdown(last))}\n`);
       return 0;
     }
     case "benchmark": {
@@ -150,7 +157,7 @@ export async function run(args: CliArgs): Promise<number> {
         print(result.record, true);
         return 0;
       }
-      process.stdout.write(`${resultText(result.record, result.assessment)}\n`);
+      process.stdout.write(`${explained("aboutBenchmark", resultText(result.record, result.assessment))}\n`);
       return 0;
     }
     case "dashboard":
