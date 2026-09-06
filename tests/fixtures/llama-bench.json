@@ -1,0 +1,18 @@
+[
+  {
+    "n_prompt": 512,
+    "n_gen": 0,
+    "avg_ts": 824.7,
+    "model_type": "qwen3 8B Q4_K_M",
+    "model_size": 5200000000,
+    "backends": "Metal,BLAS,CPU"
+  },
+  {
+    "n_prompt": 0,
+    "n_gen": 128,
+    "avg_ts": 42.8,
+    "model_type": "qwen3 8B Q4_K_M",
+    "model_size": 5200000000,
+    "backends": "Metal,BLAS,CPU"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "compatible": true,
+  "status": "comfortable",
+  "grade": "A",
+  "score": 82,
+  "modelId": "qwen3-8b",
+  "quantization": "Q4_K_M",
+  "recommendedQuantization": "Q4_K_M",
+  "estimated": {
+    "tokensPerSecond": 42,
+    "modelSizeGb": 5.2,
+    "vramRequiredGb": 6.1,
+    "ramRequiredGb": 7.5,
+    "memoryHeadroomGb": 8.5
+  },
+  "notes": ["The model should fit comfortably in unified memory."]
+}
