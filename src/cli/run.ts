@@ -5,6 +5,7 @@ import { listBenchmarks } from "../storage/benchmarks.js";
 import { killAll } from "../shared/process.js";
 import { setLogLevel } from "../shared/logger.js";
 import { renderDashboard } from "../tui/render.js";
+import { t } from "../i18n/index.js";
 import { HELP } from "./help.js";
 import type { CliArgs } from "./parse-args.js";
 import {
@@ -46,10 +47,13 @@ export async function run(args: CliArgs): Promise<number> {
 
   if (args.addPath) {
     await addModelPath(args.addPath);
-    print(`Added model path ${args.addPath}`, args.json);
+    print(t("addedPath", { path: args.addPath }), args.json);
     return 0;
   }
 
+  if (!args.json && !args.csv && process.stderr.isTTY) {
+    process.stderr.write(`${t("loading")}\n`);
+  }
   const session = await loadSession({ network: args.network });
 
   switch (args.command) {
@@ -80,7 +84,7 @@ export async function run(args: CliArgs): Promise<number> {
     case "report": {
       const last = session.history.at(-1);
       if (!last) {
-        process.stderr.write("No benchmark history.\n");
+        process.stderr.write(`${t("noHistory")}\n`);
         return 1;
       }
       process.stdout.write(reportMarkdown(last));
@@ -90,7 +94,7 @@ export async function run(args: CliArgs): Promise<number> {
       const id = args.positional[0];
       if (!id) {
         if (args.json) {
-          print({ error: "Pass a model id for JSON mode, e.g. localmeter-ai benchmark qwen3:8b --json" }, true);
+          print({ error: t("jsonNeedModel") }, true);
           return 1;
         }
         await renderDashboard(session, args.preset);
@@ -98,7 +102,7 @@ export async function run(args: CliArgs): Promise<number> {
       }
       const model = session.models.find((m) => m.id === id || m.name === id);
       if (!model) {
-        process.stderr.write(`Model not found: ${id}\n`);
+        process.stderr.write(`${t("modelNotFound", { id })}\n`);
         return 1;
       }
       const catalog = session.rows.find((r) => r.local.id === model.id)?.catalog;

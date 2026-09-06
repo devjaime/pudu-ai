@@ -1,6 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import { ollamaAdapter } from "../adapters/ollama/index.js";
+import { lmStudioAdapter } from "../adapters/lmstudio/index.js";
 import { scanGgufDirectories } from "../adapters/llamacpp/index.js";
 import { loadConfig } from "../storage/config.js";
 import type { LocalModel } from "./types.js";
@@ -18,10 +19,11 @@ function defaultGgufDirs(): string[] {
 export async function discoverLocalModels(): Promise<LocalModel[]> {
   const config = await loadConfig();
   const ollama = await ollamaAdapter.listModels();
-  const gguf = await scanGgufDirectories([...defaultGgufDirs(), ...config.modelPaths]);
+  const lmstudio = await lmStudioAdapter.listModels();
+  const gguf = await scanGgufDirectories([...defaultGgufDirs(), ...config.modelPaths], { maxDepth: 1 });
   const seen = new Set<string>();
   const merged: LocalModel[] = [];
-  for (const model of [...ollama, ...gguf]) {
+  for (const model of [...ollama, ...lmstudio, ...gguf]) {
     const key = `${model.source}:${model.id}:${model.artifactPath ?? ""}`;
     if (seen.has(key)) continue;
     seen.add(key);

@@ -1,6 +1,6 @@
 import os from "node:os";
 import { runCommand } from "../shared/process.js";
-import { parseMacosMemoryPressure, parseMacosVmStat } from "../platform/macos/hardware.js";
+import { parseMacosMemoryPressure, parseMacosSwapUsage, parseMacosVmStat } from "../platform/macos/hardware.js";
 import { nodeTelemetry } from "./fallback.js";
 import type { SystemSample, TelemetryProvider } from "./types.js";
 
@@ -23,10 +23,11 @@ export function createMacosTelemetry(pid?: number): TelemetryProvider {
     },
     async sample() {
       const base = await nodeTelemetry.sample();
-      const [vm, pressure, pagesize] = await Promise.all([
+      const [vm, pressure, pagesize, swap] = await Promise.all([
         runCommand("vm_stat", [], { timeout: 3000 }),
         runCommand("memory_pressure", [], { timeout: 3000 }),
         runCommand("sysctl", ["-n", "hw.pagesize"], { timeout: 3000 }),
+        runCommand("sysctl", ["-n", "vm.swapusage"], { timeout: 3000 }),
       ]);
       const pageSize = Number(pagesize.stdout.trim()) || 16384;
       const parsed = parseMacosVmStat(vm.stdout, pageSize);
@@ -37,7 +38,7 @@ export function createMacosTelemetry(pid?: number): TelemetryProvider {
         memory: {
           usedBytes: Math.max(0, total - available),
           availableBytes: available,
-          swapUsedBytes: parsed.swapUsedBytes ?? 0,
+          swapUsedBytes: parseMacosSwapUsage(swap.stdout) ?? 0,
         },
         thermal: {
           pressure: parseMacosMemoryPressure(pressure.stdout + pressure.stderr),

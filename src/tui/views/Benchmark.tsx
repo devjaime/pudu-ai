@@ -9,6 +9,7 @@ import { formatPercent } from "../../shared/format.js";
 import { resultText } from "../../cli/text.js";
 import { bar, sparkline } from "../theme.js";
 import { memoryLabel } from "../../hardware/types.js";
+import { t } from "../../i18n/index.js";
 
 type Phase = "select" | "running" | "done" | "error";
 
@@ -24,7 +25,7 @@ export function BenchmarkView(props: {
   const [sample, setSample] = useState<SystemSample | undefined>();
   const [elapsed, setElapsed] = useState(0);
   const [result, setResult] = useState<BenchmarkResult | undefined>();
-  const [error, setError] = useState(props.models.length ? "" : "No GGUF-resolvable models to benchmark.");
+  const [error, setError] = useState(props.models.length ? "" : t("noGguf"));
   const cpuHist = useRef<number[]>([]);
   const memHist = useRef<number[]>([]);
   const abortRef = useRef<AbortController | undefined>(undefined);

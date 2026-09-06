@@ -27,7 +27,7 @@ export function spawnTracked(file: string, args: string[] = [], options: Options
   return subprocess;
 }
 
-function toText(value: unknown): string {
+export function toText(value: unknown): string {
   if (typeof value === "string") return value;
   if (value instanceof Uint8Array) return Buffer.from(value).toString("utf8");
   if (Array.isArray(value)) return value.map(String).join("\n");

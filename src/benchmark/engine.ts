@@ -1,12 +1,4 @@
-import { spawnTracked } from "../shared/process.js";
-
-function toText(value: unknown): string {
-  if (typeof value === "string") return value;
-  if (value instanceof Uint8Array) return Buffer.from(value).toString("utf8");
-  if (Array.isArray(value)) return value.map(String).join("\n");
-  if (value == null) return "";
-  return String(value);
-}
+import { spawnTracked, toText } from "../shared/process.js";
 import { commandExists } from "../shared/which.js";
 import { bytesToGiB } from "../shared/bytes.js";
 import type { HardwareProfile } from "../hardware/types.js";
@@ -52,12 +44,6 @@ export async function runBenchmark(input: {
 
   const preset: BenchmarkPreset = resolvePreset(input.preset);
   const started = Date.now();
-  const collector = new TelemetryCollector();
-  collector.onSample = (sample) => {
-    input.onProgress?.({ sample, elapsedSeconds: (Date.now() - started) / 1000, status: "running" });
-  };
-  await collector.start(750);
-
   const args = [
     "-m",
     artifact,
@@ -72,6 +58,11 @@ export async function runBenchmark(input: {
   ];
 
   const subprocess = spawnTracked(bench, args, { timeout: 30 * 60_000 });
+  const collector = new TelemetryCollector(subprocess.pid);
+  collector.onSample = (sample) => {
+    input.onProgress?.({ sample, elapsedSeconds: (Date.now() - started) / 1000, status: "running" });
+  };
+  await collector.start(750);
   const abort = (): void => {
     subprocess.kill("SIGTERM");
   };

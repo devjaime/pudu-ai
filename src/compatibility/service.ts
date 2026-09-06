@@ -3,6 +3,7 @@ import type { HardwareProfile } from "../hardware/types.js";
 import { idsLikelyMatch, normalizeModelId } from "../models/match.js";
 import type { LocalModel } from "../models/types.js";
 import { loadCatalogCache, saveCatalogCache } from "../storage/cache.js";
+import { t } from "../i18n/index.js";
 import { localCompatibility } from "./local.js";
 import type { CatalogModel, CompatibilityResult, Recommendation } from "./types.js";
 
@@ -79,9 +80,15 @@ export async function recommendForMachine(
     .sort((a, b) => a.result.grade.localeCompare(b.result.grade));
 
   const picks: Recommendation[] = [];
+  const used = new Set<string>();
   for (const useCase of useCases) {
-    const hit = ranked.find((row) => row.model.useCase?.some((u) => u.includes(useCase) || useCase === "chat"));
+    const hit = ranked.find((row) => {
+      if (used.has(row.model.id)) return false;
+      if (useCase === "chat") return row.model.useCase?.includes("chat") ?? true;
+      return row.model.useCase?.some((u) => u.includes(useCase)) ?? false;
+    });
     if (!hit) continue;
+    used.add(hit.model.id);
     picks.push({
       useCase: labelUseCase(useCase),
       model: hit.model,
@@ -93,10 +100,10 @@ export async function recommendForMachine(
 }
 
 function labelUseCase(useCase: string): string {
-  if (useCase === "code") return "Coding";
-  if (useCase === "reasoning") return "Reasoning";
-  if (useCase === "edge") return "Lightweight";
-  return "General";
+  if (useCase === "code") return t("useCaseCoding");
+  if (useCase === "reasoning") return t("useCaseReasoning");
+  if (useCase === "edge") return t("useCaseLightweight");
+  return t("useCaseGeneral");
 }
 
 export function catalogIdFromLocal(id: string): string {

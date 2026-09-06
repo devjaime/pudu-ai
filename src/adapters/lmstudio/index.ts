@@ -2,8 +2,10 @@ import os from "node:os";
 import path from "node:path";
 import { access } from "node:fs/promises";
 import type { ModelRuntime } from "../../runtimes/types.js";
+import { scanGgufDirectories } from "../llamacpp/index.js";
+import type { LocalModel, ModelArtifact } from "../../models/types.js";
 
-function candidateDirs(): string[] {
+export function lmStudioCandidateDirs(): string[] {
   const home = os.homedir();
   return [
     path.join(home, ".lmstudio", "models"),
@@ -12,30 +14,43 @@ function candidateDirs(): string[] {
   ];
 }
 
+async function existingDirs(): Promise<string[]> {
+  const found: string[] = [];
+  for (const dir of lmStudioCandidateDirs()) {
+    try {
+      await access(dir);
+      found.push(dir);
+    } catch {
+      continue;
+    }
+  }
+  return found;
+}
+
 export const lmStudioAdapter: ModelRuntime = {
   id: "lmstudio",
   label: "LM Studio",
   async detect() {
-    for (const dir of candidateDirs()) {
-      try {
-        await access(dir);
-        return true;
-      } catch {
-        continue;
-      }
-    }
-    return false;
+    return (await existingDirs()).length > 0;
   },
   async version() {
     return undefined;
   },
   async listModels() {
-    return [];
+    const dirs = await existingDirs();
+    return scanGgufDirectories(dirs, { maxDepth: 3, source: "lmstudio" });
   },
-  async resolveModel() {
-    return undefined;
+  async resolveModel(id: string) {
+    const models = await this.listModels();
+    const hit = models.find((model) => model.id === id || model.name === id);
+    if (!hit?.artifactPath) return undefined;
+    return { id: hit.id, path: hit.artifactPath, format: "gguf" } satisfies ModelArtifact;
   },
   async benchmarkCapabilities() {
-    return ["none"];
+    return ["llama-bench"];
   },
 };
+
+export async function listLmStudioModels(): Promise<LocalModel[]> {
+  return lmStudioAdapter.listModels();
+}

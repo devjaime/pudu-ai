@@ -4,15 +4,18 @@ import { memoryLabel } from "../hardware/types.js";
 import type { Session } from "../session/load.js";
 import type { BenchmarkRecord } from "../storage/benchmarks.js";
 import { GRADE_MEANING } from "../compatibility/types.js";
+import { localCompatibility } from "../compatibility/local.js";
+import { idsLikelyMatch } from "../models/match.js";
+import { t } from "../i18n/index.js";
 
 export function hardwareText(session: Session): string {
   const h = session.hardware;
   const ram = formatBytes(h.memory.totalBytes, 0);
   const avail = h.memory.availableBytes ? formatBytes(h.memory.availableBytes) : "N/A";
   return [
-    `MACHINE`,
-    `  ${h.machineModel ?? "Unknown"}`,
-    `  ${h.cpu.name ?? "CPU N/A"}`,
+    t("machine"),
+    `  ${h.machineModel ?? t("unknownMachine")}`,
+    `  ${h.cpu.name ?? t("cpuNa")}`,
     `  CPU           ${h.cpu.physicalCores ?? "N/A"} cores (${h.cpu.performanceCores ?? "?"}P / ${h.cpu.efficiencyCores ?? "?"}E)`,
     `  GPU           ${h.gpu.name ?? "N/A"}`,
     `  ${memoryLabel(h).padEnd(13)} ${ram}`,
@@ -23,13 +26,13 @@ export function hardwareText(session: Session): string {
 
 export function runtimesText(session: Session): string {
   return [
-    "LOCAL AI RUNTIMES",
-    ...session.runtimes.map((r) => `  ${r.detected ? "✓" : "○"} ${r.label.padEnd(14)} ${r.detected ? r.version ?? "detected" : "not detected"}`),
+    t("runtimes"),
+    ...session.runtimes.map((r) => `  ${r.detected ? "✓" : "○"} ${r.label.padEnd(14)} ${r.detected ? r.version ?? t("detected") : t("notDetected")}`),
   ].join("\n");
 }
 
 export function modelsText(session: Session): string {
-  const lines = ["INSTALLED", "MODEL                 INSTALLED   FIT       EST. SPEED     MEASURED"];
+  const lines = [t("installedModels"), "MODEL                 INSTALLED   FIT       EST. SPEED     MEASURED"];
   for (const row of session.rows) {
     const fit = row.compatibility?.grade ?? "—";
     const est = row.compatibility?.estimatedTokensPerSecond
@@ -37,23 +40,28 @@ export function modelsText(session: Session): string {
       : "—";
     const measured = row.lastBenchmark?.benchmark.generationTokensPerSecond
       ? formatTokensPerSec(row.lastBenchmark.benchmark.generationTokensPerSecond)
-      : "Not tested";
+      : t("notTested");
     lines.push(
       `${row.local.name.padEnd(22)} ✓           ${fit.padEnd(9)} ${est.padEnd(14)} ${measured}`,
     );
   }
-  lines.push("", "COMPATIBLE (catalog, estimated)");
-  const installed = new Set(session.rows.map((r) => r.local.id.toLowerCase()));
-  const extras = session.catalog.slice(0, 12);
-  for (const model of extras) {
-    if ([...installed].some((id) => id.includes(model.id) || model.id.includes(id.replace(":", "-")))) continue;
-    lines.push(`${model.name.padEnd(22)} —           est.`);
+  lines.push("", t("compatible"));
+  const extras = session.catalog
+    .filter((model) => !session.rows.some((row) => idsLikelyMatch(row.local.id, model.id)))
+    .map((model) => ({ model, fit: localCompatibility(session.hardware, model) }))
+    .sort((a, b) => a.fit.grade.localeCompare(b.fit.grade))
+    .slice(0, 12);
+  for (const extra of extras) {
+    const est = extra.fit.estimatedTokensPerSecond
+      ? `~${formatNumber(extra.fit.estimatedTokensPerSecond)} t/s`
+      : "—";
+    lines.push(`${extra.model.name.padEnd(22)} —           ${extra.fit.grade.padEnd(9)} ${est.padEnd(14)} ${t("estimated")}`);
   }
   return lines.join("\n");
 }
 
 export function recommendText(session: Session): string {
-  const lines = ["RECOMMENDED FOR THIS MACHINE", "(estimated unless a local benchmark exists)", ""];
+  const lines = [t("recommended"), t("recommendedHint"), ""];
   for (const rec of session.recommendations) {
     lines.push(
       `${rec.useCase.padEnd(12)} ${rec.model.name.padEnd(22)} ${rec.grade}  ${GRADE_MEANING[rec.grade]}  ~${na(rec.estimatedTokensPerSecond)} t/s est.`,
@@ -63,7 +71,7 @@ export function recommendText(session: Session): string {
 }
 
 export function historyText(records: BenchmarkRecord[]): string {
-  if (!records.length) return "No benchmark history in ~/.localmeter/benchmarks";
+  if (!records.length) return t("historyEmpty");
   return records
     .map((r) => {
       const gen = r.benchmark.generationTokensPerSecond;
@@ -94,7 +102,7 @@ export function doctorText(session: Session): string {
     ? `${session.hardware.cpu.appleSilicon.generation} ${session.hardware.cpu.appleSilicon.variant}`
     : "no";
   const lines = [
-    "LocalMeter Doctor",
+    t("doctorTitle"),
     "",
     `✓ Node.js       ${node}`,
     `${session.hardware.cpu.appleSilicon ? "✓" : "○"} Apple Silicon ${apple}`,
@@ -103,8 +111,8 @@ export function doctorText(session: Session): string {
     `${session.networkUsed ? "✓" : "○"} CanIRun API`,
     "",
     session.llamaBench
-      ? `Ready to benchmark ${session.models.filter((m) => m.artifactPath).length} installed models.`
-      : "llama-bench unavailable. Install llama.cpp, e.g. `brew install llama.cpp`. LocalMeter will not install native dependencies.",
+      ? t("doctorReady", { count: session.models.filter((m) => m.artifactPath).length })
+      : t("doctorNoBench"),
   ];
   return lines.join("\n");
 }
@@ -132,7 +140,7 @@ export function compareText(records: BenchmarkRecord[]): string {
   const latestByModel = new Map<string, BenchmarkRecord>();
   for (const record of records) latestByModel.set(record.model.id, record);
   const list = [...latestByModel.values()].slice(0, 4);
-  if (list.length < 2) return "Need at least two measured benchmarks to compare.";
+  if (list.length < 2) return t("compareNeedTwo");
   const names = list.map((r) => r.model.id);
   const row = (label: string, pick: (r: BenchmarkRecord) => string): string =>
     `${label.padEnd(20)}${list.map((r) => pick(r).padStart(14)).join("")}`;
@@ -151,7 +159,7 @@ export function compareText(records: BenchmarkRecord[]): string {
     return best?.model.id ?? "N/A";
   };
   return [
-    "LOCAL MODEL BENCHMARKS (measured)",
+    t("compareTitle"),
     names.join(" vs "),
     row("Generation t/s", (r) => formatNumber(r.benchmark.generationTokensPerSecond)),
     row("Prompt t/s", (r) => formatNumber(r.benchmark.promptTokensPerSecond)),
@@ -160,11 +168,11 @@ export function compareText(records: BenchmarkRecord[]): string {
     row("Power", (r) => (r.resources.avgPackagePowerWatts ? `${r.resources.avgPackagePowerWatts} W` : "N/A")),
     row("t/s/W", (r) => formatNumber(r.resources.tokensPerSecondPerWatt)),
     "",
-    "Winner",
+    t("winner"),
     `Speed       ${winner((r) => r.benchmark.generationTokensPerSecond)}`,
     `Memory      ${winner((r) => r.resources.peakMemoryGb, false)}`,
     `Efficiency  ${winner((r) => r.resources.tokensPerSecondPerWatt)}`,
-    "Quality     (not derived from speed; see catalog metadata)",
+    t("qualityNote"),
   ].join("\n");
 }
 

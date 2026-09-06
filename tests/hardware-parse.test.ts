@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseAppleSiliconChip,
   parseMacosMemoryPressure,
+  parseMacosSwapUsage,
   parseMacosVmStat,
 } from "../src/platform/macos/hardware.js";
 
@@ -27,5 +28,10 @@ describe("macos hardware parsing", () => {
   it("parses memory pressure", () => {
     expect(parseMacosMemoryPressure("System-wide memory free percentage: 80")).toBe("Nominal");
     expect(parseMacosMemoryPressure("System-wide memory free percentage: 10")).toBe("Critical");
+  });
+
+  it("parses vm.swapusage", () => {
+    const used = parseMacosSwapUsage("total = 2048.00M  used = 398.50M  free = 1649.50M  (encrypted)");
+    expect(used).toBeCloseTo(398.5 * 1024 ** 2);
   });
 });

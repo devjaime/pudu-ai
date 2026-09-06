@@ -21,12 +21,8 @@ function parseVmStat(output: string, pageSize: number): { availableBytes?: numbe
   const speculative = num("Pages speculative") ?? 0;
   const inactive = num("Pages inactive") ?? 0;
   const purgeable = num("Pages purgeable") ?? 0;
-  const swapouts = num("Swapouts");
   const availableBytes = (free + speculative + inactive + purgeable) * pageSize;
-  return {
-    availableBytes,
-    swapUsedBytes: swapouts === undefined ? undefined : undefined,
-  };
+  return { availableBytes };
 }
 
 function parseMemoryPressure(output: string): string | undefined {
@@ -43,8 +39,18 @@ function parseMemoryPressure(output: string): string | undefined {
   return undefined;
 }
 
+export function parseMacosSwapUsage(output: string): number | undefined {
+  const match = output.match(/used\s*=\s*([\d.]+)\s*([KMGT])?/i);
+  if (!match) return undefined;
+  const value = Number(match[1]);
+  if (Number.isNaN(value)) return undefined;
+  const unit = (match[2] ?? "M").toUpperCase();
+  const factor = { K: 1024, M: 1024 ** 2, G: 1024 ** 3, T: 1024 ** 4 }[unit] ?? 1024 ** 2;
+  return value * factor;
+}
+
 export async function detectMacosHardware(): Promise<HardwareProfile> {
-  const [brand, physical, logical, memsize, pagesize, perf, eff, hwModel, swVers, profiler, vmstat, pressure] =
+  const [brand, physical, logical, memsize, pagesize, perf, eff, hwModel, swVers, profiler, vmstat, pressure, swap] =
     await Promise.all([
       runCommand("sysctl", ["-n", "machdep.cpu.brand_string"], { timeout: 5000 }),
       runCommand("sysctl", ["-n", "hw.physicalcpu"], { timeout: 5000 }),
@@ -58,6 +64,7 @@ export async function detectMacosHardware(): Promise<HardwareProfile> {
       runCommand("system_profiler", ["SPHardwareDataType"], { timeout: 15000 }),
       runCommand("vm_stat", [], { timeout: 5000 }),
       runCommand("memory_pressure", [], { timeout: 5000 }),
+      runCommand("sysctl", ["-n", "vm.swapusage"], { timeout: 5000 }),
     ]);
 
   const profilerText = profiler.stdout;
@@ -94,7 +101,7 @@ export async function detectMacosHardware(): Promise<HardwareProfile> {
       totalBytes,
       availableBytes: vm.availableBytes ?? os.freemem(),
       unified: Boolean(appleSilicon) || os.arch() === "arm64",
-      swapUsedBytes: undefined,
+      swapUsedBytes: parseMacosSwapUsage(swap.stdout),
       pressure: parseMemoryPressure(pressure.stdout + pressure.stderr),
     },
   };

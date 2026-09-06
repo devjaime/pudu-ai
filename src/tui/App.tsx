@@ -1,5 +1,6 @@
 import { Box, Text, useApp, useInput } from "ink";
 import { useMemo, useState, type ReactElement } from "react";
+import { t } from "../i18n/index.js";
 import type { Session } from "../session/load.js";
 import { Dashboard } from "./views/Dashboard.js";
 import { ModelsView } from "./views/Models.js";
@@ -7,8 +8,9 @@ import { HardwareView } from "./views/Hardware.js";
 import { RecommendView } from "./views/Recommend.js";
 import { CompareView } from "./views/Compare.js";
 import { BenchmarkView } from "./views/Benchmark.js";
+import { HistoryView } from "./views/History.js";
 
-type Screen = "home" | "models" | "hardware" | "recommend" | "compare" | "benchmark";
+type Screen = "home" | "models" | "hardware" | "recommend" | "compare" | "benchmark" | "history";
 
 export function App(props: { session: Session; preset?: string }): ReactElement {
   const { exit } = useApp();
@@ -28,6 +30,7 @@ export function App(props: { session: Session; preset?: string }): ReactElement 
     if (letter === "r") setScreen("recommend");
     if (letter === "h") setScreen("hardware");
     if (letter === "c") setScreen("compare");
+    if (letter === "l") setScreen("history");
     if (key.return && screen === "home") setScreen("benchmark");
   });
 
@@ -38,6 +41,7 @@ export function App(props: { session: Session; preset?: string }): ReactElement 
       {screen === "hardware" && <HardwareView session={props.session} />}
       {screen === "recommend" && <RecommendView session={props.session} />}
       {screen === "compare" && <CompareView session={props.session} />}
+      {screen === "history" && <HistoryView session={props.session} />}
       {screen === "benchmark" && (
         <BenchmarkView
           session={props.session}
@@ -50,7 +54,7 @@ export function App(props: { session: Session; preset?: string }): ReactElement 
       )}
       {screen !== "benchmark" && (
         <Box marginTop={1}>
-          <Text dimColor>[B] Benchmark  [M] Models  [R] Recommend  [H] Hardware  [C] Compare  [Q] Quit</Text>
+          <Text dimColor>{t("nav")}</Text>
         </Box>
       )}
     </Box>
