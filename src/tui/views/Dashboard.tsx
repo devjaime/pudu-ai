@@ -69,6 +69,7 @@ export function Dashboard({ session }: { session: Session }): ReactElement {
             {rec.useCase.padEnd(12)} {rec.model.name.padEnd(22)} {rec.grade} {GRADE_MEANING[rec.grade]}
           </Text>
         ))}
+        <Text dimColor>{t("credits")}</Text>
       </Box>
     </Box>
   );

@@ -8,4 +8,4 @@ Network is used only for optional CanIRun catalog/compatibility (`https://caniru
 
 Hardware detection strips serial numbers, hardware UUID, and provisioning UDID.
 
-CanIRun.ai is credited for catalog and compatibility ideas/API. Source from that project is not copied.
+Estimated catalog/compatibility data comes from [CanIRun.ai](https://canirun.ai) by [midudev](https://midu.dev) ([repository](https://github.com/midudev/canirun.ai)). Pudu does not copy that project’s source. Measured data never leaves the machine.

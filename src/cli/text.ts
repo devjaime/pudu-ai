@@ -61,7 +61,7 @@ export function modelsText(session: Session): string {
 }
 
 export function recommendText(session: Session): string {
-  const lines = [t("recommended"), t("recommendedHint"), ""];
+  const lines = [t("recommended"), t("recommendedHint"), "", t("credits"), ""];
   for (const rec of session.recommendations) {
     lines.push(
       `${rec.useCase.padEnd(12)} ${rec.model.name.padEnd(22)} ${rec.grade}  ${GRADE_MEANING[rec.grade]}  ~${na(rec.estimatedTokensPerSecond)} t/s est.`,
@@ -108,7 +108,7 @@ export function doctorText(session: Session): string {
     `${session.hardware.cpu.appleSilicon ? "✓" : "○"} Apple Silicon ${apple}`,
     `${session.hardware.gpu.metal ? "✓" : "○"} Metal`,
     ...session.runtimes.map((r) => `${r.detected ? "✓" : "○"} ${r.label.padEnd(14)} ${r.version ?? ""}`.trimEnd()),
-    `${session.networkUsed ? "✓" : "○"} CanIRun API`,
+    `${session.networkUsed ? "✓" : "○"} CanIRun.ai (midudev)`,
     "",
     session.llamaBench
       ? t("doctorReady", { count: session.models.filter((m) => m.artifactPath).length })

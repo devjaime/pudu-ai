@@ -86,7 +86,7 @@ llama-bench -m MODEL -p 512 -n 128 -r 3 -o json
 | Standard | 2048 | 256 | 5 |
 | Stress | 4096 | 512 | 10 |
 
-**Measured** values come from `llama-bench` and OS telemetry. **Estimated** values come from [CanIRun.ai](https://canirun.ai) (or a local fallback) and are labelled as such.
+**Measured** values come from `llama-bench` and OS telemetry. **Estimated** values come from [CanIRun.ai](https://canirun.ai) by [midudev](https://midu.dev) ([GitHub](https://github.com/midudev/canirun.ai)) or a local fallback, and are labelled as such.
 
 If a metric cannot be measured (GPU %, package power, temperature without extra permissions), Pudu prints `N/A`. It does not invent numbers.
 
@@ -117,7 +117,11 @@ Business logic does not depend on Ink. Specs live in `docs/spec/`. UI strings li
 
 ## Credits
 
-Compatibility catalog and grading concepts use the public API of [CanIRun.ai](https://github.com/midudev/canirun.ai) by [midudev](https://midu.dev). Pudu does not copy that project’s source. Telemetry is inspired by tools such as basitop but implemented with native OS APIs (`sysctl`, `vm_stat`, `memory_pressure`, Node `os`) — the TUI of other tools is never scraped.
+**Measured** performance is produced by Pudu using `llama-bench` and native OS telemetry.
+
+**Estimated** compatibility, catalog metadata, and recommended models come from **[CanIRun.ai](https://canirun.ai)** by **[midudev](https://midu.dev)** — also see the source repo [midudev/canirun.ai](https://github.com/midudev/canirun.ai). Those estimates are always labelled *Estimated* and are never mixed with measured results.
+
+Pudu does not copy CanIRun.ai source. Telemetry is inspired by tools such as basitop but implemented with native OS APIs (`sysctl`, `vm_stat`, `memory_pressure`, Node `os`) — the TUI of other tools is never scraped.
 
 ## Contributing
 

@@ -7,7 +7,10 @@ export const en = {
   installedModels: "INSTALLED MODELS",
   compatible: "COMPATIBLE (catalog, estimated)",
   recommended: "RECOMMENDED FOR THIS MACHINE",
-  recommendedHint: "Estimates from CanIRun / local cache — not measured",
+  recommendedHint:
+    "Estimated values come from CanIRun.ai by midudev (canirun.ai · midu.dev) or a local fallback — not measured",
+  credits:
+    "Measured: llama-bench + OS telemetry. Estimated: CanIRun.ai by midudev (https://canirun.ai, https://github.com/midudev/canirun.ai, https://midu.dev). Labelled separately; never mixed.",
   noModels: "No local models detected",
   notTested: "Not tested",
   detected: "detected",
@@ -72,6 +75,12 @@ Flags:
   --verbose       Debug logs to stderr
   --preset        quick | standard | stress
   --lang          en | es
+
+Credits:
+  Measured values come from llama-bench and OS telemetry.
+  Estimated values come from CanIRun.ai by midudev
+  (https://canirun.ai · https://github.com/midudev/canirun.ai · https://midu.dev)
+  or a local fallback, and are labelled as such.
 `,
 } as const;
 

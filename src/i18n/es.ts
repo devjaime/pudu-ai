@@ -9,7 +9,10 @@ export const es: Record<MessageId, string> = {
   installedModels: "MODELOS INSTALADOS",
   compatible: "COMPATIBLES (catálogo, estimado)",
   recommended: "RECOMENDADOS PARA ESTE EQUIPO",
-  recommendedHint: "Estimaciones de CanIRun / caché local — no son mediciones",
+  recommendedHint:
+    "Los valores estimados vienen de CanIRun.ai de midudev (canirun.ai · midu.dev) o de un fallback local — no son mediciones",
+  credits:
+    "Medido: llama-bench + telemetría del SO. Estimado: CanIRun.ai de midudev (https://canirun.ai, https://github.com/midudev/canirun.ai, https://midu.dev). Se etiquetan por separado; nunca se mezclan.",
   noModels: "No se detectaron modelos locales",
   notTested: "Sin probar",
   detected: "detectado",
@@ -74,5 +77,11 @@ Flags:
   --verbose       Logs de depuración en stderr
   --preset        quick | standard | stress
   --lang          en | es
+
+Créditos:
+  Los valores medidos vienen de llama-bench y de la telemetría del SO.
+  Los valores estimados vienen de CanIRun.ai de midudev
+  (https://canirun.ai · https://github.com/midudev/canirun.ai · https://midu.dev)
+  o de un fallback local, y se etiquetan como tal.
 `,
 };
