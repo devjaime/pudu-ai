@@ -58,7 +58,7 @@ Platform code lives under `src/platform/{macos,linux,windows}`. Core types stay 
 ## Storage
 
 ```
-~/.localmeter/
+~/.pudu/
   config.json
   models.json
   cache/canirun-models.json

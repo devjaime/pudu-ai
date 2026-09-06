@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 — 2026-09-06
+
+### Changed
+
+- CLI and npm package renamed to `pudu` (`npx pudu`)
+- Data directory is now `~/.pudu/`
+- User-facing brand is Pudu (English default, Spanish via `--lang es`)
+
 ## 0.1.1 — 2026-09-06
 
 ### Added
@@ -15,6 +23,7 @@
 - Catalog models list now shows estimated FIT grades
 - Recommendations pick distinct models per use case
 
+## 0.1.0 — 2026-09-06
 
 ### Added
 
@@ -24,6 +33,6 @@
 - llama-bench integration with JSON/markdown parsers
 - Live Ink TUI dashboard and benchmark view
 - CanIRun.ai catalog/compatibility/recommend with local cache
-- Benchmark history in `~/.localmeter/`
+- Benchmark history
 - CLI: hardware, models, recommend, benchmark, compare, history, doctor, report
 - JSON/CSV flags and `--no-network`

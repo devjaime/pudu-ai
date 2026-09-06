@@ -3,7 +3,7 @@ import path from "node:path";
 import { mkdir } from "node:fs/promises";
 
 export function homeDir(): string {
-  return path.join(os.homedir(), ".localmeter");
+  return path.join(os.homedir(), ".pudu");
 }
 
 export function configPath(): string {

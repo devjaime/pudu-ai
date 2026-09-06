@@ -21,6 +21,7 @@ export type CliArgs = {
   markdown: boolean;
   help: boolean;
   addPath?: string;
+  lang?: string;
 };
 
 export function parseArgs(argv: string[]): CliArgs {
@@ -45,6 +46,8 @@ export function parseArgs(argv: string[]): CliArgs {
 
   const presetIndex = args.findIndex((a) => a === "--preset");
   const preset = presetIndex >= 0 ? args[presetIndex + 1] : undefined;
+  const langIndex = args.findIndex((a) => a === "--lang" || a === "--locale");
+  const lang = langIndex >= 0 ? args[langIndex + 1] : undefined;
 
   return {
     command: isKnown ? command : "dashboard",
@@ -58,5 +61,6 @@ export function parseArgs(argv: string[]): CliArgs {
     markdown: flags.has("--markdown"),
     help: flags.has("-h") || flags.has("--help"),
     addPath,
+    lang,
   };
 }

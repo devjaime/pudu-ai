@@ -1,10 +1,10 @@
-# LocalMeter AI
+# Pudu
 
 Open-source terminal lab for discovering, inspecting, benchmarking, and comparing local AI models.
 
 - GitHub repository: `pudu-ai`
-- npm package / CLI: `localmeter-ai`
-- Primary command: `npx localmeter-ai`
+- npm package / CLI: `pudu`
+- Primary command: `npx pudu`
 
 ## Problem
 
@@ -27,7 +27,8 @@ A professional TUI plus machine-readable CLI that:
 - Apple unified memory is never called VRAM.
 - Business logic does not depend on Ink.
 - Network is optional (`--no-network`).
-- Benchmark data stays in `~/.localmeter/` by default.
+- Benchmark data stays in `~/.pudu/` by default.
+- Default UI language is English; Spanish is available via `--lang es`.
 
 ## Phases
 

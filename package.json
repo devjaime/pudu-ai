@@ -1,7 +1,7 @@
 {
-  "name": "localmeter-ai",
-  "version": "0.1.1",
-  "description": "Local AI hardware & benchmark lab for the terminal",
+  "name": "pudu",
+  "version": "0.2.0",
+  "description": "Pudu — local AI hardware & benchmark lab for the terminal",
   "keywords": [
     "ai",
     "llm",
@@ -9,7 +9,8 @@
     "ollama",
     "llama.cpp",
     "tui",
-    "local"
+    "local",
+    "pudu"
   ],
   "homepage": "https://github.com/devjaime/pudu-ai",
   "repository": {
@@ -23,7 +24,7 @@
   "author": "devjaime",
   "type": "module",
   "bin": {
-    "localmeter-ai": "./dist/cli/index.js"
+    "pudu": "./dist/cli/index.js"
   },
   "exports": {
     ".": "./dist/cli/index.js"

@@ -5,8 +5,8 @@ import { listBenchmarks } from "../storage/benchmarks.js";
 import { killAll } from "../shared/process.js";
 import { setLogLevel } from "../shared/logger.js";
 import { renderDashboard } from "../tui/render.js";
-import { t } from "../i18n/index.js";
-import { HELP } from "./help.js";
+import { resolveLocale, setLocale, t } from "../i18n/index.js";
+import { helpText } from "./help.js";
 import type { CliArgs } from "./parse-args.js";
 import {
   compareText,
@@ -30,8 +30,9 @@ function print(value: unknown, json: boolean): void {
 }
 
 export async function run(args: CliArgs): Promise<number> {
+  setLocale(resolveLocale(args.lang));
   if (args.help) {
-    process.stdout.write(`${HELP}\n`);
+    process.stdout.write(`${helpText()}\n`);
     return 0;
   }
   if (args.verbose) setLogLevel("verbose");

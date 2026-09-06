@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping with LocalMeter AI (`localmeter-ai`).
+Thanks for helping with Pudu (`npx pudu`).
 
 ## Setup
 

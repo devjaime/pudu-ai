@@ -1,4 +1,4 @@
-# LocalMeter Score
+# Pudu Score
 
 Hardware performance only. Model intelligence/quality is never folded into this score.
 

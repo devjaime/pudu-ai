@@ -1,5 +1,5 @@
 export const en = {
-  appTitle: "LOCALMETER AI",
+  appTitle: "PUDU",
   appSubtitle: "Local AI Hardware & Benchmark Lab",
   nav: "[B] Benchmark  [M] Models  [R] Recommend  [H] Hardware  [C] Compare  [L] History  [Q] Quit",
   machine: "MACHINE",
@@ -27,26 +27,52 @@ export const en = {
   saved: "Saved",
   hardwareHint: "Power, GPU %, and thermals require extra OS permissions and show N/A when unavailable.",
   modelsHint: "FIT and EST. SPEED are estimated. MEASURED comes from local llama-bench history.",
-  historyEmpty: "No benchmark history in ~/.localmeter/benchmarks",
+  historyEmpty: "No benchmark history in ~/.pudu/benchmarks",
   compareNeedTwo: "Need at least two measured benchmarks to compare.",
   compareTitle: "LOCAL MODEL BENCHMARKS (measured)",
   winner: "Winner",
   qualityNote: "Quality     (not derived from speed; see catalog metadata)",
-  doctorTitle: "LocalMeter Doctor",
+  doctorTitle: "Pudu Doctor",
   doctorReady: "Ready to benchmark {count} installed models.",
   doctorNoBench:
-    "llama-bench unavailable. Install llama.cpp, e.g. `brew install llama.cpp`. LocalMeter will not install native dependencies.",
+    "llama-bench unavailable. Install llama.cpp, e.g. `brew install llama.cpp`. Pudu will not install native dependencies.",
   loading: "Inspecting hardware, runtimes, and local models…",
   addedPath: "Added model path {path}",
   modelNotFound: "Model not found: {id}",
   noHistory: "No benchmark history.",
-  jsonNeedModel: "Pass a model id for JSON mode, e.g. localmeter-ai benchmark qwen3:8b --json",
+  jsonNeedModel: "Pass a model id for JSON mode, e.g. npx pudu benchmark qwen3:8b --json",
   useCaseCoding: "Coding",
   useCaseGeneral: "General",
   useCaseReasoning: "Reasoning",
   useCaseLightweight: "Lightweight",
   estimated: "Estimated",
   measured: "Measured",
+  scoreLabel: "Pudu Score",
+  reportTitle: "Pudu Benchmark",
+  benchmarkTitle: "Pudu Benchmark",
+  help: `Pudu — local AI hardware & benchmark lab
+
+Usage:
+  npx pudu
+  npx pudu hardware
+  npx pudu models
+  npx pudu models add-path ~/Models
+  npx pudu recommend
+  npx pudu benchmark [model]
+  npx pudu compare
+  npx pudu history
+  npx pudu doctor
+  npx pudu report --markdown
+
+Flags:
+  --json          Machine-readable JSON (no TUI)
+  --csv           CSV output
+  --no-network    Skip CanIRun API; use cache/local estimates
+  --no-color      Disable ANSI color
+  --verbose       Debug logs to stderr
+  --preset        quick | standard | stress
+  --lang          en | es
+`,
 } as const;
 
 export type MessageId = keyof typeof en;

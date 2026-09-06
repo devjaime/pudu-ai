@@ -119,7 +119,7 @@ export function doctorText(session: Session): string {
 
 export function reportMarkdown(record: BenchmarkRecord): string {
   const machine = `${record.machine.cpu ?? "unknown"} / ${record.machine.memoryGb ?? "?"} GB`;
-  return `## LocalMeter Benchmark
+  return `## ${t("reportTitle")}
 
 **Machine:** ${machine}
 **Model:** ${record.model.id}
@@ -132,7 +132,7 @@ export function reportMarkdown(record: BenchmarkRecord): string {
 | Average GPU | ${record.resources.avgGpuPercent ?? "N/A"}% |
 | Average power | ${record.resources.avgPackagePowerWatts ?? "N/A"} W |
 | Efficiency | ${record.resources.tokensPerSecondPerWatt ?? "N/A"} t/s/W |
-| LocalMeter Score | ${record.score?.total ?? "N/A"} / 100 |
+| ${t("scoreLabel")} | ${record.score?.total ?? "N/A"} / 100 |
 `;
 }
 
@@ -188,7 +188,7 @@ export function resultText(record: BenchmarkRecord, assessment: string[]): strin
     `Average power              ${record.resources.avgPackagePowerWatts ?? "N/A"} W`,
     `Efficiency                ${record.resources.tokensPerSecondPerWatt ?? "N/A"} t/s/W`,
     "",
-    `LocalMeter Score          ${record.score?.total ?? "N/A"}/100`,
+    `${t("scoreLabel")}          ${record.score?.total ?? "N/A"}/100`,
     "",
     ...assessment.map((line) => `✓ ${line}`),
   ].join("\n");

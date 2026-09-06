@@ -8,6 +8,6 @@ export function setLogLevel(next: LogLevel): void {
 
 export function verbose(message: string): void {
   if (level === "verbose") {
-    process.stderr.write(`[localmeter] ${message}\n`);
+    process.stderr.write(`[pudu] ${message}\n`);
   }
 }

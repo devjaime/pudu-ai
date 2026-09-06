@@ -85,14 +85,14 @@ export function BenchmarkView(props: {
   if (phase === "select") {
     return (
       <Box flexDirection="column">
-        <Text bold>Select model to benchmark</Text>
+        <Text bold>{t("selectBenchmark")}</Text>
         {props.models.map((m, i) => (
           <Text key={m.id} color={i === props.selected ? "cyan" : undefined}>
             {i === props.selected ? "❯ " : "  "}
             {m.name}
           </Text>
         ))}
-        <Text dimColor>Enter to run llama-bench  ·  Esc back</Text>
+        <Text dimColor>{t("enterToRun")}</Text>
       </Box>
     );
   }
@@ -101,7 +101,9 @@ export function BenchmarkView(props: {
     return (
       <Box flexDirection="column">
         <Text>{resultText(result.record, result.assessment)}</Text>
-        <Text dimColor>Saved {result.path}</Text>
+        <Text dimColor>
+          {t("saved")} {result.path}
+        </Text>
       </Box>
     );
   }
@@ -122,7 +124,7 @@ export function BenchmarkView(props: {
   return (
     <Box flexDirection="column">
       <Box borderStyle="round" borderColor="cyan" flexDirection="column" paddingX={1}>
-        <Text bold>LocalMeter Benchmark</Text>
+        <Text bold>{t("benchmarkTitle")}</Text>
         <Text>{model?.name}</Text>
         <Text dimColor>
           {h.cpu.name} · {formatBytes(h.memory.totalBytes, 0)} {memoryLabel(h)}
@@ -130,14 +132,16 @@ export function BenchmarkView(props: {
       </Box>
       <Box marginTop={1} flexDirection="column">
         <Text bold color="cyan">
-          PERFORMANCE
+          {t("performance")}
         </Text>
-        <Text>Elapsed                    {elapsed.toFixed(1)} s</Text>
-        <Text dimColor>Prompt / generation t/s appear after llama-bench finishes (measured).</Text>
+        <Text>
+          {t("elapsed")}                    {elapsed.toFixed(1)} s
+        </Text>
+        <Text dimColor>{t("measuredAfter")}</Text>
       </Box>
       <Box marginTop={1} flexDirection="column">
         <Text bold color="cyan">
-          SYSTEM
+          {t("system")}
         </Text>
         <Text>
           CPU       {bar(cpu)}       {formatPercent(cpu)}
@@ -152,12 +156,12 @@ export function BenchmarkView(props: {
       </Box>
       <Box marginTop={1} flexDirection="column">
         <Text bold color="cyan">
-          POWER / THERMALS
+          {t("powerThermals")}
         </Text>
         <Text>Package                    {sample?.packagePowerWatts ?? "N/A"} W</Text>
         <Text>Temperature                {sample?.thermal?.temperatureC ?? "N/A"} °C</Text>
         <Text>Thermal Pressure           {sample?.thermal?.pressure ?? "N/A"}</Text>
-        <Text dimColor>GPU % and power need extra permissions; shown as N/A when not measured.</Text>
+        <Text dimColor>{t("permissionsHint")}</Text>
       </Box>
       <Text>
         {sparkline(cpuHist.current)} CPU
@@ -165,7 +169,7 @@ export function BenchmarkView(props: {
       <Text>
         {sparkline(memHist.current.map((v) => v / (1024 ** 3)))} Memory
       </Text>
-      <Text dimColor>Ctrl+C / Q cancels llama-bench and telemetry</Text>
+      <Text dimColor>{t("cancelHint")}</Text>
     </Box>
   );
 }

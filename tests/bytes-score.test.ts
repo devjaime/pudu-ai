@@ -47,6 +47,12 @@ describe("cli parse", () => {
     expect(args.network).toBe(false);
     expect(args.preset).toBe("quick");
   });
+
+  it("parses --lang", () => {
+    const args = parseArgs(["node", "cli", "doctor", "--lang", "es"]);
+    expect(args.command).toBe("doctor");
+    expect(args.lang).toBe("es");
+  });
 });
 
 describe("benchmark schema", () => {
