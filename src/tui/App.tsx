@@ -9,8 +9,9 @@ import { RecommendView } from "./views/Recommend.js";
 import { CompareView } from "./views/Compare.js";
 import { BenchmarkView } from "./views/Benchmark.js";
 import { HistoryView } from "./views/History.js";
+import { TasksView } from "./views/Tasks.js";
 
-type Screen = "home" | "models" | "hardware" | "recommend" | "compare" | "benchmark" | "history";
+type Screen = "home" | "models" | "hardware" | "recommend" | "compare" | "benchmark" | "history" | "tasks";
 
 export function App(props: { session: Session; preset?: string }): ReactElement {
   const { exit } = useApp();
@@ -31,6 +32,7 @@ export function App(props: { session: Session; preset?: string }): ReactElement 
     if (letter === "h") setScreen("hardware");
     if (letter === "c") setScreen("compare");
     if (letter === "l") setScreen("history");
+    if (letter === "t") setScreen("tasks");
     if (key.return && screen === "home") setScreen("benchmark");
   });
 
@@ -42,6 +44,7 @@ export function App(props: { session: Session; preset?: string }): ReactElement 
       {screen === "recommend" && <RecommendView session={props.session} />}
       {screen === "compare" && <CompareView session={props.session} />}
       {screen === "history" && <HistoryView session={props.session} />}
+      {screen === "tasks" && <TasksView session={props.session} />}
       {screen === "benchmark" && (
         <BenchmarkView
           session={props.session}

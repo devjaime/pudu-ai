@@ -1,6 +1,6 @@
 # MVP (Phase 1) — macOS Apple Silicon
 
-## First run (`npx pudu`)
+## First run (`npx pudu-ai`)
 
 1. Inspect hardware.
 2. Detect Ollama, llama.cpp, llama-bench, LM Studio, MLX (detect-only).
@@ -11,7 +11,7 @@
 
 ## Commands
 
-- `pudu` dashboard
+- `pudu-ai` dashboard
 - `hardware` `models` `recommend` `benchmark [model]` `compare` `history` `doctor` `report`
 - `models add-path <dir>`
 - Flags: `--json` `--csv` `--no-network` `--no-color` `--verbose` `--preset quick|standard|stress` `--lang en|es`
@@ -33,7 +33,7 @@ Update 500ms–1s: prompt t/s, generation t/s, CPU, GPU, memory, swap, power, th
 From a clean machine with Node 20+ and local models:
 
 ```
-npx pudu
+npx pudu-ai
 ```
 
-shows chip, unified memory, installed models, recommendations, and can run a benchmark that persists to `~/.pudu/benchmarks`.
+shows chip, unified memory, installed models, recommendations, and can run a benchmark that persists to `~/.pudu-ai/benchmarks`.

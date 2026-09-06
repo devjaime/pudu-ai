@@ -1,4 +1,4 @@
-# Pudu Score
+# Pudu-AI Score
 
 Hardware performance only. Model intelligence/quality is never folded into this score.
 

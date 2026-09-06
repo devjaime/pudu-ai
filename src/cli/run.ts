@@ -6,6 +6,7 @@ import { killAll } from "../shared/process.js";
 import { setLogLevel } from "../shared/logger.js";
 import { renderDashboard } from "../tui/render.js";
 import { resolveLocale, setLocale, t } from "../i18n/index.js";
+import { parseAnswers, planTasks, tasksText } from "../tasks/plan.js";
 import { helpText } from "./help.js";
 import type { CliArgs } from "./parse-args.js";
 import {
@@ -67,6 +68,16 @@ export async function run(args: CliArgs): Promise<number> {
     case "recommend":
       print(args.json ? session.recommendations : recommendText(session), args.json);
       return 0;
+    case "tasks": {
+      const answers = parseAnswers({
+        for: args.forKinds,
+        scope: args.scope,
+        priority: args.priority,
+      });
+      const plans = planTasks(session, answers);
+      print(args.json ? { answers, plans } : tasksText(plans, answers), args.json);
+      return 0;
+    }
     case "history": {
       const records = session.history;
       if (args.csv) {

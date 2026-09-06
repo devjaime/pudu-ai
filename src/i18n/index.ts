@@ -7,7 +7,7 @@ export type Locale = keyof typeof locales;
 let current: Locale = "en";
 
 export function resolveLocale(raw?: string): Locale {
-  const value = (raw ?? process.env.PUDU_LANG ?? process.env.LANG ?? "en").toLowerCase();
+  const value = (raw ?? process.env.PUDU_AI_LANG ?? process.env.PUDU_LANG ?? process.env.LANG ?? "en").toLowerCase();
   if (value.startsWith("es")) return "es";
   return "en";
 }

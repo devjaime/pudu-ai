@@ -1,7 +1,7 @@
 {
-  "name": "pudu",
-  "version": "0.2.0",
-  "description": "Pudu — local AI hardware & benchmark lab for the terminal",
+  "name": "pudu-ai",
+  "version": "0.2.1",
+  "description": "Pudu-AI — local AI hardware & benchmark lab for the terminal",
   "keywords": [
     "ai",
     "llm",
@@ -10,7 +10,7 @@
     "llama.cpp",
     "tui",
     "local",
-    "pudu"
+    "pudu-ai"
   ],
   "homepage": "https://github.com/devjaime/pudu-ai",
   "repository": {
@@ -24,13 +24,14 @@
   "author": "devjaime",
   "type": "module",
   "bin": {
-    "pudu": "./dist/cli/index.js"
+    "pudu-ai": "./bin/pudu-ai.mjs"
   },
   "exports": {
     ".": "./dist/cli/index.js"
   },
   "files": [
     "dist",
+    "bin",
     "README.md",
     "LICENSE"
   ],
@@ -40,6 +41,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsx src/cli/index.ts",
+    "pudu-ai": "tsx src/cli/index.ts",
     "start": "node dist/cli/index.js",
     "test": "vitest run",
     "test:watch": "vitest",

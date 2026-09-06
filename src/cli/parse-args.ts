@@ -7,7 +7,8 @@ export type CliCommand =
   | "compare"
   | "history"
   | "doctor"
-  | "report";
+  | "report"
+  | "tasks";
 
 export type CliArgs = {
   command: CliCommand;
@@ -22,6 +23,9 @@ export type CliArgs = {
   help: boolean;
   addPath?: string;
   lang?: string;
+  forKinds?: string;
+  scope?: string;
+  priority?: string;
 };
 
 export function parseArgs(argv: string[]): CliArgs {
@@ -39,6 +43,7 @@ export function parseArgs(argv: string[]): CliArgs {
     "history",
     "doctor",
     "report",
+    "tasks",
   ];
   const isKnown = known.includes(command);
   let addPath: string | undefined;
@@ -48,6 +53,9 @@ export function parseArgs(argv: string[]): CliArgs {
   const preset = presetIndex >= 0 ? args[presetIndex + 1] : undefined;
   const langIndex = args.findIndex((a) => a === "--lang" || a === "--locale");
   const lang = langIndex >= 0 ? args[langIndex + 1] : undefined;
+  const forIndex = args.findIndex((a) => a === "--for");
+  const scopeIndex = args.findIndex((a) => a === "--scope");
+  const priorityIndex = args.findIndex((a) => a === "--priority");
 
   return {
     command: isKnown ? command : "dashboard",
@@ -62,5 +70,8 @@ export function parseArgs(argv: string[]): CliArgs {
     help: flags.has("-h") || flags.has("--help"),
     addPath,
     lang,
+    forKinds: forIndex >= 0 ? args[forIndex + 1] : undefined,
+    scope: scopeIndex >= 0 ? args[scopeIndex + 1] : undefined,
+    priority: priorityIndex >= 0 ? args[priorityIndex + 1] : undefined,
   };
 }

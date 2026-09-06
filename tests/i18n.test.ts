@@ -4,7 +4,7 @@ import { getLocale, resolveLocale, setLocale, t } from "../src/i18n/index.js";
 describe("i18n", () => {
   it("defaults to English", () => {
     setLocale("en");
-    expect(t("appTitle")).toBe("PUDU");
+    expect(t("appTitle")).toBe("PUDU-AI");
     expect(t("doctorReady", { count: 2 })).toBe("Ready to benchmark 2 installed models.");
     expect(t("credits")).toContain("midudev");
     expect(t("credits")).toContain("CanIRun.ai");
@@ -12,7 +12,7 @@ describe("i18n", () => {
 
   it("switches to Spanish", () => {
     setLocale("es");
-    expect(t("doctorTitle")).toBe("Pudu Doctor");
+    expect(t("doctorTitle")).toBe("Pudu-AI Doctor");
     expect(t("doctorReady", { count: 2 })).toBe("Listo para medir 2 modelos instalados.");
     expect(t("selectBenchmark")).toBe("Selecciona un modelo para medir");
     expect(t("credits")).toContain("midudev");

@@ -1,9 +1,9 @@
 import type { MessageId } from "./en.js";
 
 export const es: Record<MessageId, string> = {
-  appTitle: "PUDU",
+  appTitle: "PUDU-AI",
   appSubtitle: "Laboratorio local de hardware y benchmarks de IA",
-  nav: "[B] Benchmark  [M] Modelos  [R] Recomendaciones  [H] Hardware  [C] Comparar  [L] Historial  [Q] Salir",
+  nav: "[B] Benchmark  [M] Modelos  [R] Recomendaciones  [T] Tareas  [H] Hardware  [C] Comparar  [L] Historial  [Q] Salir",
   machine: "EQUIPO",
   runtimes: "RUNTIMES DE IA LOCAL",
   installedModels: "MODELOS INSTALADOS",
@@ -32,42 +32,96 @@ export const es: Record<MessageId, string> = {
   saved: "Guardado",
   hardwareHint: "Potencia, % de GPU y térmicas requieren permisos extra del SO; si no hay datos se muestra N/D.",
   modelsHint: "FIT y EST. SPEED son estimados. MEASURED sale del historial local de llama-bench.",
-  historyEmpty: "No hay historial de benchmarks en ~/.pudu/benchmarks",
+  historyEmpty: "No hay historial de benchmarks en ~/.pudu-ai/benchmarks",
   compareNeedTwo: "Se necesitan al menos dos benchmarks medidos para comparar.",
   compareTitle: "BENCHMARKS LOCALES (medidos)",
   winner: "Ganador",
   qualityNote: "Calidad     (no se deriva de la velocidad; ver metadatos del catálogo)",
-  doctorTitle: "Pudu Doctor",
+  doctorTitle: "Pudu-AI Doctor",
   doctorReady: "Listo para medir {count} modelos instalados.",
   doctorNoBench:
-    "llama-bench no está disponible. Instala llama.cpp, p. ej. `brew install llama.cpp`. Pudu no instala dependencias nativas.",
+    "llama-bench no está disponible. Instala llama.cpp, p. ej. `brew install llama.cpp`. Pudu-AI no instala dependencias nativas.",
   loading: "Inspeccionando hardware, runtimes y modelos locales…",
   addedPath: "Ruta de modelos añadida {path}",
   modelNotFound: "Modelo no encontrado: {id}",
   noHistory: "No hay historial de benchmarks.",
-  jsonNeedModel: "Pasa un id de modelo en modo JSON, p. ej. npx pudu benchmark qwen3:8b --json",
+  jsonNeedModel: "Pasa un id de modelo en modo JSON, p. ej. npx pudu-ai benchmark qwen3:8b --json",
   useCaseCoding: "Código",
   useCaseGeneral: "General",
   useCaseReasoning: "Razonamiento",
   useCaseLightweight: "Ligero",
   estimated: "Estimado",
   measured: "Medido",
-  scoreLabel: "Puntuación Pudu",
-  reportTitle: "Benchmark Pudu",
-  benchmarkTitle: "Benchmark Pudu",
-  help: `Pudu — laboratorio local de hardware y benchmarks de IA
+  scoreLabel: "Puntuación Pudu-AI",
+  reportTitle: "Benchmark Pudu-AI",
+  benchmarkTitle: "Benchmark Pudu-AI",
+  tasksTitle: "HARNESSES DE TAREAS",
+  tasksHint:
+    "Tareas pequeñas estilo OpenCode en tu idioma. Primero modelos instalados. El catálogo es Estimado (CanIRun.ai de midudev).",
+  tasksKinds: "Tipos de trabajo",
+  tasksScope: "Alcance",
+  tasksPriority: "Prioridad",
+  tasksInstalled: "instalado",
+  tasksNotInstalled: "no instalado",
+  tasksEmpty: "No hay modelos que coincidan con esos tipos de trabajo en este equipo.",
+  tasksQ1: "¿Qué quieres hacer? (espacio para marcar, enter para seguir)",
+  tasksQ2: "¿Solo modelos instalados, o también estimaciones del catálogo?",
+  tasksQ3: "¿Prioridad?",
+  tasksOptCode: "Código",
+  tasksOptVideo: "Vídeo",
+  tasksOptImage: "Imagen",
+  tasksOptTranscription: "Transcripción",
+  tasksOptChat: "Tareas / chat",
+  tasksOptInstalled: "Solo instalados",
+  tasksOptAll: "Instalados + catálogo (estimado)",
+  tasksOptSpeed: "Velocidad",
+  tasksOptBalanced: "Equilibrado",
+  tasksOptQuality: "Calidad",
+  taskCodeReviewTitle: "Revisar un diff local",
+  taskCodeReviewPrompt:
+    "En OpenCode: abre un git diff y pide a este modelo bugs, tests faltantes y un resumen de 5 líneas. No apliques parches salvo que lo pidas.",
+  taskCodeTestsTitle: "Escribir un test que falle",
+  taskCodeTestsPrompt:
+    "Elige una función. Pide un solo test Vitest/Jest que falle con el bug actual. No generes archivos extra.",
+  taskChatPlanTitle: "Convertir un objetivo en tareas",
+  taskChatPlanPrompt:
+    "Dale un objetivo. Exige un plan numerado de 5 tareas tamaño harness. Sin implementar todavía.",
+  taskChatAgentTitle: "Bucle de agente en un archivo",
+  taskChatAgentPrompt:
+    "Señala un archivo y un criterio de aceptación. Solo puede editar ese archivo y luego parar.",
+  taskImageCaptionTitle: "Describir una imagen local",
+  taskImageCaptionPrompt:
+    "Si es un modelo de visión/imagen, describe una imagen local en el idioma de la UI. Si es solo texto, indica N/D.",
+  taskImageBriefTitle: "Brief de generación de imagen",
+  taskImageBriefPrompt:
+    "Pide un brief de 6 líneas (sujeto, lente, luz, negative prompt) para un still. No inventes que el modelo renderizó la imagen.",
+  taskVideoBoardTitle: "Storyboard de 8 planos",
+  taskVideoBoardPrompt:
+    "Pide 8 planos: duración, cámara, acción, texto en pantalla. Local. No afirmes que existe un render.",
+  taskVideoShotTitle: "Lista de planos desde un guion",
+  taskVideoShotPrompt:
+    "Pega un guion corto. Pide lista de planos y segundos estimados. Un modelo de texto puede planear; no puede encodear vídeo.",
+  taskTranscribeCleanTitle: "Limpiar una transcripción",
+  taskTranscribeCleanPrompt:
+    "Pega texto de speech-to-text ruidoso. Pide puntuación, quitar muletillas y mantener hablantes. Esto no es ASR; edita texto.",
+  taskTranscribeActionsTitle: "Acciones desde una transcripción",
+  taskTranscribeActionsPrompt:
+    "De una reunión transcrita, extrae responsables, fechas y preguntas abiertas como checklist en el idioma de la UI.",
+  help: `Pudu-AI — laboratorio local de hardware y benchmarks de IA
 
 Uso:
-  npx pudu
-  npx pudu hardware
-  npx pudu models
-  npx pudu models add-path ~/Models
-  npx pudu recommend
-  npx pudu benchmark [model]
-  npx pudu compare
-  npx pudu history
-  npx pudu doctor
-  npx pudu report --markdown
+  npx pudu-ai
+  npx pudu-ai hardware
+  npx pudu-ai models
+  npx pudu-ai models add-path ~/Models
+  npx pudu-ai recommend
+  npx pudu-ai tasks
+  npx pudu-ai tasks --for code,image --scope all --priority speed
+  npx pudu-ai benchmark [model]
+  npx pudu-ai compare
+  npx pudu-ai history
+  npx pudu-ai doctor
+  npx pudu-ai report --markdown
 
 Flags:
   --json          JSON legible por máquinas (sin TUI)
@@ -77,6 +131,9 @@ Flags:
   --verbose       Logs de depuración en stderr
   --preset        quick | standard | stress
   --lang          en | es
+  --for           code,video,image,transcription,chat
+  --scope         installed | all
+  --priority      speed | balanced | quality
 
 Créditos:
   Los valores medidos vienen de llama-bench y de la telemetría del SO.

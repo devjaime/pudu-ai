@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping with Pudu (`npx pudu`).
+Thanks for helping with Pudu-AI (`npx pudu-ai`).
 
 ## Setup
 

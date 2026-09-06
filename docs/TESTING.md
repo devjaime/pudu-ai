@@ -1,4 +1,4 @@
-# Testing Pudu
+# Testing Pudu-AI
 
 English is the default UI. Use `--lang es` to check Spanish.
 
@@ -28,13 +28,13 @@ You already have Apple Silicon, Ollama (`qwen3:8b`, `qwen3.5:4b`) and `llama-ben
 
 | Check | Command | Pass if |
 | --- | --- | --- |
-| Help | `npx tsx src/cli/index.ts --help` | Commands say `npx pudu`, credits mention midudev / CanIRun.ai |
+| Help | `npx tsx src/cli/index.ts --help` | Commands say `npx pudu-ai`, credits mention midudev / CanIRun.ai |
 | Doctor | `npx tsx src/cli/index.ts doctor --no-network` | Node, Apple Silicon, Ollama, llama-bench |
 | Hardware | `npx tsx src/cli/index.ts hardware --json --no-network` | Unified Memory, not VRAM; no serial/UUID |
 | Models | `npx tsx src/cli/index.ts models --no-network` | Installed vs compatible; Estimated vs Measured |
 | Recommend | `npx tsx src/cli/index.ts recommend` | Estimates labelled; CanIRun credit |
 | Spanish | `npx tsx src/cli/index.ts doctor --lang es` | Spanish copy |
-| JSON bench | `npx tsx src/cli/index.ts benchmark qwen3:8b --json --preset quick --no-network` | JSON only, file in `~/.pudu/benchmarks/` |
+| JSON bench | `npx tsx src/cli/index.ts benchmark qwen3:8b --json --preset quick --no-network` | JSON only, file in `~/.pudu-ai/benchmarks/` |
 | History | `npx tsx src/cli/index.ts history --json` | Last run present |
 | Report | `npx tsx src/cli/index.ts report --markdown` | Markdown table |
 | TUI | `npx tsx src/cli/index.ts` | Keys B M R H C L Q; Ctrl+C restores terminal |
@@ -61,7 +61,7 @@ Report pass/fail counts only.
 
 ```
 Run: npx tsx src/cli/index.ts doctor --no-network
-Pass: exits 0, prints Pudu Doctor, does not crash if llama-bench missing.
+Pass: exits 0, prints Pudu-AI Doctor, does not crash if llama-bench missing.
 If llama-bench is missing it must print install instructions, not auto-install.
 ```
 
@@ -98,7 +98,7 @@ Only if llama-bench and an Ollama GGUF blob exist.
 Run: npx tsx src/cli/index.ts benchmark qwen3:8b --json --preset quick --no-network
 Pass: stdout is JSON (no TUI), schemaVersion 1, origin measured,
 prompt/generation t/s numbers or omitted (never fake power/GPU).
-A file is written under ~/.pudu/benchmarks/.
+A file is written under ~/.pudu-ai/benchmarks/.
 Ctrl+C during a retry must kill llama-bench (no zombies).
 ```
 

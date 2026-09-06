@@ -3,7 +3,7 @@ import path from "node:path";
 import { mkdir } from "node:fs/promises";
 
 export function homeDir(): string {
-  return path.join(os.homedir(), ".pudu");
+  return path.join(os.homedir(), ".pudu-ai");
 }
 
 export function configPath(): string {

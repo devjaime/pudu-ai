@@ -1,12 +1,18 @@
 # Changelog
 
+## 0.2.1 — 2026-09-06
+
+### Added
+
+- `npx pudu-ai tasks` and TUI `[T]`: questionnaire (en/es) that recommends OpenCode-style harnesses per model for code, video, image, transcription, and chat tasks
+
 ## 0.2.0 — 2026-09-06
 
 ### Changed
 
-- CLI and npm package renamed to `pudu` (`npx pudu`)
-- Data directory is now `~/.pudu/`
-- User-facing brand is Pudu (English default, Spanish via `--lang es`)
+- CLI and npm package renamed to `pudu-ai` (`npx pudu-ai`)
+- Data directory is now `~/.pudu-ai/`
+- User-facing brand is Pudu-AI (English default, Spanish via `--lang es`)
 
 ## 0.1.1 — 2026-09-06
 
