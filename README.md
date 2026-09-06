@@ -53,6 +53,9 @@ npx pudu-ai history
 npx pudu-ai history --csv
 npx pudu-ai doctor
 npx pudu-ai report --markdown
+npx pudu-ai launch
+npx pudu-ai launch opencode
+npx pudu-ai launch opencode --yes
 ```
 
 Flags: `--json` `--csv` `--no-network` `--no-color` `--verbose` `--preset quick|standard|stress` `--lang en|es` `--for` `--scope` `--priority`
@@ -111,6 +114,24 @@ On Apple Silicon the memory figure is **Unified Memory**, never VRAM.
 - **Pudu-AI Score** — hardware performance only (speed, memory, energy, thermals, swap). It does **not** include model quality/intelligence.
 
 See `docs/spec/03-scoring.md`.
+
+## Ollama integrations
+
+Pudu-AI can explain and, **only if a recommended model fits this hardware**, pull and launch:
+
+| Tool | Docs | Command |
+| --- | --- | --- |
+| OpenCode | [docs.ollama.com/integrations/opencode](https://docs.ollama.com/integrations/opencode) | `npx pudu-ai launch opencode` |
+| OpenClaw | [docs.ollama.com/integrations/openclaw](https://docs.ollama.com/integrations/openclaw) | `npx pudu-ai launch openclaw` |
+| Hermes | [docs.ollama.com/integrations/hermes](https://docs.ollama.com/integrations/hermes) | `npx pudu-ai launch hermes` |
+| Claude Code | [docs.ollama.com/integrations/claude-code](https://docs.ollama.com/integrations/claude-code) | `npx pudu-ai launch claude` |
+
+Without `--yes` the command only explains eligibility (grade S–B, coding/chat use case, measured t/s floor when a benchmark exists). It will **not** `ollama pull`, install, or `ollama launch` unless `--yes` is set **and** the gate passes. Pudu-AI never curl-pipes installers.
+
+```bash
+npx pudu-ai launch
+npx pudu-ai launch opencode --yes
+```
 
 ## Privacy
 

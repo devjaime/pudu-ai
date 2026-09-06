@@ -94,6 +94,23 @@ export const en = {
   taskTranscribeCleanPrompt: "Paste noisy speech-to-text. Ask the model to punctuate, remove fillers, and keep speaker labels. This is not ASR; it edits text.",
   taskTranscribeActionsTitle: "Actions from a transcript",
   taskTranscribeActionsPrompt: "From a meeting transcript, extract owners, due dates, and open questions as a checklist in your UI language.",
+  launchTitle: "OLLAMA INTEGRATIONS",
+  launchHint:
+    "Explain-only by default. Pull/install/launch run only with --yes and only if a recommended model fits this hardware (grade S–B; measured speed when available). Docs: OpenCode, OpenClaw, Hermes, Claude Code via Ollama.",
+  launchNeedOllama: "Ollama is not detected. Install Ollama first. Pudu-AI will not install it.",
+  launchNoModel: "No coding/chat model on this machine meets the hardware bar for this integration.",
+  launchGradeFail: "Grade {grade} is below the allowed set ({allowed}).",
+  launchSlowFail: "Measured {tps} t/s is below the {min} t/s agent floor.",
+  launchEstimateWeak: "Only a weak estimate is available; will not pull or launch.",
+  launchOk: "Eligible on this hardware for recommended tasks.",
+  launchModel: "Model",
+  launchRunHint: "To pull (if needed) and launch: npx pudu-ai launch {tool} --yes",
+  launchBlocked: "Blocked. No pull, install, or launch.",
+  launchNeedTool: "Pass a tool: opencode | openclaw | hermes | claude",
+  launchUnknown: "Unknown integration.",
+  launchPulling: "Pulling {model} with ollama pull…",
+  launchPullFail: "ollama pull failed.",
+  launchExecFail: "ollama launch failed.",
   help: `Pudu-AI — local AI hardware & benchmark lab
 
 Usage:
@@ -109,6 +126,9 @@ Usage:
   npx pudu-ai history
   npx pudu-ai doctor
   npx pudu-ai report --markdown
+  npx pudu-ai launch
+  npx pudu-ai launch opencode
+  npx pudu-ai launch opencode --yes
 
 Flags:
   --json          Machine-readable JSON (no TUI)
@@ -121,6 +141,7 @@ Flags:
   --for           code,video,image,transcription,chat
   --scope         installed | all
   --priority      speed | balanced | quality
+  --yes           Execute pull/launch only if the model is eligible
 
 Credits:
   Measured values come from llama-bench and OS telemetry.

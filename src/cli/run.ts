@@ -7,6 +7,8 @@ import { setLogLevel } from "../shared/logger.js";
 import { renderDashboard } from "../tui/render.js";
 import { resolveLocale, setLocale, t } from "../i18n/index.js";
 import { parseAnswers, planTasks, tasksText } from "../tasks/plan.js";
+import { decideAll, decideLaunch, launchText, parseIntegration } from "../integrations/decide.js";
+import { executeLaunch } from "../integrations/execute.js";
 import { helpText } from "./help.js";
 import type { CliArgs } from "./parse-args.js";
 import {
@@ -68,6 +70,26 @@ export async function run(args: CliArgs): Promise<number> {
     case "recommend":
       print(args.json ? session.recommendations : recommendText(session), args.json);
       return 0;
+    case "launch": {
+      const tool = parseIntegration(args.positional[0]);
+      const decisions = tool ? [decideLaunch(session, tool)] : decideAll(session);
+      if (!args.yes) {
+        print(args.json ? decisions : launchText(decisions), args.json);
+        return 0;
+      }
+      if (!tool) {
+        process.stderr.write(`${t("launchNeedTool")}\n`);
+        return 1;
+      }
+      const decision = decisions[0]!;
+      if (!decision.eligible) {
+        print(args.json ? decision : launchText([decision]), args.json);
+        return 1;
+      }
+      const result = await executeLaunch(decision);
+      print(args.json ? { decision, result } : result.log, args.json);
+      return result.ok ? 0 : 1;
+    }
     case "tasks": {
       const answers = parseAnswers({
         for: args.forKinds,

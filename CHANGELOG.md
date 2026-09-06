@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2 — 2026-09-06
+
+### Added
+
+- `npx pudu-ai launch` — explain Ollama integrations (OpenCode, OpenClaw, Hermes, Claude Code) and run `ollama pull` / `ollama launch` only with `--yes` when the model meets hardware gates
+
 ## 0.2.1 — 2026-09-06
 
 ### Added

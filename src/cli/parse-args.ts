@@ -8,7 +8,8 @@ export type CliCommand =
   | "history"
   | "doctor"
   | "report"
-  | "tasks";
+  | "tasks"
+  | "launch";
 
 export type CliArgs = {
   command: CliCommand;
@@ -26,6 +27,7 @@ export type CliArgs = {
   forKinds?: string;
   scope?: string;
   priority?: string;
+  yes: boolean;
 };
 
 export function parseArgs(argv: string[]): CliArgs {
@@ -44,6 +46,7 @@ export function parseArgs(argv: string[]): CliArgs {
     "doctor",
     "report",
     "tasks",
+    "launch",
   ];
   const isKnown = known.includes(command);
   let addPath: string | undefined;
@@ -73,5 +76,6 @@ export function parseArgs(argv: string[]): CliArgs {
     forKinds: forIndex >= 0 ? args[forIndex + 1] : undefined,
     scope: scopeIndex >= 0 ? args[scopeIndex + 1] : undefined,
     priority: priorityIndex >= 0 ? args[priorityIndex + 1] : undefined,
+    yes: flags.has("--yes"),
   };
 }

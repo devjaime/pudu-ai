@@ -107,6 +107,23 @@ export const es: Record<MessageId, string> = {
   taskTranscribeActionsTitle: "Acciones desde una transcripción",
   taskTranscribeActionsPrompt:
     "De una reunión transcrita, extrae responsables, fechas y preguntas abiertas como checklist en el idioma de la UI.",
+  launchTitle: "INTEGRACIONES OLLAMA",
+  launchHint:
+    "Por defecto solo explica. Pull/instalación/launch solo con --yes y solo si un modelo recomendado cabe en este hardware (nota S–B; velocidad medida si existe). Docs: OpenCode, OpenClaw, Hermes, Claude Code vía Ollama.",
+  launchNeedOllama: "Ollama no está detectado. Instálalo primero. Pudu-AI no lo instala.",
+  launchNoModel: "Ningún modelo de código/chat en este equipo cumple el umbral de hardware para esta integración.",
+  launchGradeFail: "La nota {grade} está por debajo del conjunto permitido ({allowed}).",
+  launchSlowFail: "Los {tps} t/s medidos están por debajo del mínimo de agente ({min} t/s).",
+  launchEstimateWeak: "Solo hay una estimación débil; no se hará pull ni launch.",
+  launchOk: "Elegible en este hardware para las tareas recomendadas.",
+  launchModel: "Modelo",
+  launchRunHint: "Para hacer pull (si hace falta) y lanzar: npx pudu-ai launch {tool} --yes",
+  launchBlocked: "Bloqueado. Sin pull, instalación ni launch.",
+  launchNeedTool: "Indica una herramienta: opencode | openclaw | hermes | claude",
+  launchUnknown: "Integración desconocida.",
+  launchPulling: "Descargando {model} con ollama pull…",
+  launchPullFail: "Falló ollama pull.",
+  launchExecFail: "Falló ollama launch.",
   help: `Pudu-AI — laboratorio local de hardware y benchmarks de IA
 
 Uso:
@@ -122,6 +139,9 @@ Uso:
   npx pudu-ai history
   npx pudu-ai doctor
   npx pudu-ai report --markdown
+  npx pudu-ai launch
+  npx pudu-ai launch opencode
+  npx pudu-ai launch opencode --yes
 
 Flags:
   --json          JSON legible por máquinas (sin TUI)
@@ -134,6 +154,7 @@ Flags:
   --for           code,video,image,transcription,chat
   --scope         installed | all
   --priority      speed | balanced | quality
+  --yes           Ejecuta pull/launch solo si el modelo es elegible
 
 Créditos:
   Los valores medidos vienen de llama-bench y de la telemetría del SO.
