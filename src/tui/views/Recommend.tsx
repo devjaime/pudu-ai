@@ -8,6 +8,7 @@ import { resolveOllamaTag } from "../../integrations/ollama-tags.js";
 import type { IntegrationId } from "../../integrations/types.js";
 import type { Session } from "../../session/load.js";
 import { gradeColor } from "../theme.js";
+import { fit, useCols } from "../width.js";
 
 const TOOLS: Array<{ key: string; id: IntegrationId; label: string }> = [
   { key: "1", id: "opencode", label: "OpenCode" },
@@ -16,6 +17,7 @@ const TOOLS: Array<{ key: string; id: IntegrationId; label: string }> = [
 ];
 
 export function RecommendView({ session }: { session: Session }): ReactElement {
+  const cols = useCols();
   const { exit } = useApp();
   const [cursor, setCursor] = useState(0);
   const [log, setLog] = useState("");
@@ -59,14 +61,14 @@ export function RecommendView({ session }: { session: Session }): ReactElement {
   const tag = rec ? resolveOllamaTag(rec.model.id, rec.model.name) : undefined;
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" width={cols}>
       <Text bold color="yellow">
-        {t("setupTitle")}
+        {fit(t("setupTitle"), cols)}
       </Text>
       {recs.map((item, i) => (
         <Text key={`${item.useCase}-${item.model.id}`} color={i === cursor ? "cyan" : undefined}>
           {i === cursor ? "❯ " : "  "}
-          {item.model.name}{" "}
+          {fit(item.model.name, 20)}{" "}
           <Text color={gradeColor(item.grade)}>{item.grade}</Text>
           <Text dimColor> {resolveOllamaTag(item.model.id, item.model.name) ?? "—"}</Text>
         </Text>
@@ -80,10 +82,8 @@ export function RecommendView({ session }: { session: Session }): ReactElement {
           </Text>
         ))}
       </Text>
-      <Text dimColor>
-        Enter=pull {tag ?? ""} · 1/2/3=agent
-      </Text>
-      {log ? <Text color="green">{log}</Text> : null}
+      <Text dimColor>{fit(`Enter=pull ${tag ?? ""}  1/2/3=agent  Esc=back`, cols)}</Text>
+      {log ? <Text color="green">{fit(log, cols)}</Text> : null}
     </Box>
   );
 }

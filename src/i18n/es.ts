@@ -39,7 +39,7 @@ export const es: Record<MessageId, string> = {
   setupLinkNow: "instalado → pulsa 1/2/3 para vincular este modelo",
   setupInstallAgent: "no instalado → pulsa 1/2/3 para instalar con ollama launch (si es elegible)",
   setupKeys: "Enter/I = descargar modelo    1 OpenCode    2 Hermes    3 OpenClaw    Esc = atrás",
-  setupCta: "[S] setup",
+  setupCta: "[S] Setup: instalar modelo + OpenCode / Hermes / OpenClaw",
   machine: "EQUIPO",
   runtimes: "RUNTIMES DE IA LOCAL",
   installedModels: "MODELOS INSTALADOS",

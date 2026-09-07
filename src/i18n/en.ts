@@ -37,7 +37,7 @@ export const en = {
   setupLinkNow: "installed → press 1/2/3 to link this model",
   setupInstallAgent: "not installed → press 1/2/3 to install via ollama launch (if eligible)",
   setupKeys: "Enter/I = pull model    1 OpenCode    2 Hermes    3 OpenClaw    Esc = back",
-  setupCta: "[S] setup",
+  setupCta: "[S] Setup: install model + OpenCode / Hermes / OpenClaw",
   machine: "MACHINE",
   runtimes: "LOCAL AI RUNTIMES",
   installedModels: "INSTALLED MODELS",

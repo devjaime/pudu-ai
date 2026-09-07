@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.11 — 2026-09-07
+
+### Changed
+
+- Layout follows terminal width; readable chrome without overlap
+
 ## 0.2.10 — 2026-09-07
 
 ### Changed
