@@ -25,7 +25,18 @@ export const en = {
     "Explains Ollama integrations (OpenCode, OpenClaw, Hermes, Claude Code). Pull/launch only with --yes if the model grade is S–B and speed is enough. Use it to wire a coding agent only when this hardware can carry it.",
   aboutAddPath:
     "Adds a GGUF folder to scan (not the whole disk). Use it so llama-bench can find models outside Ollama.",
-  nav: "[B] Benchmark  [M] Models  [R] Recommend  [T] Tasks  [H] Hardware  [C] Compare  [L] History  [Q] Quit",
+  nav: "[S] Setup/Install  [B] Benchmark  [M] Models  [R] Recommend  [T] Tasks  [H] Hardware  [C] Compare  [L] History  [Q] Quit",
+  setupTitle: "SETUP — INSTALL MODELS & AGENTS",
+  setupIntro:
+    "Pick a recommended model (grade S–B), install it with Ollama, then link or install OpenCode, Hermes, or OpenClaw.",
+  setupStep1: "1. Recommended models (↑↓ to choose)",
+  setupStep2: "2. Install the selected model",
+  setupInstallModel: "Press Enter or I  →  ollama pull (only if grade is S, A, or B)",
+  setupStep3: "3. Coding agent — link if present, install if missing",
+  setupLinkNow: "installed → press 1/2/3 to link this model",
+  setupInstallAgent: "not installed → press 1/2/3 to install via ollama launch (if eligible)",
+  setupKeys: "Enter/I = pull model    1 OpenCode    2 Hermes    3 OpenClaw    Esc = back",
+  setupCta: "→ Press [S] or [I] to INSTALL a recommended model and link OpenCode / Hermes / OpenClaw",
   machine: "MACHINE",
   runtimes: "LOCAL AI RUNTIMES",
   installedModels: "INSTALLED MODELS",
@@ -150,6 +161,7 @@ Usage:
   npx pudu-ai hardware
   npx pudu-ai models
   npx pudu-ai models add-path ~/Models
+  npx pudu-ai setup
   npx pudu-ai recommend
   npx pudu-ai recommend --install --yes
   npx pudu-ai recommend --link opencode --yes

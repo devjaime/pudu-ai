@@ -83,6 +83,9 @@ export function Dashboard({ session }: { session: Session }): ReactElement {
           </Text>
         ))}
         <Text dimColor>{t("credits")}</Text>
+        <Text bold color="yellow">
+          {t("setupCta")}
+        </Text>
       </Box>
     </Box>
   );

@@ -34,6 +34,7 @@ export function handleAppKey(
   if (letter === "c") return { type: "screen", screen: "compare" };
   if (letter === "l") return { type: "screen", screen: "history" };
   if (letter === "t") return { type: "screen", screen: "tasks" };
+  if (letter === "s" || letter === "i") return { type: "screen", screen: "recommend" };
   if (key.return && screen === "home") return { type: "screen", screen: "benchmark" };
   return { type: "ignore" };
 }

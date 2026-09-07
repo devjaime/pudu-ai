@@ -14,6 +14,11 @@ describe("TUI key handler", () => {
     expect(handleAppKey("home", "t", {})).toEqual({ type: "screen", screen: "tasks" });
   });
 
+  it("opens setup/install from home with s or i", () => {
+    expect(handleAppKey("home", "s", {})).toEqual({ type: "screen", screen: "recommend" });
+    expect(handleAppKey("home", "i", {})).toEqual({ type: "screen", screen: "recommend" });
+  });
+
   it("ignores letters while benchmarking", () => {
     expect(handleAppKey("benchmark", "q", {})).toEqual({ type: "ignore" });
   });

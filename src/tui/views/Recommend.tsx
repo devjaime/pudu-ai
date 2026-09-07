@@ -9,20 +9,25 @@ import type { IntegrationId } from "../../integrations/types.js";
 import type { Session } from "../../session/load.js";
 import { gradeColor } from "../theme.js";
 
+const TOOLS: Array<{ key: string; id: IntegrationId; label: string }> = [
+  { key: "1", id: "opencode", label: "OpenCode" },
+  { key: "2", id: "hermes", label: "Hermes" },
+  { key: "3", id: "openclaw", label: "OpenClaw" },
+];
+
 export function RecommendView({ session }: { session: Session }): ReactElement {
   const { exit } = useApp();
   const [cursor, setCursor] = useState(0);
   const [log, setLog] = useState("");
   const [busy, setBusy] = useState(false);
   const recs = session.recommendations;
+  const rec = recs[cursor];
 
   useInput((input, key) => {
     if (busy) return;
-    if (key.escape) return;
     if (key.upArrow) setCursor((c) => Math.max(0, c - 1));
     if (key.downArrow) setCursor((c) => Math.min(Math.max(recs.length - 1, 0), c + 1));
-    const rec = recs[cursor];
-    if (input.toLowerCase() === "i" && rec) {
+    if ((input.toLowerCase() === "i" || key.return) && rec) {
       if (!canInstallGrade(rec.grade)) {
         setLog(t("installGradeBlock", { grade: rec.grade }));
         return;
@@ -34,8 +39,7 @@ export function RecommendView({ session }: { session: Session }): ReactElement {
         setBusy(false);
       });
     }
-    const map: Record<string, IntegrationId> = { o: "opencode", e: "hermes", w: "openclaw" };
-    const tool = map[input.toLowerCase()];
+    const tool = TOOLS.find((item) => item.key === input)?.id;
     if (tool && rec) {
       const decision = decideLaunch(session, tool);
       if (!decision.eligible) {
@@ -54,38 +58,52 @@ export function RecommendView({ session }: { session: Session }): ReactElement {
 
   return (
     <Box flexDirection="column">
+      <Box borderStyle="round" borderColor="yellow" flexDirection="column" paddingX={1} marginBottom={1}>
+        <Text bold color="yellow">
+          {t("setupTitle")}
+        </Text>
+        <Text>{t("setupIntro")}</Text>
+      </Box>
+
       <Text bold color="cyan">
-        {t("recommended")}
+        {t("setupStep1")}
       </Text>
-      <Text dimColor>{t("aboutRecommend")}</Text>
-      <Text dimColor>{t("recommendKeys")}</Text>
-      {recs.map((rec, i) => (
-        <Text key={`${rec.useCase}-${rec.model.id}`} color={i === cursor ? "cyan" : undefined}>
+      {recs.length === 0 && <Text dimColor>{t("installNone")}</Text>}
+      {recs.map((item, i) => (
+        <Text key={`${item.useCase}-${item.model.id}`} color={i === cursor ? "cyan" : undefined}>
           {i === cursor ? "❯ " : "  "}
-          <Text color="magenta">{rec.useCase.padEnd(12)}</Text>
-          {rec.model.name.padEnd(22)}{" "}
-          <Text color={gradeColor(rec.grade)} bold>
-            {rec.grade}
+          <Text color="magenta">{item.useCase.padEnd(12)}</Text>
+          {item.model.name.padEnd(22)}{" "}
+          <Text color={gradeColor(item.grade)} bold>
+            {item.grade}
           </Text>{" "}
-          {GRADE_MEANING[rec.grade]}
+          {GRADE_MEANING[item.grade]}
         </Text>
       ))}
+
+      <Box marginTop={1} flexDirection="column">
+        <Text bold color="green">
+          {t("setupStep2")}
+        </Text>
+        <Text color="green">{t("setupInstallModel")}</Text>
+      </Box>
+
       <Box marginTop={1} flexDirection="column">
         <Text bold color="yellow">
-          {t("agentsTitle")}
+          {t("setupStep3")}
         </Text>
-        {session.agents.map((agent) => (
-          <Text key={agent.id} color={agent.detected ? "green" : "gray"}>
-            {agent.detected ? "✓" : "○"} {agent.label.padEnd(12)}{" "}
-            {agent.detected ? t("detected") : t("agentMissing")}
+        {session.agents.map((agent, index) => (
+          <Text key={agent.id} color={agent.detected ? "green" : "yellow"}>
+            [{index + 1}] {agent.detected ? "✓" : "○"} {agent.label.padEnd(12)}{" "}
+            {agent.detected ? t("setupLinkNow") : t("setupInstallAgent")}
           </Text>
         ))}
       </Box>
-      {log ? (
-        <Text color="green">{log}</Text>
-      ) : (
-        <Text dimColor>{t("credits")}</Text>
-      )}
+
+      <Box marginTop={1}>
+        <Text dimColor>{t("setupKeys")}</Text>
+      </Box>
+      {log ? <Text color="green">{log}</Text> : null}
     </Box>
   );
 }

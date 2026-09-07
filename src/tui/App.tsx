@@ -12,9 +12,9 @@ import { HistoryView } from "./views/History.js";
 import { TasksView } from "./views/Tasks.js";
 import { handleAppKey, type Screen } from "./keys.js";
 
-export function App(props: { session: Session; preset?: string }): ReactElement {
+export function App(props: { session: Session; preset?: string; start?: Screen }): ReactElement {
   const { exit } = useApp();
-  const [screen, setScreen] = useState<Screen>("home");
+  const [screen, setScreen] = useState<Screen>(props.start ?? "home");
   const [selected, setSelected] = useState(0);
   const benchable = useMemo(
     () => props.session.models.filter((m) => Boolean(m.artifactPath)),

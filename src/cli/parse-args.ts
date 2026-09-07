@@ -9,7 +9,8 @@ export type CliCommand =
   | "doctor"
   | "report"
   | "tasks"
-  | "launch";
+  | "launch"
+  | "setup";
 
 export type CliArgs = {
   command: CliCommand;
@@ -49,6 +50,7 @@ export function parseArgs(argv: string[]): CliArgs {
     "report",
     "tasks",
     "launch",
+    "setup",
   ];
   const isKnown = known.includes(command);
   let addPath: string | undefined;

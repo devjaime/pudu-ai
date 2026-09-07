@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.6 — 2026-09-07
+
+### Added
+
+- Visible Setup screen: install recommended models and link/install OpenCode, Hermes, OpenClaw (`npx pudu-ai setup` or press S)
+
 ## 0.2.5 — 2026-09-07
 
 ### Fixed

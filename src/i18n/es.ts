@@ -27,7 +27,18 @@ export const es: Record<MessageId, string> = {
     "Explica las integraciones de Ollama (OpenCode, OpenClaw, Hermes, Claude Code). Pull/launch solo con --yes si la nota es S–B y hay velocidad suficiente. Sirve para conectar un agente de código solo cuando el hardware lo aguanta.",
   aboutAddPath:
     "Añade una carpeta GGUF a escanear (no todo el disco). Sirve para que llama-bench encuentre modelos fuera de Ollama.",
-  nav: "[B] Benchmark  [M] Modelos  [R] Recomendaciones  [T] Tareas  [H] Hardware  [C] Comparar  [L] Historial  [Q] Salir",
+  nav: "[S] Setup/Instalar  [B] Benchmark  [M] Modelos  [R] Recomendaciones  [T] Tareas  [H] Hardware  [C] Comparar  [L] Historial  [Q] Salir",
+  setupTitle: "SETUP — INSTALAR MODELOS Y AGENTES",
+  setupIntro:
+    "Elige un modelo recomendado (nota S–B), instálalo con Ollama y luego vincula o instala OpenCode, Hermes u OpenClaw.",
+  setupStep1: "1. Modelos recomendados (↑↓ para elegir)",
+  setupStep2: "2. Instalar el modelo seleccionado",
+  setupInstallModel: "Enter o I  →  ollama pull (solo si la nota es S, A o B)",
+  setupStep3: "3. Agente de código — vincular si existe, instalar si falta",
+  setupLinkNow: "instalado → pulsa 1/2/3 para vincular este modelo",
+  setupInstallAgent: "no instalado → pulsa 1/2/3 para instalar con ollama launch (si es elegible)",
+  setupKeys: "Enter/I = descargar modelo    1 OpenCode    2 Hermes    3 OpenClaw    Esc = atrás",
+  setupCta: "→ Pulsa [S] o [I] para INSTALAR un modelo recomendado y vincular OpenCode / Hermes / OpenClaw",
   machine: "EQUIPO",
   runtimes: "RUNTIMES DE IA LOCAL",
   installedModels: "MODELOS INSTALADOS",
@@ -163,6 +174,7 @@ Uso:
   npx pudu-ai hardware
   npx pudu-ai models
   npx pudu-ai models add-path ~/Models
+  npx pudu-ai setup
   npx pudu-ai recommend
   npx pudu-ai recommend --install --yes
   npx pudu-ai recommend --link opencode --yes

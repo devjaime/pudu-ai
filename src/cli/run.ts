@@ -75,6 +75,13 @@ export async function run(args: CliArgs): Promise<number> {
     case "models":
       print(args.json ? session.rows : explained("aboutModels", modelsText(session)), args.json);
       return 0;
+    case "setup":
+      if (args.json) {
+        print({ recommendations: session.recommendations, agents: session.agents }, true);
+        return 0;
+      }
+      await renderDashboard(session, args.preset, "recommend");
+      return 0;
     case "recommend": {
       if (args.install && args.yes) {
         const rec = session.recommendations.find((r) => canInstallGrade(r.grade));
