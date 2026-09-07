@@ -44,7 +44,7 @@ export function planTasks(session: Session, answers: TaskAnswers): ModelTaskPlan
       modelId: row.local.id,
       modelName: row.local.name,
       installed: true,
-      origin: (row.lastBenchmark ? "measured" : "estimated") as const,
+      origin: row.lastBenchmark ? ("measured" as const) : ("estimated" as const),
       grade: row.compatibility?.grade,
       useCases,
       kinds,
