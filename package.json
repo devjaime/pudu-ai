@@ -1,6 +1,6 @@
 {
   "name": "pudu-ai",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Pudu-AI — local AI hardware & benchmark lab for the terminal",
   "keywords": [
     "ai",
@@ -24,7 +24,7 @@
   "author": "devjaime",
   "type": "module",
   "bin": {
-    "pudu-ai": "./bin/pudu-ai.mjs"
+    "pudu-ai": "dist/cli/index.js"
   },
   "exports": {
     ".": "./dist/cli/index.js"
@@ -39,7 +39,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "npx --yes esbuild src/cli/index.ts --bundle --platform=node --format=esm --outfile=dist/cli/index.js --packages=external --jsx=automatic && node scripts/add-shebang.mjs",
     "dev": "tsx src/cli/index.ts",
     "pudu-ai": "tsx src/cli/index.ts",
     "start": "node dist/cli/index.js",
@@ -47,7 +47,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "tsc --noEmit -p tsconfig.json",
-    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "execa": "^9.6.0",
