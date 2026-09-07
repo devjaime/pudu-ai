@@ -43,11 +43,6 @@ export function SetupView({ session }: { session: Session }): ReactElement {
       });
     }
     if (input === "4") {
-      const docker = session.runtimes.find((r) => r.id === "docker")?.detected;
-      if (!docker) {
-        setLog(t("reqDocker"));
-        return;
-      }
       setBusy(true);
       setLog(t("dockerStarting"));
       void executeDockerOllama().then((result) => {

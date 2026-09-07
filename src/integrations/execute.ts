@@ -34,6 +34,21 @@ export async function executeLaunch(decision: LaunchDecision): Promise<{ ok: boo
 }
 
 export async function executeDockerOllama(): Promise<{ ok: boolean; log: string }> {
+  const { brewInstallCask, dockerReady, startDockerDesktop, waitForDocker } = await import("./brew.js");
+  const notes: string[] = [];
+  if (!(await dockerReady())) {
+    notes.push(t("dockerBrewInstall"));
+    const installed = await brewInstallCask("docker");
+    if (!installed.ok) {
+      return { ok: false, log: `${t("reqDocker")}\n${installed.log}` };
+    }
+    notes.push(t("dockerDesktopWait"));
+    await startDockerDesktop();
+    const up = await waitForDocker();
+    if (!up) return { ok: false, log: `${notes.join("\n")}\n${t("dockerRunFail")}` };
+  }
+  const start = await runCommand("docker", ["start", "pudu-ollama"], { timeout: 30000 });
+  if (start.exitCode === 0) return { ok: true, log: t("dockerRunOk") };
   const args = DOCKER_OLLAMA.split(" ").slice(1);
   const result = await runCommand("docker", args, { timeout: 10 * 60_000 });
   if (result.exitCode !== 0) {

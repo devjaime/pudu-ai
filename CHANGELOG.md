@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.16 — 2026-09-07
+
+### Fixed
+
+- Docker [4]: brew install --cask docker if needed, start Docker Desktop, then run ollama container
+
 ## 0.2.15 — 2026-09-07
 
 ### Added

@@ -25,7 +25,9 @@ export const en = {
   dockerHint: "press 4 to run ollama/ollama in Docker",
   dockerStarting: "Starting ollama/ollama container…",
   dockerRunOk: "Docker Ollama is up on port 11434 (name: pudu-ollama).",
-  dockerRunFail: "docker run failed. Is Docker Desktop running?",
+  dockerRunFail: "Docker daemon is not running. Open Docker Desktop, wait until it is idle, press 4 again.",
+  dockerBrewInstall: "Installing Docker with Homebrew (brew install --cask docker)…",
+  dockerDesktopWait: "Starting Docker Desktop and waiting for the daemon…",
   aboutHistory:
     "Shows local benchmark files in ~/.pudu-ai/benchmarks. Use it to replay what this machine actually did.",
   aboutDoctor:
