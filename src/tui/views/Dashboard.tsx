@@ -58,6 +58,15 @@ export function Dashboard({ session }: { session: Session }): ReactElement {
           <Text color={gradeColor(rec.grade)}>{rec.grade}</Text>
         </Text>
       ))}
+      <Text>
+        <Text color={session.runtimes.find((r) => r.id === "ollama")?.detected ? "green" : "yellow"}>
+          {session.runtimes.find((r) => r.id === "ollama")?.detected ? "✓ Ollama" : `○ Ollama ${t("reqOllama")}`}
+        </Text>
+        <Text>  </Text>
+        <Text color={session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "green" : "gray"}>
+          {session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "✓ LM Studio" : `○ LM Studio ${t("reqLmStudio")}`}
+        </Text>
+      </Text>
       <Typewriter text={fit(t("setupCta"), cols)} ms={18} color="yellow" />
     </Box>
   );

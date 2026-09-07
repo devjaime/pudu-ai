@@ -74,14 +74,17 @@ export function SetupView({ session }: { session: Session }): ReactElement {
           <Text dimColor> {resolveOllamaTag(item.model.id, item.model.name) ?? "—"}</Text>
         </Text>
       ))}
-      <Text>
-        {session.agents.map((agent, index) => (
-          <Text key={agent.id} color={agent.detected ? "green" : "gray"}>
-            {index ? "  " : ""}
-            [{index + 1}]{agent.detected ? "✓" : "○"}
-            {agent.label}
-          </Text>
-        ))}
+      {session.agents.map((agent, index) => (
+        <Text key={agent.id} color={agent.detected ? "green" : "yellow"}>
+          [{index + 1}] {agent.detected ? "✓" : "○"} {agent.label}
+          {agent.detected ? "" : `  → ${agent.launch}`}
+        </Text>
+      ))}
+      <Text dimColor>
+        {fit(
+          `Ollama: ${session.runtimes.find((r) => r.id === "ollama")?.detected ? "✓" : t("reqOllama")}  LM Studio: ${session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "✓" : t("reqLmStudio")}`,
+          cols,
+        )}
       </Text>
       <Typewriter text={fit(`Enter=pull ${tag ?? ""}  1/2/3=agent  Esc=back`, cols)} ms={14} dimColor />
       {log ? <Text color="green">{fit(log, cols)}</Text> : null}

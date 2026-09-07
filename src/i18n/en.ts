@@ -16,6 +16,11 @@ export const en = {
     "Runs llama-bench on a local GGUF and records measured t/s plus system telemetry. Use it when you need real numbers, not estimates.",
   aboutCompare:
     "Compares saved measured runs (speed, memory, power). Quality is never inferred from speed. Use it after two or more benchmarks.",
+  compareHow:
+    "[C] Compare needs two measured llama-bench runs of different models. Press [B], pick a model, wait; repeat with another; then [C]. Quality is not a speed score.",
+  compareNeedBench: "Need 2+ measured models. Press [B] to benchmark first.",
+  reqOllama: "install: https://ollama.com/download  or  brew install ollama",
+  reqLmStudio: "install: https://lmstudio.ai",
   aboutHistory:
     "Shows local benchmark files in ~/.pudu-ai/benchmarks. Use it to replay what this machine actually did.",
   aboutDoctor:

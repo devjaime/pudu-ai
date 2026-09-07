@@ -121,7 +121,15 @@ export function doctorText(session: Session): string {
     `${session.hardware.gpu.metal ? "✓" : "○"} Metal`,
     ...session.runtimes.map((r) => `${r.detected ? "✓" : "○"} ${r.label.padEnd(14)} ${r.version ?? ""}`.trimEnd()),
     `${session.networkUsed ? "✓" : "○"} CanIRun.ai (midudev)`,
-    ...session.agents.map((a) => `${a.detected ? "✓" : "○"} ${a.label.padEnd(14)} ${a.detected ? t("detected") : t("agentMissing")}`),
+    ...session.agents.map((a) =>
+      `${a.detected ? "✓" : "○"} ${a.label.padEnd(14)} ${a.detected ? t("detected") : a.launch}`,
+    ),
+    ...(session.runtimes.find((r) => r.id === "ollama")?.detected
+      ? []
+      : [`○ Ollama        ${t("reqOllama")}`]),
+    ...(session.runtimes.find((r) => r.id === "lmstudio")?.detected
+      ? []
+      : [`○ LM Studio     ${t("reqLmStudio")}`]),
     "",
     session.llamaBench
       ? t("doctorReady", { count: session.models.filter((m) => m.artifactPath).length })

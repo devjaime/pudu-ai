@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.14 — 2026-09-07
+
+### Added
+
+- [C] explains how compare works; missing Ollama / LM Studio / OpenCode / Hermes / OpenClaw show install commands
+
 ## 0.2.13 — 2026-09-07
 
 ### Added

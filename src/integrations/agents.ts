@@ -5,12 +5,32 @@ export type AgentStatus = {
   label: string;
   bin: string;
   detected: boolean;
+  launch: string;
+  docs: string;
 };
 
 const AGENTS = [
-  { id: "opencode" as const, label: "OpenCode", bin: "opencode" },
-  { id: "hermes" as const, label: "Hermes", bin: "hermes" },
-  { id: "openclaw" as const, label: "OpenClaw", bin: "openclaw" },
+  {
+    id: "opencode" as const,
+    label: "OpenCode",
+    bin: "opencode",
+    launch: "ollama launch opencode",
+    docs: "https://docs.ollama.com/integrations/opencode",
+  },
+  {
+    id: "hermes" as const,
+    label: "Hermes",
+    bin: "hermes",
+    launch: "ollama launch hermes",
+    docs: "https://docs.ollama.com/integrations/hermes",
+  },
+  {
+    id: "openclaw" as const,
+    label: "OpenClaw",
+    bin: "openclaw",
+    launch: "ollama launch openclaw",
+    docs: "https://docs.ollama.com/integrations/openclaw",
+  },
 ];
 
 export async function detectAgents(): Promise<AgentStatus[]> {
@@ -23,3 +43,8 @@ export async function detectAgents(): Promise<AgentStatus[]> {
   }
   return out;
 }
+
+export const REQ_INSTALL = {
+  ollama: "https://ollama.com/download   or   brew install ollama",
+  lmstudio: "https://lmstudio.ai",
+};

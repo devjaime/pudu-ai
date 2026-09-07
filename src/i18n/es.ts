@@ -18,6 +18,11 @@ export const es: Record<MessageId, string> = {
     "Ejecuta llama-bench sobre un GGUF local y guarda t/s medidos más telemetría. Sirve cuando necesitas números reales, no estimaciones.",
   aboutCompare:
     "Compara corridas medidas (velocidad, memoria, potencia). La calidad no se infiere de la velocidad. Sirve después de dos o más benchmarks.",
+  compareHow:
+    "[C] Comparar necesita dos corridas medidas de llama-bench en modelos distintos. Pulsa [B], elige un modelo, espera; repite con otro; luego [C]. La calidad no es un score de velocidad.",
+  compareNeedBench: "Hacen falta 2+ modelos medidos. Pulsa [B] para hacer un benchmark primero.",
+  reqOllama: "instalar: https://ollama.com/download  o  brew install ollama",
+  reqLmStudio: "instalar: https://lmstudio.ai",
   aboutHistory:
     "Muestra los JSON locales en ~/.pudu-ai/benchmarks. Sirve para ver qué hizo realmente esta máquina.",
   aboutDoctor:
