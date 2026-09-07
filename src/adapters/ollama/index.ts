@@ -19,14 +19,7 @@ export const ollamaAdapter: ModelRuntime = {
   async listModels() {
     if (!(await this.detect())) return [];
     const result = await runCommand("ollama", ["list"], { timeout: 15000 });
-    const models = parseOllamaList(result.stdout);
-    const resolved = await Promise.all(
-      models.map(async (model) => {
-        const artifact = await resolveOllamaBlob(model.id);
-        return { ...model, artifactPath: artifact?.path };
-      }),
-    );
-    return resolved;
+    return parseOllamaList(result.stdout);
   },
   async resolveModel(id: string) {
     return resolveOllamaBlob(id);

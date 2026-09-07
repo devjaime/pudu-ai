@@ -1,3 +1,4 @@
+import { ollamaAdapter } from "../adapters/ollama/index.js";
 import { addModelPath } from "../storage/config.js";
 import { loadSession } from "../session/load.js";
 import { runBenchmark } from "../benchmark/engine.js";
@@ -63,7 +64,10 @@ export async function run(args: CliArgs): Promise<number> {
   if (!args.json && !args.csv && process.stderr.isTTY) {
     process.stderr.write(`${t("loading")}\n`);
   }
-  const session = await loadSession({ network: args.network });
+  const session = await loadSession({
+    network: args.network,
+    light: args.command === "launch" || args.command === "doctor" || args.command === "hardware",
+  });
 
   switch (args.command) {
     case "hardware":
@@ -181,6 +185,10 @@ export async function run(args: CliArgs): Promise<number> {
         return 1;
       }
       const catalog = session.rows.find((r) => r.local.id === model.id)?.catalog;
+      if (!model.artifactPath && model.source === "ollama") {
+        const artifact = await ollamaAdapter.resolveModel(model.id);
+        model.artifactPath = artifact?.path;
+      }
       const result = await runBenchmark({
         model,
         hardware: session.hardware,

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.19 — 2026-09-07
+
+### Fixed
+
+- `launch --yes` no longer hangs on full catalog load; OpenCode inherits the terminal
+
 ## 0.2.18 — 2026-09-07
 
 ### Fixed

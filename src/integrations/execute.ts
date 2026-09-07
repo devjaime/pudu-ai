@@ -23,7 +23,10 @@ export async function executeLaunch(decision: LaunchDecision): Promise<{ ok: boo
   const args = ["launch", def.ollamaLaunch, "--model", decision.ollamaTag];
   if (def.id === "openclaw" || def.id === "claude") args.push("--yes");
   lines.push(`ollama ${args.join(" ")}`);
-  const launched = await runCommand("ollama", args, { timeout: 120_000 });
+  const launched = await runCommand("ollama", args, {
+    timeout: 0,
+    stdio: "inherit",
+  });
   if (launched.exitCode !== 0) {
     return {
       ok: false,

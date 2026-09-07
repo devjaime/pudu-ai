@@ -17,7 +17,7 @@ export function spawnTracked(file: string, args: string[] = [], options: Options
   installSignalHandlers();
   const subprocess = execa(file, args, {
     reject: false,
-    timeout: options.timeout ?? 30_000,
+    timeout: options.timeout === undefined ? 30_000 : options.timeout === 0 ? undefined : options.timeout,
     ...options,
   });
   children.add(subprocess);

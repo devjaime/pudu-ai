@@ -35,12 +35,12 @@ export type Session = {
   agents: AgentStatus[];
 };
 
-export async function loadSession(options: { network: boolean }): Promise<Session> {
+export async function loadSession(options: { network: boolean; light?: boolean }): Promise<Session> {
   const hardware = await detectHardware();
   const [runtimes, models, catalogState, history, llamaBench, agents] = await Promise.all([
     detectRuntimes(),
     discoverLocalModels(),
-    loadCatalog(options.network),
+    options.light ? Promise.resolve({ catalog: [] as CatalogModel[], networkUsed: false }) : loadCatalog(options.network),
     listBenchmarks(),
     commandExists("llama-bench").then(Boolean),
     detectAgents(),
@@ -49,14 +49,15 @@ export async function loadSession(options: { network: boolean }): Promise<Sessio
   const rows: ModelRow[] = [];
   for (const local of models) {
     const catalog = matchCatalog(catalogState.catalog, local);
-    const compatibility = catalog
-      ? await compatibilityFor(hardware, catalog, options.network)
-      : undefined;
+    const compatibility =
+      catalog && !options.light ? await compatibilityFor(hardware, catalog, options.network) : undefined;
     const lastBenchmark = [...history].reverse().find((b) => b.model.id === local.id);
     rows.push({ local, catalog, compatibility, lastBenchmark });
   }
 
-  const recommendations = await recommendForMachine(hardware, catalogState.catalog, options.network);
+  const recommendations = options.light
+    ? []
+    : await recommendForMachine(hardware, catalogState.catalog, options.network);
 
   return {
     hardware,
