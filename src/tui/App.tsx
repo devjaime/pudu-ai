@@ -1,6 +1,5 @@
-import { Box, Text, useApp, useInput } from "ink";
+import { Box, useApp, useInput } from "ink";
 import { useMemo, useState, type ReactElement } from "react";
-import { t } from "../i18n/index.js";
 import type { Session } from "../session/load.js";
 import { Dashboard } from "./views/Dashboard.js";
 import { ModelsView } from "./views/Models.js";
@@ -11,6 +10,7 @@ import { BenchmarkView } from "./views/Benchmark.js";
 import { HistoryView } from "./views/History.js";
 import { TasksView } from "./views/Tasks.js";
 import { handleAppKey, type Screen } from "./keys.js";
+import { ColorNav, Welcome } from "./Welcome.js";
 
 export function App(props: { session: Session; preset?: string; start?: Screen }): ReactElement {
   const { exit } = useApp();
@@ -30,6 +30,7 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
 
   return (
     <Box flexDirection="column" padding={1}>
+      {screen !== "benchmark" && <Welcome compact={screen !== "home"} />}
       {screen === "home" && <Dashboard session={props.session} />}
       {screen === "models" && <ModelsView session={props.session} />}
       {screen === "hardware" && <HardwareView session={props.session} />}
@@ -47,11 +48,7 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
           onBack={() => setScreen("home")}
         />
       )}
-      {screen !== "benchmark" && (
-        <Box marginTop={1}>
-          <Text dimColor>{t("nav")}</Text>
-        </Box>
-      )}
+      {screen !== "benchmark" && <ColorNav />}
     </Box>
   );
 }

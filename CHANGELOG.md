@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.7 — 2026-09-07
+
+### Added
+
+- Colored pudú ASCII welcome and `by devjaime` signature; colored nav on every screen
+
 ## 0.2.6 — 2026-09-07
 
 ### Added

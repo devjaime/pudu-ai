@@ -8,7 +8,7 @@ export function ModelsView({ session }: { session: Session }): ReactElement {
   return (
     <Box flexDirection="column">
       <Text>{modelsText(session)}</Text>
-      <Text dimColor>{t("modelsHint")}</Text>
+      <Text color="yellow">{t("modelsHint")}</Text>
     </Box>
   );
 }

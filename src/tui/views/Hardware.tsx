@@ -9,7 +9,7 @@ export function HardwareView({ session }: { session: Session }): ReactElement {
     <Box flexDirection="column">
       <Text>{hardwareText(session)}</Text>
       <Text>{runtimesText(session)}</Text>
-      <Text dimColor>{t("hardwareHint")}</Text>
+      <Text color="yellow">{t("hardwareHint")}</Text>
     </Box>
   );
 }

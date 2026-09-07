@@ -1,6 +1,7 @@
 export const en = {
   appTitle: "PUDU-AI",
   appSubtitle: "Local AI Hardware & Benchmark Lab",
+  byline: "by devjaime",
   aboutDashboard:
     "Opens the live lab: your machine, installed models, and estimates. Use it to see what can run here before you benchmark or launch a tool.",
   aboutHardware:

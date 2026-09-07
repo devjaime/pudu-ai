@@ -3,6 +3,7 @@ import type { MessageId } from "./en.js";
 export const es: Record<MessageId, string> = {
   appTitle: "PUDU-AI",
   appSubtitle: "Laboratorio local de hardware y benchmarks de IA",
+  byline: "by devjaime",
   aboutDashboard:
     "Abre el laboratorio en vivo: equipo, modelos instalados y estimaciones. Sirve para ver qué puede correr aquí antes de medir o lanzar una herramienta.",
   aboutHardware:

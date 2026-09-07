@@ -12,13 +12,7 @@ export function Dashboard({ session }: { session: Session }): ReactElement {
   const h = session.hardware;
   return (
     <Box flexDirection="column">
-      <Box borderStyle="round" borderColor="cyan" flexDirection="column" paddingX={1} marginBottom={1}>
-        <Text bold color="cyan">
-          {t("appTitle")}
-        </Text>
-        <Text dimColor>{t("appSubtitle")}</Text>
-        <Text dimColor>{t("aboutDashboard")}</Text>
-      </Box>
+      <Text dimColor>{t("aboutDashboard")}</Text>
 
       <Text bold color="cyan">
         {t("machine")}

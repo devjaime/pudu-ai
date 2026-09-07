@@ -5,6 +5,7 @@ describe("i18n", () => {
   it("defaults to English", () => {
     setLocale("en");
     expect(t("appTitle")).toBe("PUDU-AI");
+    expect(t("byline")).toBe("by devjaime");
     expect(t("doctorReady", { count: 2 })).toBe("Ready to benchmark 2 installed models.");
     expect(t("credits")).toContain("midudev");
     expect(t("credits")).toContain("CanIRun.ai");
