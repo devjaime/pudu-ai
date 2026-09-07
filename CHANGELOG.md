@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.12 — 2026-09-07
+
+### Fixed
+
+- [R] lists recommendations only; [S] is Setup (install + agents)
+
 ## 0.2.11 — 2026-09-07
 
 ### Changed

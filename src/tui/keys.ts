@@ -6,7 +6,8 @@ export type Screen =
   | "compare"
   | "benchmark"
   | "history"
-  | "tasks";
+  | "tasks"
+  | "setup";
 
 export type AppKeyResult =
   | { type: "ignore" }
@@ -22,7 +23,7 @@ function globalNav(letter: string): AppKeyResult | undefined {
   if (letter === "c") return { type: "screen", screen: "compare" };
   if (letter === "l") return { type: "screen", screen: "history" };
   if (letter === "t") return { type: "screen", screen: "tasks" };
-  if (letter === "s") return { type: "screen", screen: "recommend" };
+  if (letter === "s") return { type: "screen", screen: "setup" };
   return undefined;
 }
 
@@ -36,13 +37,13 @@ export function handleAppKey(
   if (letter === "q") return { type: "quit" };
   if (key.escape) return screen === "home" ? { type: "quit" } : { type: "home" };
 
-  if (screen === "recommend") {
+  if (screen === "setup") {
     if (letter === "i" || letter === "1" || letter === "2" || letter === "3") return { type: "ignore" };
   }
 
   const nav = globalNav(letter);
   if (nav) return nav;
-  if (letter === "i" && screen === "home") return { type: "screen", screen: "recommend" };
+  if (letter === "i" && screen === "home") return { type: "screen", screen: "setup" };
   if (key.return && screen === "home") return { type: "screen", screen: "benchmark" };
   return { type: "ignore" };
 }

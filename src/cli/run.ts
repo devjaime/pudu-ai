@@ -80,7 +80,7 @@ export async function run(args: CliArgs): Promise<number> {
         print({ recommendations: session.recommendations, agents: session.agents }, true);
         return 0;
       }
-      await renderDashboard(session, args.preset, "recommend");
+      await renderDashboard(session, args.preset, "setup");
       return 0;
     case "recommend": {
       if (args.install && args.yes) {

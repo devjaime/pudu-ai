@@ -5,6 +5,7 @@ import { Dashboard } from "./views/Dashboard.js";
 import { ModelsView } from "./views/Models.js";
 import { HardwareView } from "./views/Hardware.js";
 import { RecommendView } from "./views/Recommend.js";
+import { SetupView } from "./views/Setup.js";
 import { CompareView } from "./views/Compare.js";
 import { BenchmarkView } from "./views/Benchmark.js";
 import { HistoryView } from "./views/History.js";
@@ -37,6 +38,7 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
       {screen === "models" && <ModelsView session={props.session} />}
       {screen === "hardware" && <HardwareView session={props.session} />}
       {screen === "recommend" && <RecommendView session={props.session} />}
+      {screen === "setup" && <SetupView session={props.session} />}
       {screen === "compare" && <CompareView session={props.session} />}
       {screen === "history" && <HistoryView session={props.session} />}
       {screen === "tasks" && <TasksView session={props.session} />}
