@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.18 — 2026-09-07
+
+### Fixed
+
+- CI typecheck TS1355 on task origin union
+
 ## 0.2.17 — 2026-09-07
 
 ### Added
