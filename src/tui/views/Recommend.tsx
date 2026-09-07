@@ -5,6 +5,7 @@ import { t } from "../../i18n/index.js";
 import { resolveOllamaTag } from "../../integrations/ollama-tags.js";
 import type { Session } from "../../session/load.js";
 import { gradeColor } from "../theme.js";
+import { Typewriter } from "../Typewriter.js";
 import { fit, useCols } from "../width.js";
 
 export function RecommendView({ session }: { session: Session }): ReactElement {
@@ -14,7 +15,7 @@ export function RecommendView({ session }: { session: Session }): ReactElement {
       <Text bold color="magenta">
         {t("recommended")}
       </Text>
-      <Text dimColor>{fit(t("aboutRecommend"), cols)}</Text>
+      <Typewriter text={fit(t("aboutRecommend"), cols)} ms={12} dimColor />
       {session.recommendations.map((rec) => (
         <Text key={`${rec.useCase}-${rec.model.id}`}>
           <Text color="magenta">{fit(rec.useCase, 10)}</Text>

@@ -8,6 +8,7 @@ import { resolveOllamaTag } from "../../integrations/ollama-tags.js";
 import type { IntegrationId } from "../../integrations/types.js";
 import type { Session } from "../../session/load.js";
 import { gradeColor } from "../theme.js";
+import { Typewriter } from "../Typewriter.js";
 import { fit, useCols } from "../width.js";
 
 const TOOLS: Array<{ key: string; id: IntegrationId; label: string }> = [
@@ -82,7 +83,7 @@ export function SetupView({ session }: { session: Session }): ReactElement {
           </Text>
         ))}
       </Text>
-      <Text dimColor>{fit(`Enter=pull ${tag ?? ""}  1/2/3=agent  Esc=back`, cols)}</Text>
+      <Typewriter text={fit(`Enter=pull ${tag ?? ""}  1/2/3=agent  Esc=back`, cols)} ms={14} dimColor />
       {log ? <Text color="green">{fit(log, cols)}</Text> : null}
     </Box>
   );

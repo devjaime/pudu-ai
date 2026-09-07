@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.13 — 2026-09-07
+
+### Added
+
+- Typewriter cursor for brand line and on-screen explanations
+
 ## 0.2.12 — 2026-09-07
 
 ### Fixed

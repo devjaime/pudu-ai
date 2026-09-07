@@ -1,23 +1,16 @@
 import { Box, Text } from "ink";
 import type { ReactElement } from "react";
 import { t } from "../i18n/index.js";
-import { fit, useCols } from "./width.js";
+import { Typewriter } from "./Typewriter.js";
+import { useCols } from "./width.js";
 
 export function Chrome(): ReactElement {
   const cols = useCols();
   const wide = cols >= 72;
+  const brand = `${t("appTitle")}  ${t("byline")}`;
   return (
     <Box flexDirection="column" width={cols} marginBottom={1}>
-      <Text>
-        <Text bold color="cyan">
-          {t("appTitle")}
-        </Text>
-        <Text color="gray"> · </Text>
-        <Text color="magenta">{t("byline")}</Text>
-        {wide ? (
-          <Text color="gray"> · {fit(t("appSubtitle"), cols - 28)}</Text>
-        ) : null}
-      </Text>
+      <Typewriter text={brand} ms={28} color="cyan" bold once />
       <Text>
         {wide ? (
           <>

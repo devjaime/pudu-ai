@@ -6,6 +6,7 @@ import { memoryLabel } from "../../hardware/types.js";
 import type { Session } from "../../session/load.js";
 import { t } from "../../i18n/index.js";
 import { gradeColor } from "../theme.js";
+import { Typewriter } from "../Typewriter.js";
 import { fit, useCols } from "../width.js";
 
 export function Dashboard({ session }: { session: Session }): ReactElement {
@@ -57,7 +58,7 @@ export function Dashboard({ session }: { session: Session }): ReactElement {
           <Text color={gradeColor(rec.grade)}>{rec.grade}</Text>
         </Text>
       ))}
-      <Text color="yellow">{fit(t("setupCta"), cols)}</Text>
+      <Typewriter text={fit(t("setupCta"), cols)} ms={18} color="yellow" />
     </Box>
   );
 }
