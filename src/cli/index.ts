@@ -5,10 +5,10 @@ import { run } from "./run.js";
 const args = parseArgs(process.argv);
 run(args)
   .then((code) => {
-    process.exitCode = code;
+    process.exit(code);
   })
   .catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     process.stderr.write(`${message}\n`);
-    process.exitCode = 1;
+    process.exit(1);
   });
