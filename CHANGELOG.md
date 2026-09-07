@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.4 — 2026-09-07
+
+### Added
+
+- Color grades and runtime status in TUI/CLI
+- Recommend can `ollama pull` eligible models (S–B) and link/install OpenCode, Hermes, OpenClaw
+
 ## 0.2.2 — 2026-09-06
 
 ### Added

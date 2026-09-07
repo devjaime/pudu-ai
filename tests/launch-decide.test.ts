@@ -44,6 +44,7 @@ function session(grade: "S" | "A" | "C" | "F", tps?: number): Session {
     history: [],
     llamaBench: true,
     networkUsed: false,
+    agents: [],
   };
 }
 

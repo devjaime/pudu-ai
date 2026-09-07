@@ -24,6 +24,11 @@ export function App(props: { session: Session; preset?: string }): ReactElement 
 
   useInput((input, key) => {
     if (screen === "benchmark") return;
+    if (screen === "recommend" || screen === "tasks") {
+      if (letter === "q") exit();
+      if (key.escape) setScreen("home");
+      return;
+    }
     const letter = input.toLowerCase();
     if (letter === "q" || key.escape) exit();
     if (letter === "b") setScreen("benchmark");

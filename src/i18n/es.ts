@@ -35,6 +35,14 @@ export const es: Record<MessageId, string> = {
   recommended: "RECOMENDADOS PARA ESTE EQUIPO",
   recommendedHint:
     "Los valores estimados vienen de CanIRun.ai de midudev (canirun.ai · midu.dev) o de un fallback local — no son mediciones",
+  recommendKeys: "[↑↓] modelo  [I] ollama pull si nota S–B  [O] OpenCode  [E] Hermes  [W] OpenClaw  [Esc] atrás",
+  recommendCliHint: "Instalar: npx pudu-ai recommend --install --yes   Vincular: npx pudu-ai recommend --link opencode --yes",
+  agentsTitle: "AGENTES DE CÓDIGO",
+  agentMissing: "no instalado — selecciónalo para instalar con ollama launch si el modelo es elegible",
+  installGradeBlock: "La nota {grade} es baja para hacer pull. Hace falta S, A o B.",
+  linkingTool: "Vinculando {tool} con {model}…",
+  modelPulled: "Descargado {model} con Ollama.",
+  installNone: "Ningún modelo recomendado tiene nota S–B para instalar.",
   credits:
     "Medido: llama-bench + telemetría del SO. Estimado: CanIRun.ai de midudev (https://canirun.ai, https://github.com/midudev/canirun.ai, https://midu.dev). Se etiquetan por separado; nunca se mezclan.",
   noModels: "No se detectaron modelos locales",
@@ -156,6 +164,8 @@ Uso:
   npx pudu-ai models
   npx pudu-ai models add-path ~/Models
   npx pudu-ai recommend
+  npx pudu-ai recommend --install --yes
+  npx pudu-ai recommend --link opencode --yes
   npx pudu-ai tasks
   npx pudu-ai tasks --for code,image --scope all --priority speed
   npx pudu-ai benchmark [model]

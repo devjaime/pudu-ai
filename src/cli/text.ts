@@ -7,13 +7,14 @@ import { GRADE_MEANING } from "../compatibility/types.js";
 import { localCompatibility } from "../compatibility/local.js";
 import { idsLikelyMatch } from "../models/match.js";
 import { t } from "../i18n/index.js";
+import { bold, cyan, dim, gradeAnsi, green, magenta, yellow } from "./color.js";
 
 export function hardwareText(session: Session): string {
   const h = session.hardware;
   const ram = formatBytes(h.memory.totalBytes, 0);
   const avail = h.memory.availableBytes ? formatBytes(h.memory.availableBytes) : "N/A";
   return [
-    t("machine"),
+    bold(cyan(t("machine"))),
     `  ${h.machineModel ?? t("unknownMachine")}`,
     `  ${h.cpu.name ?? t("cpuNa")}`,
     `  CPU           ${h.cpu.physicalCores ?? "N/A"} cores (${h.cpu.performanceCores ?? "?"}P / ${h.cpu.efficiencyCores ?? "?"}E)`,
@@ -26,13 +27,17 @@ export function hardwareText(session: Session): string {
 
 export function runtimesText(session: Session): string {
   return [
-    t("runtimes"),
-    ...session.runtimes.map((r) => `  ${r.detected ? "✓" : "○"} ${r.label.padEnd(14)} ${r.detected ? r.version ?? t("detected") : t("notDetected")}`),
+    bold(cyan(t("runtimes"))),
+    ...session.runtimes.map((r) => {
+      const mark = r.detected ? green("✓") : dim("○");
+      const state = r.detected ? green(r.version ?? t("detected")) : dim(t("notDetected"));
+      return `  ${mark} ${r.label.padEnd(14)} ${state}`;
+    }),
   ].join("\n");
 }
 
 export function modelsText(session: Session): string {
-  const lines = [t("installedModels"), "MODEL                 INSTALLED   FIT       EST. SPEED     MEASURED"];
+  const lines = [bold(cyan(t("installedModels"))), dim("MODEL                 INSTALLED   FIT       EST. SPEED     MEASURED")];
   for (const row of session.rows) {
     const fit = row.compatibility?.grade ?? "—";
     const est = row.compatibility?.estimatedTokensPerSecond
@@ -42,7 +47,7 @@ export function modelsText(session: Session): string {
       ? formatTokensPerSec(row.lastBenchmark.benchmark.generationTokensPerSecond)
       : t("notTested");
     lines.push(
-      `${row.local.name.padEnd(22)} ✓           ${fit.padEnd(9)} ${est.padEnd(14)} ${measured}`,
+      `${green(row.local.name.padEnd(22))} ✓           ${gradeAnsi(fit).padEnd(9)} ${est.padEnd(14)} ${measured}`,
     );
   }
   lines.push("", t("compatible"));
@@ -61,12 +66,19 @@ export function modelsText(session: Session): string {
 }
 
 export function recommendText(session: Session): string {
-  const lines = [t("recommended"), t("recommendedHint"), "", t("credits"), ""];
+  const lines = [bold(cyan(t("recommended"))), dim(t("recommendedHint")), "", dim(t("credits")), ""];
   for (const rec of session.recommendations) {
     lines.push(
-      `${rec.useCase.padEnd(12)} ${rec.model.name.padEnd(22)} ${rec.grade}  ${GRADE_MEANING[rec.grade]}  ~${na(rec.estimatedTokensPerSecond)} t/s est.`,
+      `${magenta(rec.useCase.padEnd(12))} ${rec.model.name.padEnd(22)} ${gradeAnsi(rec.grade)}  ${GRADE_MEANING[rec.grade]}  ~${na(rec.estimatedTokensPerSecond)} t/s est.`,
     );
   }
+  lines.push("", bold(yellow(t("agentsTitle"))));
+  for (const agent of session.agents) {
+    lines.push(
+      `  ${agent.detected ? green("✓") : dim("○")} ${agent.label.padEnd(12)} ${agent.detected ? green(t("detected")) : dim(t("agentMissing"))}`,
+    );
+  }
+  lines.push("", dim(t("recommendCliHint")));
   return lines.join("\n");
 }
 
@@ -109,6 +121,7 @@ export function doctorText(session: Session): string {
     `${session.hardware.gpu.metal ? "✓" : "○"} Metal`,
     ...session.runtimes.map((r) => `${r.detected ? "✓" : "○"} ${r.label.padEnd(14)} ${r.version ?? ""}`.trimEnd()),
     `${session.networkUsed ? "✓" : "○"} CanIRun.ai (midudev)`,
+    ...session.agents.map((a) => `${a.detected ? "✓" : "○"} ${a.label.padEnd(14)} ${a.detected ? t("detected") : t("agentMissing")}`),
     "",
     session.llamaBench
       ? t("doctorReady", { count: session.models.filter((m) => m.artifactPath).length })

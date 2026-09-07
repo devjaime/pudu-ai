@@ -6,6 +6,7 @@ import { memoryLabel } from "../../hardware/types.js";
 import type { Session } from "../../session/load.js";
 import { GRADE_MEANING } from "../../compatibility/types.js";
 import { t } from "../../i18n/index.js";
+import { gradeColor } from "../theme.js";
 
 export function Dashboard({ session }: { session: Session }): ReactElement {
   const h = session.hardware;
@@ -42,7 +43,7 @@ export function Dashboard({ session }: { session: Session }): ReactElement {
           {t("runtimes")}
         </Text>
         {session.runtimes.map((r) => (
-          <Text key={r.id}>
+          <Text key={r.id} color={r.detected ? "green" : "gray"}>
             {r.detected ? "✓" : "○"} {r.label.padEnd(14)} {r.detected ? r.version ?? t("detected") : t("notDetected")}
           </Text>
         ))}
@@ -55,7 +56,14 @@ export function Dashboard({ session }: { session: Session }): ReactElement {
         {session.rows.length === 0 && <Text dimColor>{t("noModels")}</Text>}
         {session.rows.map((row) => (
           <Text key={row.local.id}>
-            {row.local.name.padEnd(20)} {row.local.sizeBytes ? formatBytes(row.local.sizeBytes) : "N/A"}  {row.compatibility?.grade ?? "—"}  {row.lastBenchmark?.benchmark.generationTokensPerSecond ? formatTokensPerSec(row.lastBenchmark.benchmark.generationTokensPerSecond) : t("notTested")}
+            <Text color="green">{row.local.name.padEnd(20)}</Text>{" "}
+            {row.local.sizeBytes ? formatBytes(row.local.sizeBytes) : "N/A"}{" "}
+            <Text color={gradeColor(row.compatibility?.grade)} bold>
+              {row.compatibility?.grade ?? "—"}
+            </Text>{" "}
+            {row.lastBenchmark?.benchmark.generationTokensPerSecond
+              ? formatTokensPerSec(row.lastBenchmark.benchmark.generationTokensPerSecond)
+              : t("notTested")}
           </Text>
         ))}
       </Box>
@@ -67,7 +75,11 @@ export function Dashboard({ session }: { session: Session }): ReactElement {
         <Text dimColor>{t("recommendedHint")}</Text>
         {session.recommendations.map((rec) => (
           <Text key={`${rec.useCase}-${rec.model.id}`}>
-            {rec.useCase.padEnd(12)} {rec.model.name.padEnd(22)} {rec.grade} {GRADE_MEANING[rec.grade]}
+            <Text color="magenta">{rec.useCase.padEnd(12)}</Text> {rec.model.name.padEnd(22)}{" "}
+            <Text color={gradeColor(rec.grade)} bold>
+              {rec.grade}
+            </Text>{" "}
+            {GRADE_MEANING[rec.grade]}
           </Text>
         ))}
         <Text dimColor>{t("credits")}</Text>

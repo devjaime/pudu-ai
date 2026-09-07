@@ -9,6 +9,7 @@ import { resolveLocale, setLocale, t } from "../i18n/index.js";
 import { parseAnswers, planTasks, tasksText } from "../tasks/plan.js";
 import { decideAll, decideLaunch, launchText, parseIntegration } from "../integrations/decide.js";
 import { executeLaunch } from "../integrations/execute.js";
+import { canInstallGrade, pullOllamaModel } from "../integrations/pull.js";
 import { helpText } from "./help.js";
 import type { CliArgs } from "./parse-args.js";
 import {
@@ -74,9 +75,35 @@ export async function run(args: CliArgs): Promise<number> {
     case "models":
       print(args.json ? session.rows : explained("aboutModels", modelsText(session)), args.json);
       return 0;
-    case "recommend":
-      print(args.json ? session.recommendations : explained("aboutRecommend", recommendText(session)), args.json);
+    case "recommend": {
+      if (args.install && args.yes) {
+        const rec = session.recommendations.find((r) => canInstallGrade(r.grade));
+        if (!rec) {
+          print(t("installNone"), args.json);
+          return 1;
+        }
+        const pulled = await pullOllamaModel(rec.model.id);
+        print(args.json ? pulled : explained("aboutRecommend", pulled.log), args.json);
+        return pulled.ok ? 0 : 1;
+      }
+      if (args.link && args.yes) {
+        const tool = parseIntegration(args.link);
+        if (!tool || tool === "claude") {
+          process.stderr.write(`${t("launchNeedTool")}\n`);
+          return 1;
+        }
+        const decision = decideLaunch(session, tool);
+        if (!decision.eligible) {
+          print(explained("aboutLaunch", launchText([decision])), args.json);
+          return 1;
+        }
+        const result = await executeLaunch(decision);
+        print(args.json ? result : explained("aboutLaunch", result.log), args.json);
+        return result.ok ? 0 : 1;
+      }
+      print(args.json ? { recommendations: session.recommendations, agents: session.agents } : explained("aboutRecommend", recommendText(session)), args.json);
       return 0;
+    }
     case "launch": {
       const tool = parseIntegration(args.positional[0]);
       const decisions = tool ? [decideLaunch(session, tool)] : decideAll(session);

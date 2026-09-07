@@ -43,6 +43,8 @@ npx pudu-ai hardware
 npx pudu-ai models
 npx pudu-ai models add-path ~/Models
 npx pudu-ai recommend
+npx pudu-ai recommend --install --yes
+npx pudu-ai recommend --link opencode --yes
 npx pudu-ai tasks
 npx pudu-ai tasks --for code,image,transcription --lang es
 npx pudu-ai benchmark

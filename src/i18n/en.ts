@@ -33,6 +33,14 @@ export const en = {
   recommended: "RECOMMENDED FOR THIS MACHINE",
   recommendedHint:
     "Estimated values come from CanIRun.ai by midudev (canirun.ai · midu.dev) or a local fallback — not measured",
+  recommendKeys: "[↑↓] model  [I] ollama pull if grade S–B  [O] OpenCode  [E] Hermes  [W] OpenClaw  [Esc] back",
+  recommendCliHint: "Install: npx pudu-ai recommend --install --yes   Link: npx pudu-ai recommend --link opencode --yes",
+  agentsTitle: "CODING AGENTS",
+  agentMissing: "not installed — select to install via ollama launch if the model is eligible",
+  installGradeBlock: "Grade {grade} is too low to pull. Need S, A, or B.",
+  linkingTool: "Linking {tool} with {model}…",
+  modelPulled: "Pulled {model} with Ollama.",
+  installNone: "No recommended model has grade S–B to install.",
   credits:
     "Measured: llama-bench + OS telemetry. Estimated: CanIRun.ai by midudev (https://canirun.ai, https://github.com/midudev/canirun.ai, https://midu.dev). Labelled separately; never mixed.",
   noModels: "No local models detected",
@@ -143,6 +151,8 @@ Usage:
   npx pudu-ai models
   npx pudu-ai models add-path ~/Models
   npx pudu-ai recommend
+  npx pudu-ai recommend --install --yes
+  npx pudu-ai recommend --link opencode --yes
   npx pudu-ai tasks
   npx pudu-ai tasks --for code,image --scope all --priority speed
   npx pudu-ai benchmark [model]

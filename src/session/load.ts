@@ -13,6 +13,7 @@ import {
 import type { CatalogModel, CompatibilityResult, Recommendation } from "../compatibility/types.js";
 import { listBenchmarks, type BenchmarkRecord } from "../storage/benchmarks.js";
 import { commandExists } from "../shared/which.js";
+import { detectAgents, type AgentStatus } from "../integrations/agents.js";
 
 export type ModelRow = {
   local: LocalModel;
@@ -31,16 +32,18 @@ export type Session = {
   history: BenchmarkRecord[];
   llamaBench: boolean;
   networkUsed: boolean;
+  agents: AgentStatus[];
 };
 
 export async function loadSession(options: { network: boolean }): Promise<Session> {
   const hardware = await detectHardware();
-  const [runtimes, models, catalogState, history, llamaBench] = await Promise.all([
+  const [runtimes, models, catalogState, history, llamaBench, agents] = await Promise.all([
     detectRuntimes(),
     discoverLocalModels(),
     loadCatalog(options.network),
     listBenchmarks(),
     commandExists("llama-bench").then(Boolean),
+    detectAgents(),
   ]);
 
   const rows: ModelRow[] = [];
@@ -65,5 +68,6 @@ export async function loadSession(options: { network: boolean }): Promise<Sessio
     history,
     llamaBench,
     networkUsed: catalogState.networkUsed,
+    agents,
   };
 }

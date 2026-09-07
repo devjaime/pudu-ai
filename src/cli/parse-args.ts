@@ -28,6 +28,8 @@ export type CliArgs = {
   scope?: string;
   priority?: string;
   yes: boolean;
+  install: boolean;
+  link?: string;
 };
 
 export function parseArgs(argv: string[]): CliArgs {
@@ -59,6 +61,7 @@ export function parseArgs(argv: string[]): CliArgs {
   const forIndex = args.findIndex((a) => a === "--for");
   const scopeIndex = args.findIndex((a) => a === "--scope");
   const priorityIndex = args.findIndex((a) => a === "--priority");
+  const linkIndex = args.findIndex((a) => a === "--link");
 
   return {
     command: isKnown ? command : "dashboard",
@@ -77,5 +80,7 @@ export function parseArgs(argv: string[]): CliArgs {
     scope: scopeIndex >= 0 ? args[scopeIndex + 1] : undefined,
     priority: priorityIndex >= 0 ? args[priorityIndex + 1] : undefined,
     yes: flags.has("--yes"),
+    install: flags.has("--install"),
+    link: linkIndex >= 0 ? args[linkIndex + 1] : undefined,
   };
 }

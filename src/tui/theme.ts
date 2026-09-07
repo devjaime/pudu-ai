@@ -7,6 +7,14 @@ export const theme = {
   title: "white",
 } as const;
 
+export function gradeColor(grade: string | undefined): "green" | "yellow" | "magenta" | "red" | "gray" {
+  if (grade === "S" || grade === "A") return "green";
+  if (grade === "B") return "yellow";
+  if (grade === "C") return "magenta";
+  if (grade === "D" || grade === "F") return "red";
+  return "gray";
+}
+
 export function bar(percent: number | undefined, width = 10): string {
   if (percent === undefined || Number.isNaN(percent)) return `${"░".repeat(width)} N/A`;
   const filled = Math.max(0, Math.min(width, Math.round((percent / 100) * width)));

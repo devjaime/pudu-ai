@@ -29,6 +29,7 @@ function session(): Session {
     history: [],
     llamaBench: true,
     networkUsed: false,
+    agents: [],
   };
 }
 
