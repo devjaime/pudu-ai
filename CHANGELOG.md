@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.17 — 2026-09-07
+
+### Added
+
+- Setup hub: [5] brew install ollama, [6] brew install --cask lm-studio, [4] Docker, [1-3] agents
+
 ## 0.2.16 — 2026-09-07
 
 ### Fixed

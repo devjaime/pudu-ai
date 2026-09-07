@@ -28,6 +28,7 @@ export const en = {
   dockerRunFail: "Docker daemon is not running. Open Docker Desktop, wait until it is idle, press 4 again.",
   dockerBrewInstall: "Installing Docker with Homebrew (brew install --cask docker)…",
   dockerDesktopWait: "Starting Docker Desktop and waiting for the daemon…",
+  brewInstalling: "Homebrew: installing {pkg}…",
   aboutHistory:
     "Shows local benchmark files in ~/.pudu-ai/benchmarks. Use it to replay what this machine actually did.",
   aboutDoctor:

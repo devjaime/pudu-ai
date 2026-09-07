@@ -30,6 +30,7 @@ export const es: Record<MessageId, string> = {
   dockerRunFail: "El daemon de Docker no corre. Abre Docker Desktop, espera a que esté listo y pulsa 4 otra vez.",
   dockerBrewInstall: "Instalando Docker con Homebrew (brew install --cask docker)…",
   dockerDesktopWait: "Arrancando Docker Desktop y esperando al daemon…",
+  brewInstalling: "Homebrew: instalando {pkg}…",
   aboutHistory:
     "Muestra los JSON locales en ~/.pudu-ai/benchmarks. Sirve para ver qué hizo realmente esta máquina.",
   aboutDoctor:

@@ -33,6 +33,18 @@ export async function executeLaunch(decision: LaunchDecision): Promise<{ ok: boo
   return { ok: true, log: `${lines.join("\n")}\n${launched.stdout}`.trim() };
 }
 
+export async function installWithBrew(kind: "ollama" | "lmstudio"): Promise<{ ok: boolean; log: string }> {
+  const { brewInstall } = await import("./brew.js");
+  if (kind === "ollama") {
+    const result = await brewInstall(["install", "ollama"]);
+    if (result.ok) {
+      void runCommand("ollama", ["serve"], { timeout: 4000 });
+    }
+    return result;
+  }
+  return brewInstall(["install", "--cask", "lm-studio"]);
+}
+
 export async function executeDockerOllama(): Promise<{ ok: boolean; log: string }> {
   const { brewInstallCask, dockerReady, startDockerDesktop, waitForDocker } = await import("./brew.js");
   const notes: string[] = [];

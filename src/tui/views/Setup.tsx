@@ -2,7 +2,7 @@ import { Box, Text, useApp, useInput } from "ink";
 import { useState, type ReactElement } from "react";
 import { t } from "../../i18n/index.js";
 import { decideLaunch } from "../../integrations/decide.js";
-import { executeDockerOllama, executeLaunch } from "../../integrations/execute.js";
+import { executeDockerOllama, executeLaunch, installWithBrew } from "../../integrations/execute.js";
 import { canInstallGrade, pullOllamaModel } from "../../integrations/pull.js";
 import { resolveOllamaTag } from "../../integrations/ollama-tags.js";
 import type { IntegrationId } from "../../integrations/types.js";
@@ -51,20 +51,65 @@ export function SetupView({ session }: { session: Session }): ReactElement {
       });
       return;
     }
-    const tool = TOOLS.find((item) => item.key === input)?.id;
-    if (tool && rec) {
-      const decision = decideLaunch(session, tool);
-      if (!decision.eligible) {
-        setLog(decision.reasons.join(" "));
-        return;
-      }
+    if (input === "5") {
       setBusy(true);
-      setLog(t("linkingTool", { tool, model: rec.model.id }));
-      void executeLaunch({ ...decision, ollamaTag: decision.ollamaTag, modelId: rec.model.id }).then((result) => {
+      setLog(t("brewInstalling", { pkg: "ollama" }));
+      void installWithBrew("ollama").then((result) => {
         setLog(result.log);
         setBusy(false);
-        if (result.ok) exit();
       });
+      return;
+    }
+    if (input === "6") {
+      setBusy(true);
+      setLog(t("brewInstalling", { pkg: "lm-studio" }));
+      void installWithBrew("lmstudio").then((result) => {
+        setLog(result.log);
+        setBusy(false);
+      });
+      return;
+    }
+    const tool = TOOLS.find((item) => item.key === input)?.id;
+    if (tool) {
+      const ollama = session.runtimes.find((r) => r.id === "ollama")?.detected;
+      const agent = session.agents.find((a) => a.id === tool);
+      if (!ollama) {
+        setBusy(true);
+        setLog(t("brewInstalling", { pkg: "ollama" }));
+        void installWithBrew("ollama").then((brewed) => {
+          setLog(brewed.log);
+          setBusy(false);
+        });
+        return;
+      }
+      if (agent && !agent.detected) {
+        setBusy(true);
+        setLog(t("linkingTool", { tool, model: rec?.model.id ?? "" }));
+        const decision = decideLaunch(session, tool);
+        void executeLaunch(
+          decision.eligible
+            ? decision
+            : { ...decision, eligible: true, ollamaTag: decision.ollamaTag ?? "qwen3:8b", installed: false },
+        ).then((result) => {
+          setLog(result.log);
+          setBusy(false);
+        });
+        return;
+      }
+      if (rec) {
+        const decision = decideLaunch(session, tool);
+        if (!decision.eligible) {
+          setLog(decision.reasons.join(" "));
+          return;
+        }
+        setBusy(true);
+        setLog(t("linkingTool", { tool, model: rec.model.id }));
+        void executeLaunch(decision).then((result) => {
+          setLog(result.log);
+          setBusy(false);
+          if (result.ok) exit();
+        });
+      }
     }
   });
 
@@ -93,13 +138,15 @@ export function SetupView({ session }: { session: Session }): ReactElement {
         [4] {session.runtimes.find((r) => r.id === "docker")?.detected ? "✓" : "○"} Docker
         {session.runtimes.find((r) => r.id === "docker")?.detected ? `  → ${t("dockerHint")}` : `  → ${t("reqDocker")}`}
       </Text>
-      <Text dimColor>
-        {fit(
-          `Ollama: ${session.runtimes.find((r) => r.id === "ollama")?.detected ? "✓" : t("reqOllama")}  LM Studio: ${session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "✓" : t("reqLmStudio")}`,
-          cols,
-        )}
+      <Text color={session.runtimes.find((r) => r.id === "ollama")?.detected ? "green" : "yellow"}>
+        [5] {session.runtimes.find((r) => r.id === "ollama")?.detected ? "✓" : "○"} Ollama
+        {session.runtimes.find((r) => r.id === "ollama")?.detected ? "" : "  → brew install ollama"}
       </Text>
-      <Typewriter text={fit(`Enter=pull ${tag ?? ""}  1/2/3=agent  Esc=back`, cols)} ms={14} dimColor />
+      <Text color={session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "green" : "yellow"}>
+        [6] {session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "✓" : "○"} LM Studio
+        {session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "" : "  → brew install --cask lm-studio"}
+      </Text>
+      <Typewriter text={fit(`Enter=pull ${tag ?? ""}  1-3 agent  4 docker  5 ollama  6 LM Studio`, cols)} ms={14} dimColor />
       {log ? <Text color="green">{fit(log, cols)}</Text> : null}
     </Box>
   );

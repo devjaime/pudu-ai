@@ -34,6 +34,16 @@ export async function ensureBrew(): Promise<{ ok: boolean; brew?: string; log: s
   };
 }
 
+export async function brewInstall(args: string[]): Promise<{ ok: boolean; log: string }> {
+  const ensured = await ensureBrew();
+  if (!ensured.ok || !ensured.brew) return { ok: false, log: ensured.log };
+  const result = await runCommand(ensured.brew, args, { timeout: 15 * 60_000 });
+  return {
+    ok: result.exitCode === 0,
+    log: `${ensured.brew} ${args.join(" ")}\n${result.stdout || result.stderr}`,
+  };
+}
+
 export async function brewInstallCask(name: string): Promise<{ ok: boolean; log: string }> {
   const brew = await resolveBrew();
   if (!brew) {
