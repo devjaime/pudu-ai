@@ -5,6 +5,7 @@ import { t } from "../../i18n/index.js";
 import { decideLaunch } from "../../integrations/decide.js";
 import { executeLaunch } from "../../integrations/execute.js";
 import { canInstallGrade, pullOllamaModel } from "../../integrations/pull.js";
+import { resolveOllamaTag } from "../../integrations/ollama-tags.js";
 import type { IntegrationId } from "../../integrations/types.js";
 import type { Session } from "../../session/load.js";
 import { gradeColor } from "../theme.js";
@@ -33,8 +34,8 @@ export function RecommendView({ session }: { session: Session }): ReactElement {
         return;
       }
       setBusy(true);
-      setLog(t("launchPulling", { model: rec.model.id }));
-      void pullOllamaModel(rec.model.id).then((result) => {
+      setLog(t("launchPulling", { model: rec.model.name }));
+      void pullOllamaModel(rec.model.id, rec.model.name).then((result) => {
         setLog(result.log);
         setBusy(false);
       });
@@ -77,7 +78,8 @@ export function RecommendView({ session }: { session: Session }): ReactElement {
           <Text color={gradeColor(item.grade)} bold>
             {item.grade}
           </Text>{" "}
-          {GRADE_MEANING[item.grade]}
+          {GRADE_MEANING[item.grade]}{" "}
+          <Text dimColor>{resolveOllamaTag(item.model.id, item.model.name) ?? t("noOllamaTag", { model: item.model.name })}</Text>
         </Text>
       ))}
 

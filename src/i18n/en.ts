@@ -53,6 +53,8 @@ export const en = {
   linkingTool: "Linking {tool} with {model}…",
   modelPulled: "Pulled {model} with Ollama.",
   installNone: "No recommended model has grade S–B to install.",
+  noOllamaTag:
+    "No Ollama library tag for {model}. Catalog names like Agents-A1 are not pullable. Use qwen3:8b, gemma3:4b, qwen3.5:4b, llama3.1:8b.",
   credits:
     "Measured: llama-bench + OS telemetry. Estimated: CanIRun.ai by midudev (https://canirun.ai, https://github.com/midudev/canirun.ai, https://midu.dev). Labelled separately; never mixed.",
   noModels: "No local models detected",

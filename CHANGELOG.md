@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.8 — 2026-09-07
+
+### Fixed
+
+- Only `ollama pull` tags that exist in the Ollama library (no Agents-A1, etc.)
+- Welcome art: compact llama + Claude-style header, `by devjaime`
+
 ## 0.2.7 — 2026-09-07
 
 ### Added

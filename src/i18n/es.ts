@@ -55,6 +55,8 @@ export const es: Record<MessageId, string> = {
   linkingTool: "Vinculando {tool} con {model}…",
   modelPulled: "Descargado {model} con Ollama.",
   installNone: "Ningún modelo recomendado tiene nota S–B para instalar.",
+  noOllamaTag:
+    "No hay tag de Ollama para {model}. Nombres de catálogo como Agents-A1 no se pueden descargar. Usa qwen3:8b, gemma3:4b, qwen3.5:4b, llama3.1:8b.",
   credits:
     "Medido: llama-bench + telemetría del SO. Estimado: CanIRun.ai de midudev (https://canirun.ai, https://github.com/midudev/canirun.ai, https://midu.dev). Se etiquetan por separado; nunca se mezclan.",
   noModels: "No se detectaron modelos locales",

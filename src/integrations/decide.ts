@@ -3,17 +3,12 @@ import type { Grade } from "../compatibility/types.js";
 import { localCompatibility } from "../compatibility/local.js";
 import type { Session } from "../session/load.js";
 import { INTEGRATIONS } from "./catalog.js";
+import { resolveOllamaTag } from "./ollama-tags.js";
 import { INTEGRATION_IDS, type IntegrationId, type LaunchDecision } from "./types.js";
 
 const GRADE_RANK: Record<Grade, number> = { S: 5, A: 4, B: 3, C: 2, D: 1, F: 0 };
 
-export function toOllamaTag(id: string): string {
-  const compact = id.toLowerCase().replace(/_/g, "-");
-  const match = compact.match(/^([a-z0-9.]+(?:-[a-z0-9.]+)*)-(\d+(?:\.\d+)?b)$/i);
-  if (match) return `${match[1]}:${match[2]}`;
-  if (compact.includes(":")) return compact;
-  return compact;
-}
+export { toOllamaTag, resolveOllamaTag } from "./ollama-tags.js";
 
 function useCaseOk(useCases: string[] | undefined, needed: string[]): boolean {
   if (!useCases?.length) return needed.includes("chat");
@@ -39,10 +34,12 @@ export function decideLaunch(session: Session, id: IntegrationId): LaunchDecisio
   for (const row of session.rows) {
     const useCases = row.catalog?.useCase ?? ["chat", "code"];
     if (!useCaseOk(useCases, def.useCases)) continue;
+    const tag = resolveOllamaTag(row.local.id, row.local.name, row.catalog?.id, row.catalog?.name);
+    if (!tag) continue;
     const tps = row.lastBenchmark?.benchmark.generationTokensPerSecond;
     candidates.push({
       modelId: row.local.id,
-      ollamaTag: row.local.id.includes(":") ? row.local.id : toOllamaTag(row.local.id),
+      ollamaTag: tag,
       installed: true,
       origin: row.lastBenchmark ? "measured" : "estimated",
       grade: row.compatibility?.grade,
@@ -55,9 +52,11 @@ export function decideLaunch(session: Session, id: IntegrationId): LaunchDecisio
       if (!useCaseOk(model.useCase, def.useCases)) continue;
       const fit = localCompatibility(session.hardware, model);
       if (!def.allowedGrades.includes(fit.grade)) continue;
+      const tag = resolveOllamaTag(model.id, model.name);
+      if (!tag) continue;
       candidates.push({
         modelId: model.id,
-        ollamaTag: toOllamaTag(model.id),
+        ollamaTag: tag,
         installed: false,
         origin: "estimated",
         grade: fit.grade,

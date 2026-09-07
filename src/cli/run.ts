@@ -89,7 +89,7 @@ export async function run(args: CliArgs): Promise<number> {
           print(t("installNone"), args.json);
           return 1;
         }
-        const pulled = await pullOllamaModel(rec.model.id);
+        const pulled = await pullOllamaModel(rec.model.id, rec.model.name);
         print(args.json ? pulled : explained("aboutRecommend", pulled.log), args.json);
         return pulled.ok ? 0 : 1;
       }

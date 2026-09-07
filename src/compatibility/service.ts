@@ -4,6 +4,7 @@ import { idsLikelyMatch, normalizeModelId } from "../models/match.js";
 import type { LocalModel } from "../models/types.js";
 import { loadCatalogCache, saveCatalogCache } from "../storage/cache.js";
 import { t } from "../i18n/index.js";
+import { resolveOllamaTag } from "../integrations/ollama-tags.js";
 import { localCompatibility } from "./local.js";
 import type { CatalogModel, CompatibilityResult, Recommendation } from "./types.js";
 
@@ -66,8 +67,12 @@ export async function recommendForMachine(
     try {
       const rows: Recommendation[] = [];
       for (const useCase of useCases) {
-        const found = await fetchRecommendations(hardware, useCase, 1);
-        rows.push(...found.map((item) => ({ ...item, useCase: labelUseCase(useCase) })));
+        const found = await fetchRecommendations(hardware, useCase, 8);
+        const mapped = found
+          .filter((item) => resolveOllamaTag(item.model.id, item.model.name))
+          .slice(0, 1)
+          .map((item) => ({ ...item, useCase: labelUseCase(useCase) }));
+        rows.push(...mapped);
       }
       if (rows.length) return rows;
     } catch {
@@ -84,6 +89,7 @@ export async function recommendForMachine(
   for (const useCase of useCases) {
     const hit = ranked.find((row) => {
       if (used.has(row.model.id)) return false;
+      if (!resolveOllamaTag(row.model.id, row.model.name)) return false;
       if (useCase === "chat") return row.model.useCase?.includes("chat") ?? true;
       return row.model.useCase?.some((u) => u.includes(useCase)) ?? false;
     });
