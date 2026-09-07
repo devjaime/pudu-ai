@@ -10,7 +10,7 @@ import { BenchmarkView } from "./views/Benchmark.js";
 import { HistoryView } from "./views/History.js";
 import { TasksView } from "./views/Tasks.js";
 import { handleAppKey, type Screen } from "./keys.js";
-import { ColorNav, Welcome } from "./Welcome.js";
+import { Chrome } from "./Welcome.js";
 
 export function App(props: { session: Session; preset?: string; start?: Screen }): ReactElement {
   const { exit } = useApp();
@@ -31,13 +31,8 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
   });
 
   return (
-    <Box flexDirection="column" paddingX={1} paddingTop={0} paddingBottom={1}>
-      {screen !== "benchmark" && (
-        <>
-          <ColorNav />
-          <Welcome compact />
-        </>
-      )}
+    <Box flexDirection="column" paddingX={1}>
+      {screen !== "benchmark" && <Chrome />}
       {screen === "home" && <Dashboard session={props.session} />}
       {screen === "models" && <ModelsView session={props.session} />}
       {screen === "hardware" && <HardwareView session={props.session} />}

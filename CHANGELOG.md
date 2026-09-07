@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.10 — 2026-09-07
+
+### Changed
+
+- Compact one-line chrome; drop overlapping art and long copy
+
 ## 0.2.9 — 2026-09-07
 
 ### Fixed

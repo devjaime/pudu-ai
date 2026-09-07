@@ -1,6 +1,5 @@
 import { Box, Text, useApp, useInput } from "ink";
 import { useState, type ReactElement } from "react";
-import { GRADE_MEANING } from "../../compatibility/types.js";
 import { t } from "../../i18n/index.js";
 import { decideLaunch } from "../../integrations/decide.js";
 import { executeLaunch } from "../../integrations/execute.js";
@@ -57,54 +56,33 @@ export function RecommendView({ session }: { session: Session }): ReactElement {
     }
   });
 
+  const tag = rec ? resolveOllamaTag(rec.model.id, rec.model.name) : undefined;
+
   return (
     <Box flexDirection="column">
-      <Box borderStyle="round" borderColor="yellow" flexDirection="column" paddingX={1} marginBottom={1}>
-        <Text bold color="yellow">
-          {t("setupTitle")}
-        </Text>
-        <Text>{t("setupIntro")}</Text>
-      </Box>
-
-      <Text bold color="cyan">
-        {t("setupStep1")}
+      <Text bold color="yellow">
+        {t("setupTitle")}
       </Text>
-      {recs.length === 0 && <Text dimColor>{t("installNone")}</Text>}
       {recs.map((item, i) => (
         <Text key={`${item.useCase}-${item.model.id}`} color={i === cursor ? "cyan" : undefined}>
           {i === cursor ? "❯ " : "  "}
-          <Text color="magenta">{item.useCase.padEnd(12)}</Text>
-          {item.model.name.padEnd(22)}{" "}
-          <Text color={gradeColor(item.grade)} bold>
-            {item.grade}
-          </Text>{" "}
-          {GRADE_MEANING[item.grade]}{" "}
-          <Text dimColor>{resolveOllamaTag(item.model.id, item.model.name) ?? t("noOllamaTag", { model: item.model.name })}</Text>
+          {item.model.name}{" "}
+          <Text color={gradeColor(item.grade)}>{item.grade}</Text>
+          <Text dimColor> {resolveOllamaTag(item.model.id, item.model.name) ?? "—"}</Text>
         </Text>
       ))}
-
-      <Box marginTop={1} flexDirection="column">
-        <Text bold color="green">
-          {t("setupStep2")}
-        </Text>
-        <Text color="green">{t("setupInstallModel")}</Text>
-      </Box>
-
-      <Box marginTop={1} flexDirection="column">
-        <Text bold color="yellow">
-          {t("setupStep3")}
-        </Text>
+      <Text>
         {session.agents.map((agent, index) => (
-          <Text key={agent.id} color={agent.detected ? "green" : "yellow"}>
-            [{index + 1}] {agent.detected ? "✓" : "○"} {agent.label.padEnd(12)}{" "}
-            {agent.detected ? t("setupLinkNow") : t("setupInstallAgent")}
+          <Text key={agent.id} color={agent.detected ? "green" : "gray"}>
+            {index ? "  " : ""}
+            [{index + 1}]{agent.detected ? "✓" : "○"}
+            {agent.label}
           </Text>
         ))}
-      </Box>
-
-      <Box marginTop={1}>
-        <Text dimColor>{t("setupKeys")}</Text>
-      </Box>
+      </Text>
+      <Text dimColor>
+        Enter=pull {tag ?? ""} · 1/2/3=agent
+      </Text>
       {log ? <Text color="green">{log}</Text> : null}
     </Box>
   );
