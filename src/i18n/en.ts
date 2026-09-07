@@ -21,6 +21,11 @@ export const en = {
   compareNeedBench: "Need 2+ measured models. Press [B] to benchmark first.",
   reqOllama: "install: https://ollama.com/download  or  brew install ollama",
   reqLmStudio: "install: https://lmstudio.ai",
+  reqDocker: "install: https://docs.docker.com/get-docker/  or  brew install --cask docker",
+  dockerHint: "press 4 to run ollama/ollama in Docker",
+  dockerStarting: "Starting ollama/ollama container…",
+  dockerRunOk: "Docker Ollama is up on port 11434 (name: pudu-ollama).",
+  dockerRunFail: "docker run failed. Is Docker Desktop running?",
   aboutHistory:
     "Shows local benchmark files in ~/.pudu-ai/benchmarks. Use it to replay what this machine actually did.",
   aboutDoctor:

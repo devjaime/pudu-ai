@@ -20,6 +20,11 @@ export async function detectRuntimes(): Promise<RuntimeStatus[]> {
     label: "llama-bench",
     detected: llamaBench,
   });
+  statuses.push({
+    id: "docker",
+    label: "Docker",
+    detected: Boolean(await commandExists("docker")),
+  });
   return statuses;
 }
 

@@ -1,4 +1,5 @@
 import { runCommand } from "../shared/process.js";
+import { DOCKER_OLLAMA } from "./agents.js";
 import { t } from "../i18n/index.js";
 import type { LaunchDecision } from "./types.js";
 import { INTEGRATIONS } from "./catalog.js";
@@ -30,4 +31,13 @@ export async function executeLaunch(decision: LaunchDecision): Promise<{ ok: boo
     };
   }
   return { ok: true, log: `${lines.join("\n")}\n${launched.stdout}`.trim() };
+}
+
+export async function executeDockerOllama(): Promise<{ ok: boolean; log: string }> {
+  const args = DOCKER_OLLAMA.split(" ").slice(1);
+  const result = await runCommand("docker", args, { timeout: 10 * 60_000 });
+  if (result.exitCode !== 0) {
+    return { ok: false, log: result.stderr || t("dockerRunFail") };
+  }
+  return { ok: true, log: t("dockerRunOk") };
 }

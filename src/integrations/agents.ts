@@ -47,4 +47,8 @@ export async function detectAgents(): Promise<AgentStatus[]> {
 export const REQ_INSTALL = {
   ollama: "https://ollama.com/download   or   brew install ollama",
   lmstudio: "https://lmstudio.ai",
+  docker: "https://docs.docker.com/get-docker/   or   brew install --cask docker",
 };
+
+export const DOCKER_OLLAMA =
+  "docker run -d --name pudu-ollama -p 11434:11434 -v ollama:/root/.ollama ollama/ollama";

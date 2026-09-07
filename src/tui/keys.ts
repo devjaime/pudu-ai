@@ -38,7 +38,7 @@ export function handleAppKey(
   if (key.escape) return screen === "home" ? { type: "quit" } : { type: "home" };
 
   if (screen === "setup") {
-    if (letter === "i" || letter === "1" || letter === "2" || letter === "3") return { type: "ignore" };
+    if (letter === "i" || letter === "1" || letter === "2" || letter === "3" || letter === "4") return { type: "ignore" };
   }
 
   const nav = globalNav(letter);

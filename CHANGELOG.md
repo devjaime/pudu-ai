@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.15 — 2026-09-07
+
+### Added
+
+- Docker as a runtime option: detect, install hint, or [4] `docker run ollama/ollama`
+
 ## 0.2.14 — 2026-09-07
 
 ### Added

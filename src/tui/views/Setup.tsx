@@ -2,7 +2,7 @@ import { Box, Text, useApp, useInput } from "ink";
 import { useState, type ReactElement } from "react";
 import { t } from "../../i18n/index.js";
 import { decideLaunch } from "../../integrations/decide.js";
-import { executeLaunch } from "../../integrations/execute.js";
+import { executeDockerOllama, executeLaunch } from "../../integrations/execute.js";
 import { canInstallGrade, pullOllamaModel } from "../../integrations/pull.js";
 import { resolveOllamaTag } from "../../integrations/ollama-tags.js";
 import type { IntegrationId } from "../../integrations/types.js";
@@ -42,6 +42,20 @@ export function SetupView({ session }: { session: Session }): ReactElement {
         setBusy(false);
       });
     }
+    if (input === "4") {
+      const docker = session.runtimes.find((r) => r.id === "docker")?.detected;
+      if (!docker) {
+        setLog(t("reqDocker"));
+        return;
+      }
+      setBusy(true);
+      setLog(t("dockerStarting"));
+      void executeDockerOllama().then((result) => {
+        setLog(result.log);
+        setBusy(false);
+      });
+      return;
+    }
     const tool = TOOLS.find((item) => item.key === input)?.id;
     if (tool && rec) {
       const decision = decideLaunch(session, tool);
@@ -80,6 +94,10 @@ export function SetupView({ session }: { session: Session }): ReactElement {
           {agent.detected ? "" : `  → ${agent.launch}`}
         </Text>
       ))}
+      <Text color={session.runtimes.find((r) => r.id === "docker")?.detected ? "green" : "yellow"}>
+        [4] {session.runtimes.find((r) => r.id === "docker")?.detected ? "✓" : "○"} Docker
+        {session.runtimes.find((r) => r.id === "docker")?.detected ? `  → ${t("dockerHint")}` : `  → ${t("reqDocker")}`}
+      </Text>
       <Text dimColor>
         {fit(
           `Ollama: ${session.runtimes.find((r) => r.id === "ollama")?.detected ? "✓" : t("reqOllama")}  LM Studio: ${session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "✓" : t("reqLmStudio")}`,

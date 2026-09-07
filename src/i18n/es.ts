@@ -23,6 +23,11 @@ export const es: Record<MessageId, string> = {
   compareNeedBench: "Hacen falta 2+ modelos medidos. Pulsa [B] para hacer un benchmark primero.",
   reqOllama: "instalar: https://ollama.com/download  o  brew install ollama",
   reqLmStudio: "instalar: https://lmstudio.ai",
+  reqDocker: "instalar: https://docs.docker.com/get-docker/  o  brew install --cask docker",
+  dockerHint: "pulsa 4 para correr ollama/ollama en Docker",
+  dockerStarting: "Arrancando contenedor ollama/ollama…",
+  dockerRunOk: "Ollama en Docker está en el puerto 11434 (nombre: pudu-ollama).",
+  dockerRunFail: "falló docker run. ¿Docker Desktop está abierto?",
   aboutHistory:
     "Muestra los JSON locales en ~/.pudu-ai/benchmarks. Sirve para ver qué hizo realmente esta máquina.",
   aboutDoctor:

@@ -130,6 +130,9 @@ export function doctorText(session: Session): string {
     ...(session.runtimes.find((r) => r.id === "lmstudio")?.detected
       ? []
       : [`○ LM Studio     ${t("reqLmStudio")}`]),
+    ...(session.runtimes.find((r) => r.id === "docker")?.detected
+      ? [`✓ Docker         ${t("dockerHint")}`]
+      : [`○ Docker        ${t("reqDocker")}`]),
     "",
     session.llamaBench
       ? t("doctorReady", { count: session.models.filter((m) => m.artifactPath).length })
