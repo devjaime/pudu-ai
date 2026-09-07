@@ -10,8 +10,7 @@ import { CompareView } from "./views/Compare.js";
 import { BenchmarkView } from "./views/Benchmark.js";
 import { HistoryView } from "./views/History.js";
 import { TasksView } from "./views/Tasks.js";
-
-type Screen = "home" | "models" | "hardware" | "recommend" | "compare" | "benchmark" | "history" | "tasks";
+import { handleAppKey, type Screen } from "./keys.js";
 
 export function App(props: { session: Session; preset?: string }): ReactElement {
   const { exit } = useApp();
@@ -23,22 +22,10 @@ export function App(props: { session: Session; preset?: string }): ReactElement 
   );
 
   useInput((input, key) => {
-    if (screen === "benchmark") return;
-    if (screen === "recommend" || screen === "tasks") {
-      if (letter === "q") exit();
-      if (key.escape) setScreen("home");
-      return;
-    }
-    const letter = input.toLowerCase();
-    if (letter === "q" || key.escape) exit();
-    if (letter === "b") setScreen("benchmark");
-    if (letter === "m") setScreen("models");
-    if (letter === "r") setScreen("recommend");
-    if (letter === "h") setScreen("hardware");
-    if (letter === "c") setScreen("compare");
-    if (letter === "l") setScreen("history");
-    if (letter === "t") setScreen("tasks");
-    if (key.return && screen === "home") setScreen("benchmark");
+    const result = handleAppKey(screen, input, key);
+    if (result.type === "quit") exit();
+    if (result.type === "home") setScreen("home");
+    if (result.type === "screen") setScreen(result.screen);
   });
 
   return (

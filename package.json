@@ -1,6 +1,6 @@
 {
   "name": "pudu-ai",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Pudu-AI — local AI hardware & benchmark lab for the terminal",
   "keywords": [
     "ai",
