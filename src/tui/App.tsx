@@ -1,5 +1,5 @@
 import { Box, useApp, useInput } from "ink";
-import { useMemo, useState, type ReactElement } from "react";
+import { useMemo, useRef, useState, type ReactElement } from "react";
 import type { Session } from "../session/load.js";
 import { Dashboard } from "./views/Dashboard.js";
 import { ModelsView } from "./views/Models.js";
@@ -15,6 +15,8 @@ import { ColorNav, Welcome } from "./Welcome.js";
 export function App(props: { session: Session; preset?: string; start?: Screen }): ReactElement {
   const { exit } = useApp();
   const [screen, setScreen] = useState<Screen>(props.start ?? "home");
+  const screenRef = useRef(screen);
+  screenRef.current = screen;
   const [selected, setSelected] = useState(0);
   const benchable = useMemo(
     () => props.session.models.filter((m) => Boolean(m.artifactPath)),
@@ -22,15 +24,20 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
   );
 
   useInput((input, key) => {
-    const result = handleAppKey(screen, input, key);
+    const result = handleAppKey(screenRef.current, input, key);
     if (result.type === "quit") exit();
     if (result.type === "home") setScreen("home");
     if (result.type === "screen") setScreen(result.screen);
   });
 
   return (
-    <Box flexDirection="column" padding={1}>
-      {screen !== "benchmark" && <Welcome compact={screen !== "home"} />}
+    <Box flexDirection="column" paddingX={1} paddingTop={0} paddingBottom={1}>
+      {screen !== "benchmark" && (
+        <>
+          <ColorNav />
+          <Welcome compact />
+        </>
+      )}
       {screen === "home" && <Dashboard session={props.session} />}
       {screen === "models" && <ModelsView session={props.session} />}
       {screen === "hardware" && <HardwareView session={props.session} />}
@@ -48,7 +55,6 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
           onBack={() => setScreen("home")}
         />
       )}
-      {screen !== "benchmark" && <ColorNav />}
     </Box>
   );
 }

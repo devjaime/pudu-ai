@@ -14,19 +14,7 @@ export type AppKeyResult =
   | { type: "home" }
   | { type: "screen"; screen: Screen };
 
-export function handleAppKey(
-  screen: Screen,
-  input: string,
-  key: { escape?: boolean; return?: boolean },
-): AppKeyResult {
-  const letter = input.toLowerCase();
-  if (screen === "benchmark") return { type: "ignore" };
-  if (screen === "recommend" || screen === "tasks") {
-    if (letter === "q") return { type: "quit" };
-    if (key.escape) return { type: "home" };
-    return { type: "ignore" };
-  }
-  if (letter === "q" || key.escape) return { type: "quit" };
+function globalNav(letter: string): AppKeyResult | undefined {
   if (letter === "b") return { type: "screen", screen: "benchmark" };
   if (letter === "m") return { type: "screen", screen: "models" };
   if (letter === "r") return { type: "screen", screen: "recommend" };
@@ -34,7 +22,27 @@ export function handleAppKey(
   if (letter === "c") return { type: "screen", screen: "compare" };
   if (letter === "l") return { type: "screen", screen: "history" };
   if (letter === "t") return { type: "screen", screen: "tasks" };
-  if (letter === "s" || letter === "i") return { type: "screen", screen: "recommend" };
+  if (letter === "s") return { type: "screen", screen: "recommend" };
+  return undefined;
+}
+
+export function handleAppKey(
+  screen: Screen,
+  input: string,
+  key: { escape?: boolean; return?: boolean },
+): AppKeyResult {
+  const letter = input.toLowerCase();
+  if (screen === "benchmark") return { type: "ignore" };
+  if (letter === "q") return { type: "quit" };
+  if (key.escape) return screen === "home" ? { type: "quit" } : { type: "home" };
+
+  if (screen === "recommend") {
+    if (letter === "i" || letter === "1" || letter === "2" || letter === "3") return { type: "ignore" };
+  }
+
+  const nav = globalNav(letter);
+  if (nav) return nav;
+  if (letter === "i" && screen === "home") return { type: "screen", screen: "recommend" };
   if (key.return && screen === "home") return { type: "screen", screen: "benchmark" };
   return { type: "ignore" };
 }

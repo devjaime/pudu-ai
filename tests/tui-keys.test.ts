@@ -22,4 +22,11 @@ describe("TUI key handler", () => {
   it("ignores letters while benchmarking", () => {
     expect(handleAppKey("benchmark", "q", {})).toEqual({ type: "ignore" });
   });
+
+  it("keeps S and B working from the setup screen", () => {
+    expect(handleAppKey("recommend", "b", {})).toEqual({ type: "screen", screen: "benchmark" });
+    expect(handleAppKey("recommend", "s", {})).toEqual({ type: "screen", screen: "recommend" });
+    expect(handleAppKey("recommend", "i", {})).toEqual({ type: "ignore" });
+    expect(handleAppKey("tasks", "b", {})).toEqual({ type: "screen", screen: "benchmark" });
+  });
 });

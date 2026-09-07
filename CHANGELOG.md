@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.9 — 2026-09-07
+
+### Fixed
+
+- Nav keys S/B/M/… work from Setup/Tasks; menu pinned to the top so it is not covered
+
 ## 0.2.8 — 2026-09-07
 
 ### Fixed
