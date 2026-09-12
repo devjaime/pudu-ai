@@ -39,6 +39,29 @@ export const en = {
     "Explains Ollama integrations (OpenCode, OpenClaw, Hermes, Claude Code). Pull/launch only with --yes if the model grade is S–B and speed is enough. Use it to wire a coding agent only when this hardware can carry it.",
   aboutAddPath:
     "Adds a GGUF folder to scan (not the whole disk). Use it so llama-bench can find models outside Ollama.",
+  aboutRepoSearch:
+    "Deterministic repository search (Pudu Agent Lab). Literal strings use rg; syntactic patterns use ast-grep. No LLM. Missing tools are reported, never faked.",
+  repoSearchTitle: "Pudu Agent Lab — repo search",
+  repoNeedQuery: "Pass a query or --structural PATTERN, e.g. npx pudu-ai repo search validate_user --json",
+  repoUnknownSubcommand: "Unknown repo subcommand: {sub}. Iteration 1 supports search only.",
+  repoPythonMissing: "python3 not found. Agent Lab search needs Python 3.10+ on PATH.",
+  repoToolMissing: "{tool} not found on PATH",
+  repoNoMatches: "No matches.",
+  repoHelp: `Pudu Agent Lab — repository search
+
+Usage:
+  npx pudu-ai repo search QUERY
+  npx pudu-ai repo search QUERY --repo PATH --json
+  npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
+
+Flags:
+  --repo PATH         Repository root (default: cwd)
+  --structural PAT    ast-grep pattern
+  --intent INTENT     TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
+  --glob GLOB         Repeatable include glob
+  --limit N           Max matches (default 100)
+  --json              Machine-readable SearchResult
+`,
   nav: "[S] Setup/Install  [B] Benchmark  [M] Models  [R] Recommend  [T] Tasks  [H] Hardware  [C] Compare  [L] History  [Q] Quit",
   setupTitle: "SETUP — INSTALL MODELS & AGENTS",
   setupIntro:
@@ -191,6 +214,8 @@ Usage:
   npx pudu-ai launch
   npx pudu-ai launch opencode
   npx pudu-ai launch opencode --yes
+  npx pudu-ai repo search QUERY
+  npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
 
 Flags:
   --json          Machine-readable JSON (no TUI)
@@ -204,6 +229,11 @@ Flags:
   --scope         installed | all
   --priority      speed | balanced | quality
   --yes           Execute pull/launch only if the model is eligible
+  --repo          Agent Lab repository root
+  --structural    ast-grep pattern for repo search
+  --intent        TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
+  --glob          Repeatable include glob for repo search
+  --limit         Max repo search matches
 
 Credits:
   Measured values come from llama-bench and OS telemetry.

@@ -1,0 +1,27 @@
+[
+  {
+    "text": "def validate_user(username: str) -> bool:\n    return bool(username)",
+    "range": {
+      "byteOffset": { "start": 0, "end": 60 },
+      "start": { "line": 0, "column": 0 },
+      "end": { "line": 1, "column": 28 }
+    },
+    "file": "pkg/auth.py",
+    "lines": "def validate_user(username: str) -> bool:",
+    "language": "Python",
+    "metaVariables": {
+      "single": {
+        "FUNC": {
+          "text": "validate_user",
+          "range": {
+            "byteOffset": { "start": 4, "end": 17 },
+            "start": { "line": 0, "column": 4 },
+            "end": { "line": 0, "column": 17 }
+          }
+        }
+      },
+      "multi": {},
+      "transformed": {}
+    }
+  }
+]

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Pudu Agent Lab spec and `pudu-ai repo search` (rg + ast-grep via Python JSON protocol)
+- Docs in English and Spanish: `docs/spec/agent-lab.md`, `docs/spec/agent-lab.es.md`, `docs/agent-lab-usage.md`, `docs/agent-lab-usage.es.md`, `README.es.md`
+
 ## 0.2.19 — 2026-09-07
 
 ### Fixed

@@ -35,6 +35,8 @@ TUI / JSON / CSV
 
 The same session + benchmark engine powers interactive TUI, `--json`, and future UIs.
 
+Agent Lab (`src/agent-lab`, `python/pudu_agent`) is a separate orchestrator. `pudu-ai repo …` must not call `loadSession`. See `docs/spec/agent-lab.md`.
+
 ## Adapters
 
 ```ts

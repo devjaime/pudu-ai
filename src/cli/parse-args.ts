@@ -10,7 +10,8 @@ export type CliCommand =
   | "report"
   | "tasks"
   | "launch"
-  | "setup";
+  | "setup"
+  | "repo";
 
 export type CliArgs = {
   command: CliCommand;
@@ -31,12 +32,58 @@ export type CliArgs = {
   yes: boolean;
   install: boolean;
   link?: string;
+  structural?: string;
+  repo?: string;
+  intent?: string;
+  limit?: number;
+  globs: string[];
 };
+
+const VALUE_FLAGS = new Set([
+  "--preset",
+  "--lang",
+  "--locale",
+  "--for",
+  "--scope",
+  "--priority",
+  "--link",
+  "--structural",
+  "--repo",
+  "--intent",
+  "--limit",
+  "--glob",
+]);
+
+function flagValue(args: string[], name: string): string | undefined {
+  const index = args.findIndex((a) => a === name);
+  if (index < 0) return undefined;
+  const value = args[index + 1];
+  if (!value || value.startsWith("-")) return undefined;
+  return value;
+}
+
+function flagValues(args: string[], name: string): string[] {
+  const values: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === name) {
+      const value = args[i + 1];
+      if (value && !value.startsWith("-")) values.push(value);
+    }
+  }
+  return values;
+}
 
 export function parseArgs(argv: string[]): CliArgs {
   const args = argv.slice(2);
   const flags = new Set(args.filter((a) => a.startsWith("-")));
-  const rest = args.filter((a) => !a.startsWith("-"));
+  const consumed = new Set<number>();
+  for (let i = 0; i < args.length; i++) {
+    const current = args[i];
+    if (current && VALUE_FLAGS.has(current) && args[i + 1] && !args[i + 1]!.startsWith("-")) {
+      consumed.add(i + 1);
+    }
+  }
+  const rest = args.filter((a, i) => !a.startsWith("-") && !consumed.has(i));
   const command = (rest[0] as CliCommand | undefined) ?? "dashboard";
   const known: CliCommand[] = [
     "dashboard",
@@ -51,19 +98,14 @@ export function parseArgs(argv: string[]): CliArgs {
     "tasks",
     "launch",
     "setup",
+    "repo",
   ];
   const isKnown = known.includes(command);
   let addPath: string | undefined;
   if (command === "models" && rest[1] === "add-path") addPath = rest[2];
 
-  const presetIndex = args.findIndex((a) => a === "--preset");
-  const preset = presetIndex >= 0 ? args[presetIndex + 1] : undefined;
-  const langIndex = args.findIndex((a) => a === "--lang" || a === "--locale");
-  const lang = langIndex >= 0 ? args[langIndex + 1] : undefined;
-  const forIndex = args.findIndex((a) => a === "--for");
-  const scopeIndex = args.findIndex((a) => a === "--scope");
-  const priorityIndex = args.findIndex((a) => a === "--priority");
-  const linkIndex = args.findIndex((a) => a === "--link");
+  const limitRaw = flagValue(args, "--limit");
+  const limit = limitRaw && /^\d+$/.test(limitRaw) ? Number(limitRaw) : undefined;
 
   return {
     command: isKnown ? command : "dashboard",
@@ -73,16 +115,21 @@ export function parseArgs(argv: string[]): CliArgs {
     network: !flags.has("--no-network"),
     color: !flags.has("--no-color"),
     verbose: flags.has("--verbose"),
-    preset,
+    preset: flagValue(args, "--preset"),
     markdown: flags.has("--markdown"),
     help: flags.has("-h") || flags.has("--help"),
     addPath,
-    lang,
-    forKinds: forIndex >= 0 ? args[forIndex + 1] : undefined,
-    scope: scopeIndex >= 0 ? args[scopeIndex + 1] : undefined,
-    priority: priorityIndex >= 0 ? args[priorityIndex + 1] : undefined,
+    lang: flagValue(args, "--lang") ?? flagValue(args, "--locale"),
+    forKinds: flagValue(args, "--for"),
+    scope: flagValue(args, "--scope"),
+    priority: flagValue(args, "--priority"),
     yes: flags.has("--yes"),
     install: flags.has("--install"),
-    link: linkIndex >= 0 ? args[linkIndex + 1] : undefined,
+    link: flagValue(args, "--link"),
+    structural: flagValue(args, "--structural"),
+    repo: flagValue(args, "--repo"),
+    intent: flagValue(args, "--intent"),
+    limit,
+    globs: flagValues(args, "--glob"),
   };
 }

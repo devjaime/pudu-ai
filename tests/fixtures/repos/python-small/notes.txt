@@ -1,0 +1,2 @@
+If login fails, show: invalid user token
+Do not confuse this comment with validate_user.

@@ -46,6 +46,10 @@ export async function run(args: CliArgs): Promise<number> {
   }
   if (args.verbose) setLogLevel("verbose");
   if (!args.color) process.env.NO_COLOR = "1";
+  if (args.command === "repo") {
+    const { runRepoCommand } = await import("../agent-lab/repo-cli.js");
+    return runRepoCommand(args);
+  }
 
   const cleanup = (): void => {
     void killAll("SIGTERM");

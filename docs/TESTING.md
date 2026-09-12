@@ -122,3 +122,17 @@ Quality must stay labelled as catalog metadata.
 7. H7 history  
 
 After H6/H7, only then iterate on TUI polish in a separate session.
+
+## 4. Agent Lab (iteration 1)
+
+Usage: [English](agent-lab-usage.md) · [Español](agent-lab-usage.es.md)
+
+Optional: `python3`, `rg`, `ast-grep`. Tests skip those tools when missing.
+
+```bash
+npx tsx src/cli/index.ts repo search validate_user --repo tests/fixtures/repos/python-small --json
+npx tsx src/cli/index.ts repo search --structural 'def $FUNC($$$ARGS): $$$BODY' --repo tests/fixtures/repos/python-cross-module --json
+npx tsx src/cli/index.ts repo search validate_user --repo tests/fixtures/repos/python-small --lang es
+```
+
+Pass: stdout is JSON `SearchResult`, `metrics.origin` is `MEASURED`, no hardware session scan, missing tools listed rather than fake matches. Spanish UI with `--lang es`.

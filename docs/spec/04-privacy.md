@@ -6,6 +6,8 @@ Network is used only for optional CanIRun catalog/compatibility (`https://caniru
 
 `--no-network` disables all outbound requests. Cached catalog may still be used.
 
+Agent Lab search is local-only: repository contents are not uploaded. Python/`rg`/`ast-grep` run on the machine. See `docs/spec/agent-lab.md`.
+
 Hardware detection strips serial numbers, hardware UUID, and provisioning UDID.
 
 Estimated catalog/compatibility data comes from [CanIRun.ai](https://canirun.ai) by [midudev](https://midu.dev) ([repository](https://github.com/midudev/canirun.ai)). Pudu-AI does not copy that project’s source. Measured data never leaves the machine.

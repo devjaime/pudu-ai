@@ -8,7 +8,7 @@ Discover, inspect, benchmark, and compare models that run on your machine. Measu
 npx pudu-ai
 ```
 
-English is the default UI language. Use `--lang es` for Spanish.
+English is the default UI language. Use `--lang es` for Spanish. Docs: [English](README.md) · [Español](README.es.md).
 
 The npm name `pudu` is taken by an empty stub. This CLI is **`pudu-ai`**.
 
@@ -59,9 +59,11 @@ npx pudu-ai report --markdown
 npx pudu-ai launch
 npx pudu-ai launch opencode
 npx pudu-ai launch opencode --yes
+npx pudu-ai repo search validate_user --json
+npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY' --repo .
 ```
 
-Flags: `--json` `--csv` `--no-network` `--no-color` `--verbose` `--preset quick|standard|stress` `--lang en|es` `--for` `--scope` `--priority`
+Flags: `--json` `--csv` `--no-network` `--no-color` `--verbose` `--preset quick|standard|stress` `--lang en|es` `--for` `--scope` `--priority` `--repo` `--structural` `--intent` `--glob` `--limit`
 
 ```bash
 npx pudu-ai --lang es
@@ -135,6 +137,21 @@ Without `--yes` the command only explains eligibility (grade S–B, coding/chat 
 npx pudu-ai launch
 npx pudu-ai launch opencode --yes
 ```
+
+## Agent Lab (preview)
+
+Deterministic repository search. Optional Python 3.10+, `rg`, and `ast-grep`. No LLM.
+
+- Usage: [English](docs/agent-lab-usage.md) · [Español](docs/agent-lab-usage.es.md)
+- Spec: [English](docs/spec/agent-lab.md) · [Español](docs/spec/agent-lab.es.md)
+
+```bash
+npx pudu-ai repo search validate_user --repo . --json
+npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
+npx pudu-ai repo search validate_user --lang es
+```
+
+Requires `python3` on PATH. If `rg` or `ast-grep` is missing, JSON reports `available: false` instead of inventing hits.
 
 ## Privacy
 

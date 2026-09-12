@@ -41,6 +41,29 @@ export const es: Record<MessageId, string> = {
     "Explica las integraciones de Ollama (OpenCode, OpenClaw, Hermes, Claude Code). Pull/launch solo con --yes si la nota es S–B y hay velocidad suficiente. Sirve para conectar un agente de código solo cuando el hardware lo aguanta.",
   aboutAddPath:
     "Añade una carpeta GGUF a escanear (no todo el disco). Sirve para que llama-bench encuentre modelos fuera de Ollama.",
+  aboutRepoSearch:
+    "Búsqueda determinista de repositorio (Pudu Agent Lab). Cadenas literales: rg; patrones sintácticos: ast-grep. Sin LLM. Si falta una herramienta se informa, no se inventa.",
+  repoSearchTitle: "Pudu Agent Lab — búsqueda de repo",
+  repoNeedQuery: "Pasa una consulta o --structural PATRÓN, p. ej. npx pudu-ai repo search validate_user --json",
+  repoUnknownSubcommand: "Subcomando de repo desconocido: {sub}. La iteración 1 solo admite search.",
+  repoPythonMissing: "No se encontró python3. La búsqueda de Agent Lab necesita Python 3.10+ en PATH.",
+  repoToolMissing: "{tool} no está en PATH",
+  repoNoMatches: "Sin coincidencias.",
+  repoHelp: `Pudu Agent Lab — búsqueda de repositorio
+
+Uso:
+  npx pudu-ai repo search CONSULTA
+  npx pudu-ai repo search CONSULTA --repo RUTA --json
+  npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
+
+Flags:
+  --repo PATH         Raíz del repositorio (por defecto: cwd)
+  --structural PAT    Patrón de ast-grep
+  --intent INTENT     TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
+  --glob GLOB         Glob de inclusión (repetible)
+  --limit N           Máximo de coincidencias (100)
+  --json              SearchResult legible por máquinas
+`,
   nav: "[S] Setup/Instalar  [B] Benchmark  [M] Modelos  [R] Recomendaciones  [T] Tareas  [H] Hardware  [C] Comparar  [L] Historial  [Q] Salir",
   setupTitle: "SETUP — INSTALAR MODELOS Y AGENTES",
   setupIntro:
@@ -204,6 +227,8 @@ Uso:
   npx pudu-ai launch
   npx pudu-ai launch opencode
   npx pudu-ai launch opencode --yes
+  npx pudu-ai repo search CONSULTA
+  npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
 
 Flags:
   --json          JSON legible por máquinas (sin TUI)
@@ -217,6 +242,11 @@ Flags:
   --scope         installed | all
   --priority      speed | balanced | quality
   --yes           Ejecuta pull/launch solo si el modelo es elegible
+  --repo          Raíz del repositorio para Agent Lab
+  --structural    Patrón ast-grep para repo search
+  --intent        TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
+  --glob          Glob de inclusión (repetible)
+  --limit         Máximo de coincidencias
 
 Créditos:
   Los valores medidos vienen de llama-bench y de la telemetría del SO.

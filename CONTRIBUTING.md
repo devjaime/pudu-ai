@@ -22,7 +22,7 @@ Requires Node.js 20+.
 - Label estimated vs measured performance.
 - Never call Apple unified memory “VRAM”.
 - Add fixtures for command output parsers. Unit tests must not require real GPUs.
-- Integration tests that call Ollama / llama-bench should skip when the binary is missing.
+- Integration tests that call Ollama / llama-bench / `rg` / `ast-grep` / Python Agent Lab should skip when the binary is missing.
 - Do not copy source from CanIRun.ai, basitop, or other projects. Credit ideas and APIs.
 
 ## Commit style
