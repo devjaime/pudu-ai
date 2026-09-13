@@ -7,6 +7,12 @@
 - Pudu Agent Lab spec and `pudu-ai repo search` (rg + ast-grep via Python JSON protocol)
 - Docs in English and Spanish: `docs/spec/agent-lab.md`, `docs/spec/agent-lab.es.md`, `docs/agent-lab-usage.md`, `docs/agent-lab-usage.es.md`, `README.es.md`
 
+## 0.2.21 — 2026-09-13
+
+### Fixed
+
+- Skip ast-grep fixture test unless the `ast-grep` binary is on PATH (`sg` on Ubuntu is not ast-grep).
+
 ## 0.2.20 — 2026-09-13
 
 ### Fixed

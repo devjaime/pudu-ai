@@ -114,7 +114,7 @@ describe("Agent Lab repo search", () => {
   });
 
   it("structural-searches Python defs with ast-grep", async () => {
-    if (!(await pythonReady()) || !(await commandExists("ast-grep") || (await commandExists("sg")))) return;
+    if (!(await pythonReady()) || !(await commandExists("ast-grep"))) return;
     const result = await searchRepo({
       repo: crossRepo,
       structuralPattern: "def $FUNC($$$ARGS): $$$BODY",
