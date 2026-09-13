@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from pudu_agent.ast_search import run_ast_grep, tool_info as ast_tool_info
+from pudu_agent.graph import build_graph, graph_tool_info, query_graph
 from pudu_agent.protocol import (
     PROTOCOL_VERSION,
     classify_intent,
@@ -46,10 +47,6 @@ def rg_tool_info() -> dict[str, Any]:
         "path": path,
         "version": _version(path) if path else None,
     }
-
-
-def graph_tool_info() -> dict[str, Any]:
-    return {"available": False, "path": None, "version": None}
 
 
 def parse_rg_json_line(line: str) -> dict[str, Any] | None:
@@ -222,16 +219,8 @@ def handle_search(req: dict[str, Any]) -> dict[str, Any]:
         result["ok"] = False
         return result
 
-    if intent in {"RELATIONSHIP", "IMPACT", "SEMANTIC"} or planned == ["graph"] or not planned:
+    if intent == "SEMANTIC" or not planned:
         duration_ms = int((time.perf_counter() - started) * 1000)
-        unavailable = ["graph"] if intent in {"RELATIONSHIP", "IMPACT"} else (["semantic"] if intent == "SEMANTIC" else planned)
-        errors = [
-            {
-                "tool": "graph" if intent != "SEMANTIC" else "semantic",
-                "message": "not implemented in Agent Lab iteration 1",
-                "origin": "MEASURED",
-            }
-        ]
         return empty_search(
             str(repo),
             query,
@@ -239,10 +228,38 @@ def handle_search(req: dict[str, Any]) -> dict[str, Any]:
             intent,
             strategy if planned else "hybrid",
             tools,
-            errors,
-            unavailable,
+            [{"tool": "semantic", "message": "semantic search is not implemented; no LLM router", "origin": "MEASURED"}],
+            ["semantic"],
             duration_ms,
         )
+
+    if intent in {"RELATIONSHIP", "IMPACT"} or planned == ["graph"]:
+        graph = build_graph(repo, persist=True)
+        duration_ms = int((time.perf_counter() - started) * 1000)
+        matches = query_graph(graph, query, limit)
+        errors = list(graph.get("errors") or [])
+        return {
+            "schemaVersion": PROTOCOL_VERSION,
+            "ok": True,
+            "op": "search",
+            "repo": str(repo),
+            "query": query,
+            "structuralPattern": structural,
+            "intent": intent,
+            "strategy": "graph",
+            "matches": matches,
+            "tools": tools,
+            "errors": errors,
+            "metrics": {
+                "durationMs": duration_ms,
+                "matchCount": len(matches),
+                "rgQueries": 0,
+                "astQueries": 0,
+                "graphQueries": 1,
+                "origin": "MEASURED",
+            },
+            "unavailable": [],
+        }
 
     matches: list[dict[str, Any]] = []
     errors: list[dict[str, Any]] = []
@@ -327,6 +344,35 @@ def main() -> int:
                 "op": "classify",
                 "intent": intent,
                 "strategies": strategies_for(intent),
+            }
+        )
+        return 0
+    if op == "graph":
+        repo_raw = req.get("repo") or "."
+        repo = Path(repo_raw).expanduser().resolve()
+        if not repo.is_dir():
+            write_response(error_response("repo is not a directory", op="graph"))
+            return 1
+        result = build_graph(repo, persist=True)
+        write_response(result)
+        return 0
+    if op == "harness":
+        repo_raw = req.get("repo") or "."
+        repo = Path(repo_raw).expanduser().resolve()
+        task = req.get("task") if isinstance(req.get("task"), str) else None
+        if not repo.is_dir():
+            write_response(error_response("repo is not a directory", op="harness"))
+            return 1
+        graph = build_graph(repo, persist=True)
+        write_response(
+            {
+                "schemaVersion": PROTOCOL_VERSION,
+                "ok": True,
+                "op": "harness",
+                "repo": str(repo),
+                "task": task,
+                "graph": graph,
+                "effort": graph.get("effort"),
             }
         )
         return 0

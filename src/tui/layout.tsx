@@ -9,6 +9,7 @@ const NAV: Array<{ key: string; label: string; color: "yellow" | "green" | "cyan
   { key: "M", label: "Models", color: "cyan" },
   { key: "R", label: "Rec", color: "magenta" },
   { key: "T", label: "Tasks", color: "blue" },
+  { key: "G", label: "Graph", color: "magenta" },
   { key: "H", label: "HW", color: "white" },
   { key: "C", label: "Cmp", color: "green" },
   { key: "L", label: "Log", color: "cyan" },

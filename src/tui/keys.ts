@@ -7,7 +7,8 @@ export type Screen =
   | "benchmark"
   | "history"
   | "tasks"
-  | "setup";
+  | "setup"
+  | "graph";
 
 export type AppKeyResult =
   | { type: "ignore" }
@@ -24,6 +25,7 @@ function globalNav(letter: string): AppKeyResult | undefined {
   if (letter === "l") return { type: "screen", screen: "history" };
   if (letter === "t") return { type: "screen", screen: "tasks" };
   if (letter === "s") return { type: "screen", screen: "setup" };
+  if (letter === "g") return { type: "screen", screen: "graph" };
   return undefined;
 }
 
@@ -34,6 +36,10 @@ export function handleAppKey(
 ): AppKeyResult {
   const letter = input.toLowerCase();
   if (screen === "benchmark") return { type: "ignore" };
+  if (screen === "graph") {
+    if (key.escape) return { type: "home" };
+    return { type: "ignore" };
+  }
   if (letter === "q") return { type: "quit" };
   if (key.escape) return screen === "home" ? { type: "quit" } : { type: "home" };
 

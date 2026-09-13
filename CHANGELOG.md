@@ -7,6 +7,14 @@
 - Pudu Agent Lab spec and `pudu-ai repo search` (rg + ast-grep via Python JSON protocol)
 - Docs in English and Spanish: `docs/spec/agent-lab.md`, `docs/spec/agent-lab.es.md`, `docs/agent-lab-usage.md`, `docs/agent-lab-usage.es.md`, `README.es.md`
 
+## 0.2.22 — 2026-09-13
+
+### Added
+
+- `pudu-ai repo graph` — Python AST implementation graph (imports/defs/calls/inherits), written to `.pudu-ai/code-graph.json`
+- `pudu-ai repo harness --task` — DERIVED task effort from the graph
+- TUI `[G] Graph` harness: analyze cwd, type a prompt, pick best installed local model (no invented metrics)
+
 ## 0.2.21 — 2026-09-13
 
 ### Fixed

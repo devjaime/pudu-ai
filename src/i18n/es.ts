@@ -45,24 +45,43 @@ export const es: Record<MessageId, string> = {
     "Búsqueda determinista de repositorio (Pudu Agent Lab). Cadenas literales: rg; patrones sintácticos: ast-grep. Sin LLM. Si falta una herramienta se informa, no se inventa.",
   repoSearchTitle: "Pudu Agent Lab — búsqueda de repo",
   repoNeedQuery: "Pasa una consulta o --structural PATRÓN, p. ej. npx pudu-ai repo search validate_user --json",
-  repoUnknownSubcommand: "Subcomando de repo desconocido: {sub}. La iteración 1 solo admite search.",
+  repoUnknownSubcommand: "Subcomando de repo desconocido: {sub}. Soportados: search, graph, harness.",
   repoPythonMissing: "No se encontró python3. La búsqueda de Agent Lab necesita Python 3.10+ en PATH.",
   repoToolMissing: "{tool} no está en PATH",
   repoNoMatches: "Sin coincidencias.",
-  repoHelp: `Pudu Agent Lab — búsqueda de repositorio
+  repoNeedTask: "Pasa una tarea, p. ej. npx pudu-ai repo harness --task \"arreglar validate_user\" --repo .",
+  repoGraphTitle: "AGENT LAB — GRAFO DE IMPLEMENTACIÓN",
+  aboutRepoGraph:
+    "Grafo AST de Python (imports, defs, llamadas, herencias). Graphify opcional si existe el archivo. Aristas EXTRACTED o RESOLVED. Nunca inventadas.",
+  repoGraphBuilding: "Construyendo el grafo de esta carpeta…",
+  repoGraphEmpty: "No hay Python con estructura extraíble.",
+  repoGraphFiles: "Archivos",
+  repoGraphNodes: "Nodos",
+  repoGraphEdges: "Aristas",
+  repoTokens: "Estimación de tokens",
+  repoEffortTitle: "ESFUERZO DE TAREA (DERIVED)",
+  repoHarnessPrompt: "TAREA HARNESS",
+  repoHarnessPromptHint: "Escribe la tarea de código y pulsa Enter",
+  repoHarnessEnter: "Enter = elegir modelo local según esfuerzo   Esc = atrás",
+  repoHarnessNoPrompt: "(prompt vacío — el esfuerzo sigue saliendo del grafo)",
+  repoHarnessModel: "MEJOR MODELO LOCAL PARA ESTA TAREA",
+  repoHelp: `Pudu Agent Lab — búsqueda, grafo y harness
 
 Uso:
   npx pudu-ai repo search CONSULTA
   npx pudu-ai repo search CONSULTA --repo RUTA --json
   npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
+  npx pudu-ai repo graph --repo RUTA
+  npx pudu-ai repo harness --task "arreglar auth" --repo RUTA --json
 
 Flags:
-  --repo PATH         Raíz del repositorio (por defecto: cwd)
-  --structural PAT    Patrón de ast-grep
+  --repo PATH         Raíz del repositorio (cwd)
+  --structural PAT    Patrón ast-grep
   --intent INTENT     TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
   --glob GLOB         Glob de inclusión (repetible)
   --limit N           Máximo de coincidencias (100)
-  --json              SearchResult legible por máquinas
+  --task TEXT         Prompt de la tarea harness
+  --json              JSON
 `,
   nav: "[S] Setup/Instalar  [B] Benchmark  [M] Modelos  [R] Recomendaciones  [T] Tareas  [H] Hardware  [C] Comparar  [L] Historial  [Q] Salir",
   setupTitle: "SETUP — INSTALAR MODELOS Y AGENTES",
@@ -229,6 +248,8 @@ Uso:
   npx pudu-ai launch opencode --yes
   npx pudu-ai repo search CONSULTA
   npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
+  npx pudu-ai repo graph
+  npx pudu-ai repo harness --task "arreglar auth"
 
 Flags:
   --json          JSON legible por máquinas (sin TUI)

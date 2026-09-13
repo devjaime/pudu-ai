@@ -148,6 +148,8 @@ Deterministic repository search. Optional Python 3.10+, `rg`, and `ast-grep`. No
 ```bash
 npx pudu-ai repo search validate_user --repo . --json
 npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
+npx pudu-ai repo graph --repo .
+npx pudu-ai repo harness --task "fix validate_user" --json
 npx pudu-ai repo search validate_user --lang es
 ```
 

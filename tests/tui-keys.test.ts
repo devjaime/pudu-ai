@@ -10,8 +10,9 @@ describe("TUI key handler", () => {
     expect(handleAppKey("tasks", "x", {})).toEqual({ type: "ignore" });
   });
 
-  it("opens tasks from home with t", () => {
+  it("opens tasks from home with t and graph with g", () => {
     expect(handleAppKey("home", "t", {})).toEqual({ type: "screen", screen: "tasks" });
+    expect(handleAppKey("home", "g", {})).toEqual({ type: "screen", screen: "graph" });
   });
 
   it("R shows recommendations, S opens setup", () => {
@@ -20,8 +21,10 @@ describe("TUI key handler", () => {
     expect(handleAppKey("home", "i", {})).toEqual({ type: "screen", screen: "setup" });
   });
 
-  it("ignores letters while benchmarking", () => {
+  it("ignores letters while benchmarking or typing a graph harness prompt", () => {
     expect(handleAppKey("benchmark", "q", {})).toEqual({ type: "ignore" });
+    expect(handleAppKey("graph", "q", {})).toEqual({ type: "ignore" });
+    expect(handleAppKey("graph", "", { escape: true })).toEqual({ type: "home" });
   });
 
   it("keeps S and B working from setup, I stays local", () => {

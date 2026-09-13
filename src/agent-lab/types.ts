@@ -19,7 +19,7 @@ export type SearchMatch = {
   endLine: number | null;
   endColumn: number | null;
   text: string;
-  strategy: "rg" | "ast-grep";
+  strategy: "rg" | "ast-grep" | "graph";
   language: string | null;
   metavariables: Record<string, string>;
 };
@@ -156,6 +156,75 @@ export type TaskTrace = {
 };
 
 export type TaskEffortLabel = "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+
+export type GraphNode = {
+  id: string;
+  type: string;
+  name: string;
+  file: string | null;
+  line: number | null;
+  backend?: string;
+};
+
+export type GraphEdge = {
+  source: string;
+  target: string;
+  type: string;
+  confidence: "EXTRACTED" | "RESOLVED" | "INFERRED";
+  file: string | null;
+  line: number | null;
+  symbol: string | null;
+  backend?: string;
+};
+
+export type CodeGraph = {
+  schemaVersion: 1;
+  ok: boolean;
+  op: "graph";
+  repo: string;
+  backend: string;
+  writtenTo: string | null;
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  metrics: {
+    fileCount: number;
+    nodeCount: number;
+    edgeCount: number;
+    tokenEstimate: number | null;
+    tokenOrigin: MetricOrigin | null;
+    durationMs: number;
+    origin: MetricOrigin;
+  };
+  effort: {
+    label: TaskEffortLabel;
+    score0to100: number;
+    origin: "DERIVED";
+    humanBaselineMinutes: null;
+    agentRuntimeMinutes: null;
+    humanInterventionMinutes: null;
+    potentialTimeReductionPct: null;
+  };
+  errors: Array<{ tool: string; message: string; origin: MetricOrigin }>;
+  tools: { graph: ToolAvailability };
+};
+
+export type HarnessResult = {
+  schemaVersion: 1;
+  ok: boolean;
+  op: "harness";
+  repo: string;
+  task: string | null;
+  graph: CodeGraph;
+  effort: CodeGraph["effort"];
+  model: {
+    modelId: string | null;
+    modelName: string | null;
+    grade: string | null;
+    measuredTps: number | null;
+    reason: string;
+    origin: "DERIVED" | null;
+  };
+};
 
 export type TaskMetrics = {
   schemaVersion: 1;

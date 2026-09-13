@@ -124,13 +124,12 @@ describe("Agent Lab repo search", () => {
     expect(result.matches.some((m) => m.strategy === "ast-grep" && m.text.includes("validate_user"))).toBe(true);
   });
 
-  it("does not invent graph results", async () => {
+  it("relationship search uses the AST graph without inventing edges", async () => {
     if (!(await pythonReady())) return;
     const result = await searchRepo({ repo: smallRepo, query: "who calls validate_user" });
     expect(result.strategy).toBe("graph");
-    expect(result.matches).toEqual([]);
-    expect(result.errors.some((e) => e.tool === "graph")).toBe(true);
-    expect(result.unavailable).toContain("graph");
+    expect(result.unavailable).not.toContain("graph");
+    expect(result.matches.every((m) => m.strategy === "graph")).toBe(true);
   });
 
   it("formats text output with origin labels", () => {

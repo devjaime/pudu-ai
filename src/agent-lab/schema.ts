@@ -25,7 +25,7 @@ export const searchMatchSchema = z.object({
   endLine: z.number().nullable(),
   endColumn: z.number().nullable(),
   text: z.string(),
-  strategy: z.enum(["rg", "ast-grep"]),
+  strategy: z.enum(["rg", "ast-grep", "graph"]),
   language: z.string().nullable(),
   metavariables: z.record(z.string()),
 });

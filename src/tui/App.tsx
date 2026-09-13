@@ -10,6 +10,7 @@ import { CompareView } from "./views/Compare.js";
 import { BenchmarkView } from "./views/Benchmark.js";
 import { HistoryView } from "./views/History.js";
 import { TasksView } from "./views/Tasks.js";
+import { GraphView } from "./views/Graph.js";
 import { handleAppKey, type Screen } from "./keys.js";
 import { Frame, Header } from "./layout.js";
 
@@ -42,6 +43,7 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
       {screen === "compare" && <CompareView session={props.session} />}
       {screen === "history" && <HistoryView session={props.session} />}
       {screen === "tasks" && <TasksView session={props.session} />}
+      {screen === "graph" && <GraphView session={props.session} />}
       {screen === "benchmark" && (
         <BenchmarkView
           session={props.session}

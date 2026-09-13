@@ -37,6 +37,7 @@ export type CliArgs = {
   intent?: string;
   limit?: number;
   globs: string[];
+  task?: string;
 };
 
 const VALUE_FLAGS = new Set([
@@ -52,6 +53,7 @@ const VALUE_FLAGS = new Set([
   "--intent",
   "--limit",
   "--glob",
+  "--task",
 ]);
 
 function flagValue(args: string[], name: string): string | undefined {
@@ -131,5 +133,6 @@ export function parseArgs(argv: string[]): CliArgs {
     intent: flagValue(args, "--intent"),
     limit,
     globs: flagValues(args, "--glob"),
+    task: flagValue(args, "--task"),
   };
 }

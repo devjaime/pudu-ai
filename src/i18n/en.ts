@@ -43,16 +43,34 @@ export const en = {
     "Deterministic repository search (Pudu Agent Lab). Literal strings use rg; syntactic patterns use ast-grep. No LLM. Missing tools are reported, never faked.",
   repoSearchTitle: "Pudu Agent Lab — repo search",
   repoNeedQuery: "Pass a query or --structural PATTERN, e.g. npx pudu-ai repo search validate_user --json",
-  repoUnknownSubcommand: "Unknown repo subcommand: {sub}. Iteration 1 supports search only.",
+  repoUnknownSubcommand: "Unknown repo subcommand: {sub}. Supported: search, graph, harness.",
   repoPythonMissing: "python3 not found. Agent Lab search needs Python 3.10+ on PATH.",
   repoToolMissing: "{tool} not found on PATH",
   repoNoMatches: "No matches.",
-  repoHelp: `Pudu Agent Lab — repository search
+  repoNeedTask: "Pass a task, e.g. npx pudu-ai repo harness --task \"fix validate_user\" --repo .",
+  repoGraphTitle: "AGENT LAB — IMPLEMENTATION GRAPH",
+  aboutRepoGraph:
+    "Python stdlib AST graph (imports, defs, calls, inherits). Optional Graphify file if present. Edges are EXTRACTED or RESOLVED. Never invented.",
+  repoGraphBuilding: "Building graph of this folder…",
+  repoGraphEmpty: "No Python files with extractable structure.",
+  repoGraphFiles: "Files",
+  repoGraphNodes: "Nodes",
+  repoGraphEdges: "Edges",
+  repoTokens: "Token estimate",
+  repoEffortTitle: "TASK EFFORT (DERIVED)",
+  repoHarnessPrompt: "HARNESS TASK",
+  repoHarnessPromptHint: "Type the coding task, then Enter",
+  repoHarnessEnter: "Enter = pick local model from effort   Esc = back",
+  repoHarnessNoPrompt: "(empty prompt — effort is still from the graph)",
+  repoHarnessModel: "BEST LOCAL MODEL FOR THIS TASK",
+  repoHelp: `Pudu Agent Lab — repository search, graph, harness
 
 Usage:
   npx pudu-ai repo search QUERY
   npx pudu-ai repo search QUERY --repo PATH --json
   npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
+  npx pudu-ai repo graph --repo PATH
+  npx pudu-ai repo harness --task "fix auth" --repo PATH --json
 
 Flags:
   --repo PATH         Repository root (default: cwd)
@@ -60,7 +78,8 @@ Flags:
   --intent INTENT     TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
   --glob GLOB         Repeatable include glob
   --limit N           Max matches (default 100)
-  --json              Machine-readable SearchResult
+  --task TEXT         Harness task prompt
+  --json              Machine-readable JSON
 `,
   nav: "[S] Setup/Install  [B] Benchmark  [M] Models  [R] Recommend  [T] Tasks  [H] Hardware  [C] Compare  [L] History  [Q] Quit",
   setupTitle: "SETUP — INSTALL MODELS & AGENTS",
@@ -216,6 +235,8 @@ Usage:
   npx pudu-ai launch opencode --yes
   npx pudu-ai repo search QUERY
   npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
+  npx pudu-ai repo graph
+  npx pudu-ai repo harness --task "fix auth"
 
 Flags:
   --json          Machine-readable JSON (no TUI)
@@ -234,6 +255,7 @@ Flags:
   --intent        TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
   --glob          Repeatable include glob for repo search
   --limit         Max repo search matches
+  --task          Harness task prompt
 
 Credits:
   Measured values come from llama-bench and OS telemetry.
