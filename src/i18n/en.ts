@@ -63,6 +63,9 @@ export const en = {
   repoHarnessEnter: "Enter = pick local model from effort   Esc = back",
   repoHarnessNoPrompt: "(empty prompt — effort is still from the graph)",
   repoHarnessModel: "BEST LOCAL MODEL FOR THIS TASK",
+  repoHarnessKeys: "1 OpenCode  2 Hermes  3 OpenClaw  Enter=OpenCode  Esc=back",
+  repoHarnessNoTag: "No Ollama tag for this model. N/A — will not invent a launch command.",
+  repoHarnessWroteConfig: "Wrote OpenCode config {file} (local model + pudu-ai MCP tools).",
   repoHelp: `Pudu Agent Lab — repository search, graph, harness
 
 Usage:

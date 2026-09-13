@@ -4,13 +4,24 @@ import { buildRepoGraph } from "../../agent-lab/graph.js";
 import { pickHarnessModel } from "../../agent-lab/harness.js";
 import type { CodeGraph } from "../../agent-lab/types.js";
 import { t } from "../../i18n/index.js";
+import type { HarnessLaunchRequest } from "../../integrations/harness-launch.js";
+import type { IntegrationId } from "../../integrations/types.js";
 import type { Session } from "../../session/load.js";
 import { Panel } from "../layout.js";
 import { fit } from "../width.js";
 
-type Phase = "build" | "prompt" | "done" | "error";
+type Phase = "build" | "prompt" | "pick" | "error";
 
-export function GraphView({ session }: { session: Session }): ReactElement {
+const TOOLS: Array<{ key: string; id: IntegrationId; label: string }> = [
+  { key: "1", id: "opencode", label: "OpenCode" },
+  { key: "2", id: "hermes", label: "Hermes" },
+  { key: "3", id: "openclaw", label: "OpenClaw" },
+];
+
+export function GraphView(props: {
+  session: Session;
+  onLaunch: (req: HarnessLaunchRequest) => void;
+}): ReactElement {
   const [phase, setPhase] = useState<Phase>("build");
   const [graph, setGraph] = useState<CodeGraph | undefined>();
   const [error, setError] = useState("");
@@ -36,22 +47,39 @@ export function GraphView({ session }: { session: Session }): ReactElement {
     };
   }, [repo]);
 
-  useInput((input, key) => {
-    if (phase !== "prompt") return;
-    if (key.return) {
-      setPhase("done");
-      return;
-    }
-    if (key.backspace || key.delete) {
-      setPrompt((value) => value.slice(0, -1));
-      return;
-    }
-    if (input && !key.ctrl && !key.meta && input !== "\t") {
-      setPrompt((value) => `${value}${input}`.slice(0, 240));
-    }
-  });
+  const pick = useMemo(() => (graph ? pickHarnessModel(props.session, graph.effort) : undefined), [graph, props.session]);
 
-  const pick = useMemo(() => (graph ? pickHarnessModel(session, graph.effort) : undefined), [graph, session]);
+  useInput((input, key) => {
+    if (phase === "prompt") {
+      if (key.return) {
+        setPhase("pick");
+        return;
+      }
+      if (key.backspace || key.delete) {
+        setPrompt((value) => value.slice(0, -1));
+        return;
+      }
+      if (input && !key.ctrl && !key.meta && input !== "\t") {
+        setPrompt((value) => `${value}${input}`.slice(0, 240));
+      }
+      return;
+    }
+    if (phase !== "pick" || !pick?.modelId) return;
+    const tool = TOOLS.find((item) => item.key === input)?.id ?? (key.return ? "opencode" : undefined);
+    if (!tool) return;
+    if (!pick.ollamaTag) {
+      setError(t("repoHarnessNoTag"));
+      setPhase("error");
+      return;
+    }
+    props.onLaunch({
+      tool,
+      repo,
+      task: prompt,
+      modelId: pick.modelId,
+      ollamaTag: pick.ollamaTag,
+    });
+  });
 
   if (phase === "build") {
     return (
@@ -119,12 +147,13 @@ export function GraphView({ session }: { session: Session }): ReactElement {
           <Text dimColor>{prompt || t("repoHarnessNoPrompt")}</Text>
           {pick?.modelName ? (
             <Text>
-              {pick.modelName}  {pick.grade ?? "—"}  {pick.measuredTps != null ? `${pick.measuredTps} t/s` : t("notTested")}
+              {pick.modelName}  {pick.ollamaTag ?? "—"}  {pick.grade ?? "—"}  {pick.measuredTps != null ? `${pick.measuredTps} t/s` : t("notTested")}
             </Text>
           ) : (
             <Text color="yellow">{pick?.reason ?? "N/A"}</Text>
           )}
           <Text dimColor>{pick?.reason}</Text>
+          {pick?.ollamaTag ? <Text color="cyan">{t("repoHarnessKeys")}</Text> : <Text color="yellow">{t("repoHarnessNoTag")}</Text>}
         </Panel>
       )}
     </>

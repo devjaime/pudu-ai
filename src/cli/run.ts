@@ -46,7 +46,12 @@ async function openLab(session: Awaited<ReturnType<typeof loadSession>>, preset?
     return;
   }
   const { renderDashboard } = await import("../tui/render.js");
-  await renderDashboard(session, preset, start);
+  const pending = await renderDashboard(session, preset, start);
+  if (pending) {
+    const { executeHarnessLaunch } = await import("../integrations/harness-launch.js");
+    const result = await executeHarnessLaunch(pending);
+    if (!result.ok) process.stderr.write(`${result.log}\n`);
+  }
 }
 
 export async function run(args: CliArgs): Promise<number> {

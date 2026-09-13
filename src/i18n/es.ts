@@ -65,6 +65,9 @@ export const es: Record<MessageId, string> = {
   repoHarnessEnter: "Enter = elegir modelo local según esfuerzo   Esc = atrás",
   repoHarnessNoPrompt: "(prompt vacío — el esfuerzo sigue saliendo del grafo)",
   repoHarnessModel: "MEJOR MODELO LOCAL PARA ESTA TAREA",
+  repoHarnessKeys: "1 OpenCode  2 Hermes  3 OpenClaw  Enter=OpenCode  Esc=atrás",
+  repoHarnessNoTag: "Este modelo no tiene tag Ollama. N/A — no se inventa el comando de launch.",
+  repoHarnessWroteConfig: "Config OpenCode escrita en {file} (modelo local + tools MCP pudu-ai).",
   repoHelp: `Pudu Agent Lab — búsqueda, grafo y harness
 
 Uso:

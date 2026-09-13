@@ -7,6 +7,13 @@
 - Pudu Agent Lab spec and `pudu-ai repo search` (rg + ast-grep via Python JSON protocol)
 - Docs in English and Spanish: `docs/spec/agent-lab.md`, `docs/spec/agent-lab.es.md`, `docs/agent-lab-usage.md`, `docs/agent-lab-usage.es.md`, `README.es.md`
 
+## 0.2.23 — 2026-09-13
+
+### Added
+
+- TUI `[G]` launches OpenCode (Enter/1), Hermes (2), or OpenClaw (3) with the selected local Ollama model
+- Writes project `opencode.json`: `model: ollama/<tag>` plus local MCP `pudu-ai` (`python -m pudu_agent mcp`)
+
 ## 0.2.22 — 2026-09-13
 
 ### Added

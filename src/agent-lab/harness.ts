@@ -1,4 +1,5 @@
 import type { Session } from "../session/load.js";
+import { resolveOllamaTag } from "../integrations/ollama-tags.js";
 import type { TaskEffortLabel } from "./types.js";
 
 const GRADE_RANK: Record<string, number> = { S: 0, A: 1, B: 2, C: 3, D: 4, F: 5 };
@@ -6,6 +7,7 @@ const GRADE_RANK: Record<string, number> = { S: 0, A: 1, B: 2, C: 3, D: 4, F: 5 
 export type HarnessModelPick = {
   modelId: string | null;
   modelName: string | null;
+  ollamaTag: string | null;
   grade: string | null;
   measuredTps: number | null;
   reason: string;
@@ -24,6 +26,7 @@ export function pickHarnessModel(session: Session, effort: { label: TaskEffortLa
     return {
       modelId: null,
       modelName: null,
+      ollamaTag: null,
       grade: null,
       measuredTps: null,
       reason: "No installed models. N/A",
@@ -67,6 +70,9 @@ export function pickHarnessModel(session: Session, effort: { label: TaskEffortLa
   return {
     modelId: best.row.local.id,
     modelName: best.row.local.name,
+    ollamaTag:
+      resolveOllamaTag(best.row.local.id, best.row.local.name, best.row.catalog?.id, best.row.catalog?.name) ??
+      (best.row.local.id.includes(":") ? best.row.local.id : null),
     grade: best.grade,
     measuredTps: best.tps,
     reason: reasons[effort.label],

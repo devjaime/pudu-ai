@@ -13,8 +13,14 @@ import { TasksView } from "./views/Tasks.js";
 import { GraphView } from "./views/Graph.js";
 import { handleAppKey, type Screen } from "./keys.js";
 import { Frame, Header } from "./layout.js";
+import type { HarnessLaunchRequest } from "../integrations/harness-launch.js";
 
-export function App(props: { session: Session; preset?: string; start?: Screen }): ReactElement {
+export function App(props: {
+  session: Session;
+  preset?: string;
+  start?: Screen;
+  onLaunch?: (req: HarnessLaunchRequest) => void;
+}): ReactElement {
   const { exit } = useApp();
   const [screen, setScreen] = useState<Screen>(props.start ?? "home");
   const screenRef = useRef(screen);
@@ -43,7 +49,15 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
       {screen === "compare" && <CompareView session={props.session} />}
       {screen === "history" && <HistoryView session={props.session} />}
       {screen === "tasks" && <TasksView session={props.session} />}
-      {screen === "graph" && <GraphView session={props.session} />}
+      {screen === "graph" && (
+        <GraphView
+          session={props.session}
+          onLaunch={(req) => {
+            props.onLaunch?.(req);
+            exit();
+          }}
+        />
+      )}
       {screen === "benchmark" && (
         <BenchmarkView
           session={props.session}
