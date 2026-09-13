@@ -84,8 +84,10 @@ export function BenchmarkView(props: {
 
   if (phase === "select") {
     return (
-      <Box flexDirection="column">
-        <Text bold>{t("selectBenchmark")}</Text>
+      <Box flexDirection="column" paddingX={1}>
+        <Text bold color="cyan">
+          {t("selectBenchmark")}
+        </Text>
         {props.models.map((m, i) => (
           <Text key={m.id} color={i === props.selected ? "cyan" : undefined}>
             {i === props.selected ? "❯ " : "  "}

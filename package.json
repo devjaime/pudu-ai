@@ -1,6 +1,6 @@
 {
   "name": "pudu-ai",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "description": "Pudu-AI — local AI hardware & benchmark lab for the terminal",
   "keywords": [
     "ai",
@@ -40,7 +40,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "npx --yes esbuild src/cli/index.ts --bundle --platform=node --format=esm --outfile=dist/cli/index.js --packages=external --jsx=automatic && node scripts/add-shebang.mjs",
+    "build": "rm -rf dist && npx --yes esbuild src/cli/index.ts --bundle --platform=node --format=esm --splitting --outdir=dist/cli --outbase=src/cli --packages=external --jsx=automatic && node scripts/add-shebang.mjs",
     "dev": "tsx src/cli/index.ts",
     "pudu-ai": "tsx src/cli/index.ts",
     "start": "node dist/cli/index.js",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fit } from "../src/tui/width.js";
+import { fit } from "../src/tui/fit.js";
 
 describe("terminal fit", () => {
   it("does not exceed width", () => {

@@ -7,6 +7,14 @@
 - Pudu Agent Lab spec and `pudu-ai repo search` (rg + ast-grep via Python JSON protocol)
 - Docs in English and Spanish: `docs/spec/agent-lab.md`, `docs/spec/agent-lab.es.md`, `docs/agent-lab-usage.md`, `docs/agent-lab-usage.es.md`, `README.es.md`
 
+## 0.2.20 — 2026-09-13
+
+### Fixed
+
+- TUI no longer dumps ANSI CLI text into Ink (garbled layout). Screens use bordered Ink panels.
+- Ink loads only when a TTY lab session starts (`--help` / `--json` stay text).
+- Removed typewriter header that reflowed the whole screen.
+
 ## 0.2.19 — 2026-09-07
 
 ### Fixed

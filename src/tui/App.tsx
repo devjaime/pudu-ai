@@ -1,4 +1,4 @@
-import { Box, useApp, useInput } from "ink";
+import { useApp, useInput } from "ink";
 import { useMemo, useRef, useState, type ReactElement } from "react";
 import type { Session } from "../session/load.js";
 import { Dashboard } from "./views/Dashboard.js";
@@ -11,7 +11,7 @@ import { BenchmarkView } from "./views/Benchmark.js";
 import { HistoryView } from "./views/History.js";
 import { TasksView } from "./views/Tasks.js";
 import { handleAppKey, type Screen } from "./keys.js";
-import { Chrome } from "./Welcome.js";
+import { Frame, Header } from "./layout.js";
 
 export function App(props: { session: Session; preset?: string; start?: Screen }): ReactElement {
   const { exit } = useApp();
@@ -32,8 +32,8 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
   });
 
   return (
-    <Box flexDirection="column" paddingX={1}>
-      {screen !== "benchmark" && <Chrome />}
+    <Frame>
+      {screen !== "benchmark" && <Header />}
       {screen === "home" && <Dashboard session={props.session} />}
       {screen === "models" && <ModelsView session={props.session} />}
       {screen === "hardware" && <HardwareView session={props.session} />}
@@ -52,6 +52,6 @@ export function App(props: { session: Session; preset?: string; start?: Screen }
           onBack={() => setScreen("home")}
         />
       )}
-    </Box>
+    </Frame>
   );
 }

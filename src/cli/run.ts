@@ -5,8 +5,8 @@ import { runBenchmark } from "../benchmark/engine.js";
 import { listBenchmarks } from "../storage/benchmarks.js";
 import { killAll } from "../shared/process.js";
 import { setLogLevel } from "../shared/logger.js";
-import { renderDashboard } from "../tui/render.js";
 import { resolveLocale, setLocale, t } from "../i18n/index.js";
+import type { Screen } from "../tui/keys.js";
 import { parseAnswers, planTasks, tasksText } from "../tasks/plan.js";
 import { decideAll, decideLaunch, launchText, parseIntegration } from "../integrations/decide.js";
 import { executeLaunch } from "../integrations/execute.js";
@@ -36,6 +36,17 @@ function print(value: unknown, json: boolean): void {
 
 function explained(aboutKey: Parameters<typeof t>[0], body: string): string {
   return `${t(aboutKey)}\n\n${body}`;
+}
+
+async function openLab(session: Awaited<ReturnType<typeof loadSession>>, preset?: string, start?: Screen): Promise<void> {
+  if (!process.stdout.isTTY || !process.stdin.isTTY) {
+    process.stdout.write(
+      `${explained("aboutDashboard", `${hardwareText(session)}\n\n${modelsText(session)}`)}\n`,
+    );
+    return;
+  }
+  const { renderDashboard } = await import("../tui/render.js");
+  await renderDashboard(session, preset, start);
 }
 
 export async function run(args: CliArgs): Promise<number> {
@@ -88,7 +99,7 @@ export async function run(args: CliArgs): Promise<number> {
         print({ recommendations: session.recommendations, agents: session.agents }, true);
         return 0;
       }
-      await renderDashboard(session, args.preset, "setup");
+      await openLab(session, args.preset, "setup");
       return 0;
     case "recommend": {
       if (args.install && args.yes) {
@@ -180,10 +191,10 @@ export async function run(args: CliArgs): Promise<number> {
           print({ error: t("jsonNeedModel") }, true);
           return 1;
         }
-        await renderDashboard(session, args.preset);
-        return 0;
-      }
-      const model = session.models.find((m) => m.id === id || m.name === id);
+         await openLab(session, args.preset);
+         return 0;
+       }
+       const model = session.models.find((m) => m.id === id || m.name === id);
       if (!model) {
         process.stderr.write(`${t("modelNotFound", { id })}\n`);
         return 1;
@@ -212,7 +223,7 @@ export async function run(args: CliArgs): Promise<number> {
         print(session, true);
         return 0;
       }
-      await renderDashboard(session, args.preset);
+      await openLab(session, args.preset);
       return 0;
   }
 }

@@ -5,27 +5,32 @@ import { t } from "../../i18n/index.js";
 import { resolveOllamaTag } from "../../integrations/ollama-tags.js";
 import type { Session } from "../../session/load.js";
 import { gradeColor } from "../theme.js";
-import { Typewriter } from "../Typewriter.js";
-import { fit, useCols } from "../width.js";
+import { Panel } from "../layout.js";
+import { fit } from "../width.js";
 
 export function RecommendView({ session }: { session: Session }): ReactElement {
-  const cols = useCols();
   return (
-    <Box flexDirection="column" width={cols}>
-      <Text bold color="magenta">
-        {t("recommended")}
-      </Text>
-      <Typewriter text={fit(t("aboutRecommend"), cols)} ms={12} dimColor />
-      {session.recommendations.map((rec) => (
-        <Text key={`${rec.useCase}-${rec.model.id}`}>
-          <Text color="magenta">{fit(rec.useCase, 10)}</Text>
-          <Text> {fit(rec.model.name, 22)} </Text>
-          <Text color={gradeColor(rec.grade)}>{rec.grade}</Text>
-          <Text> {GRADE_MEANING[rec.grade]}</Text>
-          <Text dimColor> {resolveOllamaTag(rec.model.id, rec.model.name) ?? "—"}</Text>
-        </Text>
-      ))}
-      <Text color="yellow">{fit(t("setupCta"), cols)}</Text>
-    </Box>
+    <>
+      <Panel title={t("recommended")} color="magenta">
+        <Text dimColor>{t("recommendedHint")}</Text>
+        {session.recommendations.map((rec) => (
+          <Box key={`${rec.useCase}-${rec.model.id}`}>
+            <Box width={12}>
+              <Text color="magenta">{fit(rec.useCase, 10)}</Text>
+            </Box>
+            <Box width={24}>
+              <Text>{fit(rec.model.name, 22)}</Text>
+            </Box>
+            <Box width={4}>
+              <Text color={gradeColor(rec.grade)}>{rec.grade}</Text>
+            </Box>
+            <Text dimColor>
+              {GRADE_MEANING[rec.grade]}  {resolveOllamaTag(rec.model.id, rec.model.name) ?? "—"}
+            </Text>
+          </Box>
+        ))}
+      </Panel>
+      <Text color="yellow">{t("setupCta")}</Text>
+    </>
   );
 }

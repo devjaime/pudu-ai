@@ -8,7 +8,7 @@ import { resolveOllamaTag } from "../../integrations/ollama-tags.js";
 import type { IntegrationId } from "../../integrations/types.js";
 import type { Session } from "../../session/load.js";
 import { gradeColor } from "../theme.js";
-import { Typewriter } from "../Typewriter.js";
+import { Panel } from "../layout.js";
 import { fit, useCols } from "../width.js";
 
 const TOOLS: Array<{ key: string; id: IntegrationId; label: string }> = [
@@ -117,17 +117,19 @@ export function SetupView({ session }: { session: Session }): ReactElement {
 
   return (
     <Box flexDirection="column" width={cols}>
-      <Text bold color="yellow">
-        {fit(t("setupTitle"), cols)}
-      </Text>
-      {recs.map((item, i) => (
-        <Text key={`${item.useCase}-${item.model.id}`} color={i === cursor ? "cyan" : undefined}>
-          {i === cursor ? "❯ " : "  "}
-          {fit(item.model.name, 20)}{" "}
-          <Text color={gradeColor(item.grade)}>{item.grade}</Text>
-          <Text dimColor> {resolveOllamaTag(item.model.id, item.model.name) ?? "—"}</Text>
-        </Text>
-      ))}
+      <Panel title={t("setupTitle")} color="yellow">
+        <Text dimColor>{t("setupIntro")}</Text>
+        {recs.map((item, i) => (
+          <Box key={`${item.useCase}-${item.model.id}`}>
+            <Text color={i === cursor ? "cyan" : undefined}>
+              {i === cursor ? "❯ " : "  "}
+              {fit(item.model.name, 20)}{" "}
+            </Text>
+            <Text color={gradeColor(item.grade)}>{item.grade}</Text>
+            <Text dimColor> {resolveOllamaTag(item.model.id, item.model.name) ?? "—"}</Text>
+          </Box>
+        ))}
+      </Panel>
       {session.agents.map((agent, index) => (
         <Text key={agent.id} color={agent.detected ? "green" : "yellow"}>
           [{index + 1}] {agent.detected ? "✓" : "○"} {agent.label}
@@ -146,7 +148,7 @@ export function SetupView({ session }: { session: Session }): ReactElement {
         [6] {session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "✓" : "○"} LM Studio
         {session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "" : "  → brew install --cask lm-studio"}
       </Text>
-      <Typewriter text={fit(`Enter=pull ${tag ?? ""}  1-3 agent  4 docker  5 ollama  6 LM Studio`, cols)} ms={14} dimColor />
+      <Text dimColor>{fit(`Enter=pull ${tag ?? ""}  1-3 agent  4 docker  5 ollama  6 LM Studio`, cols)}</Text>
       {log ? <Text color="green">{fit(log, cols)}</Text> : null}
     </Box>
   );

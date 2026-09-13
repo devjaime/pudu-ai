@@ -4,6 +4,9 @@ import type { Session } from "../session/load.js";
 import type { Screen } from "./keys.js";
 
 export async function renderDashboard(session: Session, preset?: string, start?: Screen): Promise<void> {
-  const instance = render(<App session={session} preset={preset} start={start} />);
+  const instance = render(<App session={session} preset={preset} start={start} />, {
+    exitOnCtrlC: true,
+    patchConsole: true,
+  });
   await instance.waitUntilExit();
 }

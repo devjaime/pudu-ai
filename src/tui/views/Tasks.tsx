@@ -4,6 +4,7 @@ import { t } from "../../i18n/index.js";
 import type { Session } from "../../session/load.js";
 import { planTasks, tasksText } from "../../tasks/plan.js";
 import { WORK_KINDS, type TaskPriority, type TaskScope, type WorkKind } from "../../tasks/types.js";
+import { Panel } from "../layout.js";
 
 const KIND_LABEL: Record<WorkKind, "tasksOptCode" | "tasksOptVideo" | "tasksOptImage" | "tasksOptTranscription" | "tasksOptChat"> =
   {
@@ -51,17 +52,14 @@ export function TasksView({ session }: { session: Session }): ReactElement {
 
   if (step === 3) {
     return (
-      <Box flexDirection="column">
+      <Panel title={t("tasksTitle")} color="blue">
         <Text>{tasksText(plans, { kinds, scope, priority })}</Text>
-      </Box>
+      </Panel>
     );
   }
 
   return (
-    <Box flexDirection="column">
-      <Text bold color="cyan">
-        {t("tasksTitle")}
-      </Text>
+    <Panel title={t("tasksTitle")} color="blue">
       {step === 0 && (
         <>
           <Text>{t("tasksQ1")}</Text>
@@ -97,6 +95,6 @@ export function TasksView({ session }: { session: Session }): ReactElement {
           ))}
         </>
       )}
-    </Box>
+    </Panel>
   );
 }
