@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Pudu-AI: laboratorio local de modelos",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/devjaime/pudu-ai",
+      "provider": "github",
+      "revision": "302b25858f3dce32488e31fe49e997bbe1f5779a"
+    },
+    "views": [
+      {
+        "id": "finalidad",
+        "label": "Finalidad",
+        "focus": ["operador", "cli", "session", "storage"],
+        "note": "CLI local para descubrir, medir y comparar modelos sin subir datos de la máquina."
+      },
+      {
+        "id": "pipeline",
+        "label": "Pipeline de sesión",
+        "focus": ["cli", "session", "hardware", "models", "compatibility", "benchmark", "storage"],
+        "note": "loadSession compone hardware, runtimes, modelos, catálogo y historial local."
+      },
+      {
+        "id": "medido-estimado",
+        "label": "Medido vs estimado",
+        "focus": ["compatibility", "canirun", "benchmark", "storage"],
+        "note": "CanIRun.ai es estimado; llama-bench es medido. Nunca se mezclan."
+      },
+      {
+        "id": "agent-lab",
+        "label": "Agent Lab",
+        "focus": ["cli", "agentlab"],
+        "note": "pudu-ai repo search no llama a loadSession y no envía el repo a ninguna API."
+      }
+    ]
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [56, 96],
+    "cols": 5,
+    "gapX": 88,
+    "gapY": 100,
+    "cellW": 128,
+    "cellH": 72
+  },
+  "components": [
+    {
+      "id": "operador",
+      "type": "external",
+      "label": "Operador",
+      "sublabel": "Terminal",
+      "tag": "npx pudu-ai",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "cli",
+      "type": "frontend",
+      "label": "CLI + TUI",
+      "sublabel": "Ink / JSON / CSV",
+      "tag": "src/cli",
+      "row": 1,
+      "col": 1,
+      "sources": [
+        { "path": "src/cli/index.ts", "line": 1, "end_line": 14, "label": "entrypoint" },
+        { "path": "src/cli/run.ts", "line": 57, "end_line": 68, "label": "dispatch" }
+      ]
+    },
+    {
+      "id": "session",
+      "type": "backend",
+      "label": "Sesión",
+      "sublabel": "loadSession",
+      "tag": "src/session",
+      "row": 1,
+      "col": 2,
+      "sources": [
+        { "path": "src/session/load.ts", "line": 38, "end_line": 73, "label": "loadSession" }
+      ]
+    },
+    {
+      "id": "hardware",
+      "type": "backend",
+      "label": "Hardware",
+      "sublabel": "CPU / GPU / RAM",
+      "tag": "src/hardware",
+      "row": 0,
+      "col": 2,
+      "sources": [
+        { "path": "src/hardware/detect.ts", "line": 20, "end_line": 36, "label": "detectHardware" }
+      ]
+    },
+    {
+      "id": "models",
+      "type": "backend",
+      "label": "Modelos locales",
+      "sublabel": "Ollama / GGUF",
+      "tag": "src/models",
+      "brand": "ollama",
+      "row": 1,
+      "col": 3,
+      "sources": [
+        { "path": "src/models/discovery.ts", "line": 19, "end_line": 33, "label": "discoverLocalModels" }
+      ]
+    },
+    {
+      "id": "benchmark",
+      "type": "backend",
+      "label": "Benchmark",
+      "sublabel": "llama-bench",
+      "tag": "src/benchmark",
+      "row": 1,
+      "col": 4,
+      "sources": [
+        { "path": "src/benchmark/engine.ts", "line": 28, "end_line": 45, "label": "runBenchmark" }
+      ]
+    },
+    {
+      "id": "compatibility",
+      "type": "backend",
+      "label": "Compatibilidad",
+      "sublabel": "grados S–F",
+      "tag": "src/compatibility",
+      "row": 2,
+      "col": 3,
+      "sources": [
+        { "path": "src/compatibility/service.ts", "line": 26, "end_line": 39, "label": "loadCatalog" },
+        { "path": "src/compatibility/service.ts", "line": 45, "end_line": 50, "label": "compatibilityFor" }
+      ]
+    },
+    {
+      "id": "storage",
+      "type": "database",
+      "label": "~/.pudu-ai",
+      "sublabel": "historial local",
+      "tag": "src/storage",
+      "row": 2,
+      "col": 4,
+      "sources": [
+        { "path": "src/storage/paths.ts", "line": 5, "end_line": 36, "label": "homeDir" }
+      ]
+    },
+    {
+      "id": "canirun",
+      "type": "external",
+      "label": "CanIRun.ai",
+      "sublabel": "estimado",
+      "tag": "--no-network",
+      "row": 2,
+      "col": 2,
+      "sources": [
+        { "path": "src/adapters/canirun/index.ts", "line": 10, "label": "BASE" }
+      ]
+    },
+    {
+      "id": "agentlab",
+      "type": "backend",
+      "label": "Agent Lab",
+      "sublabel": "repo search",
+      "tag": "sin LLM",
+      "row": 2,
+      "col": 1,
+      "sources": [
+        { "path": "src/cli/run.ts", "line": 65, "end_line": 68, "label": "repo dispatch" },
+        { "path": "src/agent-lab/repo-cli.ts", "line": 1, "end_line": 8, "label": "repo-cli" }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Proceso local pudu-ai",
+      "wraps": ["cli", "session", "hardware", "models", "compatibility", "benchmark", "storage"]
+    },
+    {
+      "kind": "region",
+      "label": "Red opcional",
+      "wraps": ["canirun"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "operador-cli",
+      "from": "operador",
+      "to": "cli",
+      "label": "npx pudu-ai",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cli-session",
+      "from": "cli",
+      "to": "session",
+      "label": "loadSession",
+      "variant": "emphasis"
+    },
+    {
+      "id": "session-hardware",
+      "from": "session",
+      "to": "hardware",
+      "label": "detectHardware"
+    },
+    {
+      "id": "session-models",
+      "from": "session",
+      "to": "models",
+      "label": "listModels",
+      "variant": "emphasis"
+    },
+    {
+      "id": "models-bench",
+      "from": "models",
+      "to": "benchmark",
+      "label": "runBenchmark",
+      "variant": "emphasis"
+    },
+    {
+      "id": "bench-storage",
+      "from": "benchmark",
+      "to": "storage",
+      "label": "saveBenchmark",
+      "variant": "emphasis",
+      "labelDy": 24
+    },
+    {
+      "id": "models-compat",
+      "from": "models",
+      "to": "compatibility",
+      "label": "matchCatalog",
+      "labelDy": 24
+    },
+    {
+      "id": "compat-canirun",
+      "from": "compatibility",
+      "to": "canirun",
+      "label": "fetchCatalog",
+      "variant": "dashed"
+    },
+    {
+      "id": "cli-agentlab",
+      "from": "cli",
+      "to": "agentlab",
+      "label": "repo search",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Finalidad",
+      "items": [
+        "Laboratorio de terminal para descubrir, inspeccionar, medir y comparar modelos locales",
+        "Misma sesión alimenta TUI Ink, --json y --csv"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Medido vs estimado",
+      "items": [
+        "Medido: llama-bench y telemetría del SO",
+        "Estimado: CanIRun.ai, siempre etiquetado; --no-network usa caché o fallback"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Local-first",
+      "items": [
+        "Datos en ~/.pudu-ai/; nada se sube",
+        "Agent Lab no llama loadSession ni envía el repositorio a una API"
+      ]
+    }
+  ]
+}
