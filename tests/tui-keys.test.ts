@@ -32,6 +32,7 @@ describe("TUI key handler", () => {
     expect(handleAppKey("setup", "s", {})).toEqual({ type: "screen", screen: "setup" });
     expect(handleAppKey("setup", "r", {})).toEqual({ type: "screen", screen: "recommend" });
     expect(handleAppKey("setup", "i", {})).toEqual({ type: "ignore" });
+    expect(handleAppKey("setup", "7", {})).toEqual({ type: "ignore" });
     expect(handleAppKey("tasks", "b", {})).toEqual({ type: "screen", screen: "benchmark" });
   });
 });

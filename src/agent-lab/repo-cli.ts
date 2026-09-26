@@ -2,9 +2,12 @@ import path from "node:path";
 import { t } from "../i18n/index.js";
 import { na } from "../shared/format.js";
 import type { CliArgs } from "../cli/parse-args.js";
+import { readFile } from "node:fs/promises";
 import { findPython } from "./python-bridge.js";
 import { buildRepoGraph, runRepoHarness } from "./graph.js";
+import { commitObsidianExport, planObsidianExport, type ExportGraph } from "./obsidian-export.js";
 import { searchRepo } from "./search.js";
+import { buildVaultGraph, loadVaultFiles } from "./vault-graph.js";
 import type { CodeGraph, SearchIntent, SearchResult } from "./types.js";
 
 const INTENTS: SearchIntent[] = ["TEXT", "STRUCTURAL", "RELATIONSHIP", "IMPACT", "SEMANTIC", "UNKNOWN"];
@@ -56,19 +59,87 @@ export function formatSearchText(result: SearchResult): string {
   return lines.join("\n");
 }
 
+async function runVaultCommand(sub: string, args: CliArgs, repo: string): Promise<number> {
+  try {
+    return await runVaultCommandInner(sub, args, repo);
+  } catch (error: unknown) {
+    return fail(error, args.json);
+  }
+}
+
+async function runVaultCommandInner(sub: string, args: CliArgs, repo: string): Promise<number> {
+  if (sub === "export") {
+    if (!args.from) {
+      process.stderr.write(`${t("repoExportNeedFrom")}\n`);
+      return 1;
+    }
+    if (!args.out) {
+      process.stderr.write(`${t("repoExportNeedOut")}\n`);
+      return 1;
+    }
+    const raw = JSON.parse(await readFile(path.resolve(args.from), "utf8")) as ExportGraph;
+    const plan = planObsidianExport(raw);
+    const result = await commitObsidianExport(path.resolve(args.out), plan, args.yes);
+    print(args.json ? result : formatExportText(result), args.json);
+    return 0;
+  }
+
+  const vault = path.resolve(args.vault ?? repo);
+  const loaded = await loadVaultFiles(vault);
+  const graph = buildVaultGraph(loaded.root, loaded.files, loaded.present);
+  let exportResult: Awaited<ReturnType<typeof commitObsidianExport>> | undefined;
+  if (args.out) {
+    exportResult = await commitObsidianExport(path.resolve(args.out), planObsidianExport(graph), args.yes);
+  }
+  const payload = exportResult ? { graph, export: exportResult } : graph;
+  print(args.json ? payload : formatVaultText(graph, exportResult), args.json);
+  return graph.ok ? 0 : 1;
+}
+
+function formatExportText(result: { wrote: boolean; planned: string[]; written: string[]; skipped: string[] }): string {
+  const lines = [result.wrote ? t("repoExportWrote", { count: result.written.length }) : t("repoExportDry"), ...result.planned.map((file) => `  ${file}`)];
+  if (result.skipped.length) lines.push(t("repoExportSkipped", { files: result.skipped.join(", ") }));
+  return lines.join("\n");
+}
+
+function formatVaultText(
+  graph: ReturnType<typeof buildVaultGraph>,
+  exported?: { wrote: boolean; planned: string[]; written: string[]; skipped: string[] },
+): string {
+  const lines = [
+    t("repoVaultTitle"),
+    "",
+    t("aboutRepoVault"),
+    "",
+    `Repo       ${graph.repo}`,
+    `Files      ${graph.metrics.fileCount}  (${graph.metrics.origin})`,
+    `Edges      ${graph.metrics.edgeCount}  (${graph.metrics.origin})`,
+    `Unresolved ${graph.metrics.unresolvedCount}  (${graph.metrics.origin})`,
+  ];
+  for (const edge of graph.edges) lines.push(`${edge.file}:${edge.line}  ${edge.type} → ${edge.target}  [${edge.confidence}]`);
+  for (const miss of graph.unresolved) lines.push(`${miss.source}:${miss.line}  unresolved ${miss.target}`);
+  if (exported) lines.push("", formatExportText(exported));
+  if (!graph.edges.length && !graph.unresolved.length) lines.push(t("repoGraphEmpty"));
+  return lines.join("\n");
+}
+
 export async function runRepoCommand(args: CliArgs): Promise<number> {
   const sub = args.positional[0];
   if (!sub || sub === "help") {
     print(t("repoHelp"), args.json);
     return 0;
   }
+  const repo = path.resolve(args.repo ?? process.cwd());
+
+  if (sub === "export" || (sub === "graph" && args.vault)) {
+    return runVaultCommand(sub, args, repo);
+  }
+
   const python = await findPython();
   if (!python) {
     process.stderr.write(`${t("repoPythonMissing")}\n`);
     return 1;
   }
-
-  const repo = path.resolve(args.repo ?? process.cwd());
 
   if (sub === "graph") {
     try {

@@ -44,7 +44,7 @@ export function handleAppKey(
   if (key.escape) return screen === "home" ? { type: "quit" } : { type: "home" };
 
   if (screen === "setup") {
-    if ("i123456".includes(letter)) return { type: "ignore" };
+    if ("i1234567".includes(letter)) return { type: "ignore" };
   }
 
   const nav = globalNav(letter);

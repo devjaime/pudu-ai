@@ -2,7 +2,7 @@ import { Box, Text, useApp, useInput } from "ink";
 import { useState, type ReactElement } from "react";
 import { t } from "../../i18n/index.js";
 import { decideLaunch } from "../../integrations/decide.js";
-import { executeDockerOllama, executeLaunch, installWithBrew } from "../../integrations/execute.js";
+import { executeDockerOllama, executeLaunch, installAntigravity, installWithBrew, openAntigravity } from "../../integrations/execute.js";
 import { canInstallGrade, pullOllamaModel } from "../../integrations/pull.js";
 import { resolveOllamaTag } from "../../integrations/ollama-tags.js";
 import type { IntegrationId } from "../../integrations/types.js";
@@ -69,6 +69,24 @@ export function SetupView({ session }: { session: Session }): ReactElement {
       });
       return;
     }
+    if (input === "7") {
+      const antigravity = session.agents.find((agent) => agent.id === "antigravity");
+      setBusy(true);
+      if (antigravity?.detected) {
+        setLog(t("antigravityOpening"));
+        void openAntigravity().then((result) => {
+          setLog(result.log);
+          setBusy(false);
+        });
+        return;
+      }
+      setLog(t("brewInstalling", { pkg: "antigravity" }));
+      void installAntigravity().then((result) => {
+        setLog(result.ok ? `${result.log}\n${t("antigravityInstalled")}` : result.log);
+        setBusy(false);
+      });
+      return;
+    }
     const tool = TOOLS.find((item) => item.key === input)?.id;
     if (tool) {
       const ollama = session.runtimes.find((r) => r.id === "ollama")?.detected;
@@ -130,7 +148,7 @@ export function SetupView({ session }: { session: Session }): ReactElement {
           </Box>
         ))}
       </Panel>
-      {session.agents.map((agent, index) => (
+      {session.agents.filter((agent) => agent.id !== "antigravity").map((agent, index) => (
         <Text key={agent.id} color={agent.detected ? "green" : "yellow"}>
           [{index + 1}] {agent.detected ? "✓" : "○"} {agent.label}
           {agent.detected ? "" : `  → ${agent.launch}`}
@@ -148,7 +166,13 @@ export function SetupView({ session }: { session: Session }): ReactElement {
         [6] {session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "✓" : "○"} LM Studio
         {session.runtimes.find((r) => r.id === "lmstudio")?.detected ? "" : "  → brew install --cask lm-studio"}
       </Text>
-      <Text dimColor>{fit(`Enter=pull ${tag ?? ""}  1-3 agent  4 docker  5 ollama  6 LM Studio`, cols)}</Text>
+      <Text color={session.agents.find((agent) => agent.id === "antigravity")?.detected ? "green" : "yellow"}>
+        [7] {session.agents.find((agent) => agent.id === "antigravity")?.detected ? "✓" : "○"} Antigravity
+        {session.agents.find((agent) => agent.id === "antigravity")?.detected
+          ? `  → ${t("antigravityOpenHint")}`
+          : "  → brew install --cask antigravity"}
+      </Text>
+      <Text dimColor>{fit(`Enter=pull ${tag ?? ""}  1-3 agent  4 docker  5 ollama  6 LM Studio  7 Antigravity`, cols)}</Text>
       {log ? <Text color="green">{fit(log, cols)}</Text> : null}
     </Box>
   );

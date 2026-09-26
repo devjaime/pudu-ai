@@ -43,7 +43,7 @@ export const en = {
     "Deterministic repository search (Pudu Agent Lab). Literal strings use rg; syntactic patterns use ast-grep. No LLM. Missing tools are reported, never faked.",
   repoSearchTitle: "Pudu Agent Lab — repo search",
   repoNeedQuery: "Pass a query or --structural PATTERN, e.g. npx pudu-ai repo search validate_user --json",
-  repoUnknownSubcommand: "Unknown repo subcommand: {sub}. Supported: search, graph, harness.",
+  repoUnknownSubcommand: "Unknown repo subcommand: {sub}. Supported: search, graph, harness, export.",
   repoPythonMissing: "python3 not found. Agent Lab search needs Python 3.10+ on PATH.",
   repoToolMissing: "{tool} not found on PATH",
   repoNoMatches: "No matches.",
@@ -73,10 +73,15 @@ Usage:
   npx pudu-ai repo search QUERY --repo PATH --json
   npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
   npx pudu-ai repo graph --repo PATH
+  npx pudu-ai repo graph --vault PATH
+  npx pudu-ai repo export --from graph.json --out DIR
   npx pudu-ai repo harness --task "fix auth" --repo PATH --json
 
 Flags:
   --repo PATH         Repository root (default: cwd)
+  --vault PATH        Markdown vault root (wikilinks only)
+  --from FILE         Graph JSON to export
+  --out PATH          Export directory, or Antigravity config path with --yes
   --structural PAT    ast-grep pattern
   --intent INTENT     TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
   --glob GLOB         Repeatable include glob
@@ -87,15 +92,20 @@ Flags:
   nav: "[S] Setup/Install  [B] Benchmark  [M] Models  [R] Recommend  [T] Tasks  [H] Hardware  [C] Compare  [L] History  [Q] Quit",
   setupTitle: "SETUP — INSTALL MODELS & AGENTS",
   setupIntro:
-    "Pick a recommended model (grade S–B), install it with Ollama, then link or install OpenCode, Hermes, or OpenClaw.",
+    "Pick a recommended model (grade S–B), install it with Ollama, then link OpenCode, Hermes, or OpenClaw. [7] installs Antigravity with Homebrew. It does not curl-pipe an installer or launch a local agent.",
   setupStep1: "1. Recommended models (↑↓ to choose)",
   setupStep2: "2. Install the selected model",
   setupInstallModel: "Press Enter or I  →  ollama pull (only if grade is S, A, or B)",
   setupStep3: "3. Coding agent — link if present, install if missing",
   setupLinkNow: "installed → press 1/2/3 to link this model",
   setupInstallAgent: "not installed → press 1/2/3 to install via ollama launch (if eligible)",
-  setupKeys: "Enter/I = pull model    1 OpenCode    2 Hermes    3 OpenClaw    Esc = back",
-  setupCta: "[S] Setup: install model + OpenCode / Hermes / OpenClaw",
+  setupKeys: "Enter/I = pull model    1 OpenCode    2 Hermes    3 OpenClaw    7 Antigravity    Esc = back",
+  setupCta: "[S] Setup: install model, agents, or Antigravity",
+  antigravityInstalled: "Antigravity cask installed. Not launched. Local Gemma 4 still needs launch antigravity.",
+  antigravityOpening: "Opening Antigravity…",
+  antigravityOpened: "Opened Antigravity. No local agent was started.",
+  antigravityOpenFail: "Could not open Antigravity.",
+  antigravityOpenHint: "installed → press 7 to open",
   machine: "MACHINE",
   runtimes: "LOCAL AI RUNTIMES",
   installedModels: "INSTALLED MODELS",
@@ -210,7 +220,23 @@ Flags:
   launchModel: "Model",
   launchRunHint: "To pull (if needed) and launch: npx pudu-ai launch {tool} --yes",
   launchBlocked: "Blocked. No pull, install, or launch.",
-  launchNeedTool: "Pass a tool: opencode | openclaw | hermes | claude",
+  launchNeedTool: "Pass a tool: opencode | openclaw | hermes | claude | antigravity",
+  launchAntigravityTitle: "ANTIGRAVITY — LOCAL GEMMA 4",
+  launchAntigravityHint:
+    "Explain-only. Antigravity is not an ollama launch target. --yes writes a loopback OpenAI-compatible config only when a local Gemma 4 tag fits. Cloud tags and LiteRT checkpoints are not pulled.",
+  launchCloudBlocked: "Cloud tag is not a local task target.",
+  launchNonLoopback: "base URL is not loopback. Refusing.",
+  launchNeedOut: "Pass --out to write. Nothing was written.",
+  launchConfigPlan: "Config (not written unless --out and --yes):",
+  launchConfigWrote: "Wrote {file}. Did not launch Antigravity.",
+  launchLiteRtDetectOnly: "LiteRT checkpoint is detect-only. Pudu-AI will not download it or pip install.",
+  repoVaultTitle: "AGENT LAB — VAULT GRAPH",
+  aboutRepoVault: "Markdown wikilink graph. EXTRACTED edges only when both notes exist. Dangling links are unresolved, never invented.",
+  repoExportNeedFrom: "Pass --from graph.json",
+  repoExportNeedOut: "Pass --out DIR",
+  repoExportDry: "Export plan only. Nothing written.",
+  repoExportWrote: "Wrote {count} notes.",
+  repoExportSkipped: "Skipped hand-edited notes: {files}",
   launchUnknown: "Unknown integration.",
   launchPulling: "Pulling {model} with ollama pull…",
   launchPullFail: "ollama pull failed.",
@@ -236,9 +262,13 @@ Usage:
   npx pudu-ai launch
   npx pudu-ai launch opencode
   npx pudu-ai launch opencode --yes
+  npx pudu-ai launch antigravity
+  npx pudu-ai launch antigravity gemma4:e4b --out ./antigravity.local.json --yes
   npx pudu-ai repo search QUERY
   npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
   npx pudu-ai repo graph
+  npx pudu-ai repo graph --vault PATH
+  npx pudu-ai repo export --from graph.json --out DIR
   npx pudu-ai repo harness --task "fix auth"
 
 Flags:
@@ -252,7 +282,10 @@ Flags:
   --for           code,video,image,transcription,chat
   --scope         installed | all
   --priority      speed | balanced | quality
-  --yes           Execute pull/launch only if the model is eligible
+  --yes           Execute pull/launch, or write a local config/export, only if eligible
+  --vault         Markdown vault for repo graph
+  --out           Write path for Antigravity config or Obsidian export
+  --from          Graph JSON for repo export
   --repo          Agent Lab repository root
   --structural    ast-grep pattern for repo search
   --intent        TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN

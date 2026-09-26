@@ -1,7 +1,9 @@
+import { access } from "node:fs/promises";
+import { constants } from "node:fs";
 import { commandExists } from "../shared/which.js";
 
 export type AgentStatus = {
-  id: "opencode" | "hermes" | "openclaw";
+  id: "opencode" | "hermes" | "openclaw" | "antigravity";
   label: string;
   bin: string;
   detected: boolean;
@@ -33,6 +35,16 @@ const AGENTS = [
   },
 ];
 
+export async function antigravityInstalled(): Promise<boolean> {
+  if (await commandExists("agy")) return true;
+  try {
+    await access("/Applications/Antigravity.app", constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function detectAgents(): Promise<AgentStatus[]> {
   const out: AgentStatus[] = [];
   for (const agent of AGENTS) {
@@ -41,6 +53,14 @@ export async function detectAgents(): Promise<AgentStatus[]> {
       detected: Boolean(await commandExists(agent.bin)),
     });
   }
+  out.push({
+    id: "antigravity",
+    label: "Antigravity",
+    bin: "agy",
+    detected: await antigravityInstalled(),
+    launch: "brew install --cask antigravity",
+    docs: "https://antigravity.google/download",
+  });
   return out;
 }
 

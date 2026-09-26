@@ -14,6 +14,11 @@ export type CompatibilityService = {
 };
 
 const FALLBACK_CATALOG: CatalogModel[] = [
+  { id: "gemma4-e2b", name: "Gemma 4 E2B", provider: "Google", paramsBillions: 2.3, useCase: ["chat", "code"] },
+  { id: "gemma4-e4b", name: "Gemma 4 E4B", provider: "Google", paramsBillions: 4.5, useCase: ["chat", "code"] },
+  { id: "gemma4-12b", name: "Gemma 4 12B", provider: "Google", paramsBillions: 12, useCase: ["chat", "code"] },
+  { id: "gemma4-26b", name: "Gemma 4 26B", provider: "Google", paramsBillions: 26, useCase: ["chat", "code"] },
+  { id: "gemma4-31b", name: "Gemma 4 31B", provider: "Google", paramsBillions: 31, useCase: ["chat", "code"] },
   { id: "gemma3-4b", name: "Gemma 3 4B", provider: "Google", paramsBillions: 4, useCase: ["chat"] },
   { id: "qwen3-8b", name: "Qwen 3 8B", provider: "Alibaba", paramsBillions: 8, useCase: ["code", "chat", "reasoning"] },
   { id: "qwen3-4b", name: "Qwen 3 4B", provider: "Alibaba", paramsBillions: 4, useCase: ["chat"] },

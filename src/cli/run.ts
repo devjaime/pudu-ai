@@ -8,7 +8,11 @@ import { setLogLevel } from "../shared/logger.js";
 import { resolveLocale, setLocale, t } from "../i18n/index.js";
 import type { Screen } from "../tui/keys.js";
 import { parseAnswers, planTasks, tasksText } from "../tasks/plan.js";
+import { access } from "node:fs/promises";
+import { constants } from "node:fs";
 import { decideAll, decideLaunch, launchText, parseIntegration } from "../integrations/decide.js";
+import { antigravityFromSession, antigravityText, decideAntigravity, writeAntigravityConfig } from "../integrations/antigravity.js";
+import { commandExists } from "../shared/which.js";
 import { executeLaunch } from "../integrations/execute.js";
 import { canInstallGrade, pullOllamaModel } from "../integrations/pull.js";
 import { helpText } from "./help.js";
@@ -136,6 +140,27 @@ export async function run(args: CliArgs): Promise<number> {
       return 0;
     }
     case "launch": {
+      if (args.positional[0]?.toLowerCase() === "antigravity") {
+        const detected = Boolean(await commandExists("agy")) || (await access("/Applications/Antigravity.app", constants.F_OK).then(() => true).catch(() => false));
+        const decision = decideAntigravity(antigravityFromSession(session, args.positional[1], detected));
+        if (!args.yes) {
+          print(args.json ? decision : explained("aboutLaunch", antigravityText(decision)), args.json);
+          return 0;
+        }
+        if (!decision.eligible || !decision.config) {
+          print(args.json ? decision : explained("aboutLaunch", antigravityText(decision)), args.json);
+          return 1;
+        }
+        if (!args.out) {
+          process.stderr.write(`${t("launchNeedOut")}\n`);
+          print(args.json ? decision : explained("aboutLaunch", antigravityText(decision)), args.json);
+          return 1;
+        }
+        const file = await writeAntigravityConfig(args.out, decision.config);
+        const body = `${antigravityText(decision)}\n${t("launchConfigWrote", { file })}`;
+        print(args.json ? { decision, wrote: file } : explained("aboutLaunch", body), args.json);
+        return 0;
+      }
       const tool = parseIntegration(args.positional[0]);
       const decisions = tool ? [decideLaunch(session, tool)] : decideAll(session);
       if (!args.yes) {

@@ -38,6 +38,9 @@ export type CliArgs = {
   limit?: number;
   globs: string[];
   task?: string;
+  vault?: string;
+  out?: string;
+  from?: string;
 };
 
 const VALUE_FLAGS = new Set([
@@ -54,6 +57,9 @@ const VALUE_FLAGS = new Set([
   "--limit",
   "--glob",
   "--task",
+  "--vault",
+  "--out",
+  "--from",
 ]);
 
 function flagValue(args: string[], name: string): string | undefined {
@@ -134,5 +140,8 @@ export function parseArgs(argv: string[]): CliArgs {
     limit,
     globs: flagValues(args, "--glob"),
     task: flagValue(args, "--task"),
+    vault: flagValue(args, "--vault"),
+    out: flagValue(args, "--out"),
+    from: flagValue(args, "--from"),
   };
 }

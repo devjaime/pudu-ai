@@ -36,6 +36,17 @@ export async function executeLaunch(decision: LaunchDecision): Promise<{ ok: boo
   return { ok: true, log: `${lines.join("\n")}\n${launched.stdout}`.trim() };
 }
 
+export async function installAntigravity(): Promise<{ ok: boolean; log: string }> {
+  const { brewInstall } = await import("./brew.js");
+  return brewInstall(["install", "--cask", "antigravity"]);
+}
+
+export async function openAntigravity(): Promise<{ ok: boolean; log: string }> {
+  const result = await runCommand("open", ["-a", "Antigravity"], { timeout: 15000 });
+  if (result.exitCode !== 0) return { ok: false, log: result.stderr || t("antigravityOpenFail") };
+  return { ok: true, log: t("antigravityOpened") };
+}
+
 export async function installWithBrew(kind: "ollama" | "lmstudio"): Promise<{ ok: boolean; log: string }> {
   const { brewInstall } = await import("./brew.js");
   if (kind === "ollama") {

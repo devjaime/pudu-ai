@@ -38,3 +38,4 @@ A professional TUI plus machine-readable CLI that:
 | 2 | Compare, LM Studio, MLX, energy efficiency, Markdown reports |
 | 3 | Linux NVIDIA/AMD, Windows, opt-in community database |
 | Agent Lab (spec) | Local-first code intelligence + agent benchmarking. Iteration 1: `pudu-ai repo search`. See `docs/spec/agent-lab.md`. |
+| Local workbench (spec) | Gemma 4 local eligibility, Antigravity as loopback client, vault graph, Obsidian export. Not a release. See `docs/spec/05-local-workbench.md`. |

@@ -45,7 +45,7 @@ export const es: Record<MessageId, string> = {
     "Búsqueda determinista de repositorio (Pudu Agent Lab). Cadenas literales: rg; patrones sintácticos: ast-grep. Sin LLM. Si falta una herramienta se informa, no se inventa.",
   repoSearchTitle: "Pudu Agent Lab — búsqueda de repo",
   repoNeedQuery: "Pasa una consulta o --structural PATRÓN, p. ej. npx pudu-ai repo search validate_user --json",
-  repoUnknownSubcommand: "Subcomando de repo desconocido: {sub}. Soportados: search, graph, harness.",
+  repoUnknownSubcommand: "Subcomando de repo desconocido: {sub}. Soportados: search, graph, harness, export.",
   repoPythonMissing: "No se encontró python3. La búsqueda de Agent Lab necesita Python 3.10+ en PATH.",
   repoToolMissing: "{tool} no está en PATH",
   repoNoMatches: "Sin coincidencias.",
@@ -75,10 +75,15 @@ Uso:
   npx pudu-ai repo search CONSULTA --repo RUTA --json
   npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
   npx pudu-ai repo graph --repo RUTA
+  npx pudu-ai repo graph --vault RUTA
+  npx pudu-ai repo export --from graph.json --out DIR
   npx pudu-ai repo harness --task "arreglar auth" --repo RUTA --json
 
 Flags:
   --repo PATH         Raíz del repositorio (cwd)
+  --vault PATH        Raíz de la bóveda markdown (solo wikilinks)
+  --from FILE         JSON del grafo a exportar
+  --out PATH          Directorio de export, o ruta de config Antigravity con --yes
   --structural PAT    Patrón ast-grep
   --intent INTENT     TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
   --glob GLOB         Glob de inclusión (repetible)
@@ -89,15 +94,20 @@ Flags:
   nav: "[S] Setup/Instalar  [B] Benchmark  [M] Modelos  [R] Recomendaciones  [T] Tareas  [H] Hardware  [C] Comparar  [L] Historial  [Q] Salir",
   setupTitle: "SETUP — INSTALAR MODELOS Y AGENTES",
   setupIntro:
-    "Elige un modelo recomendado (nota S–B), instálalo con Ollama y luego vincula o instala OpenCode, Hermes u OpenClaw.",
+    "Elige un modelo recomendado (nota S–B), instálalo con Ollama y luego vincula OpenCode, Hermes u OpenClaw. [7] instala Antigravity con Homebrew. No hace curl-pipe ni lanza un agente local.",
   setupStep1: "1. Modelos recomendados (↑↓ para elegir)",
   setupStep2: "2. Instalar el modelo seleccionado",
   setupInstallModel: "Enter o I  →  ollama pull (solo si la nota es S, A o B)",
   setupStep3: "3. Agente de código — vincular si existe, instalar si falta",
   setupLinkNow: "instalado → pulsa 1/2/3 para vincular este modelo",
   setupInstallAgent: "no instalado → pulsa 1/2/3 para instalar con ollama launch (si es elegible)",
-  setupKeys: "Enter/I = descargar modelo    1 OpenCode    2 Hermes    3 OpenClaw    Esc = atrás",
-  setupCta: "[S] Setup: instalar modelo + OpenCode / Hermes / OpenClaw",
+  setupKeys: "Enter/I = descargar modelo    1 OpenCode    2 Hermes    3 OpenClaw    7 Antigravity    Esc = atrás",
+  setupCta: "[S] Setup: instalar modelo, agentes o Antigravity",
+  antigravityInstalled: "Cask de Antigravity instalado. No se lanzó. Gemma 4 local sigue en launch antigravity.",
+  antigravityOpening: "Abriendo Antigravity…",
+  antigravityOpened: "Antigravity abierto. No se arrancó un agente local.",
+  antigravityOpenFail: "No se pudo abrir Antigravity.",
+  antigravityOpenHint: "instalado → pulsa 7 para abrir",
   machine: "EQUIPO",
   runtimes: "RUNTIMES DE IA LOCAL",
   installedModels: "MODELOS INSTALADOS",
@@ -223,7 +233,23 @@ Flags:
   launchModel: "Modelo",
   launchRunHint: "Para hacer pull (si hace falta) y lanzar: npx pudu-ai launch {tool} --yes",
   launchBlocked: "Bloqueado. Sin pull, instalación ni launch.",
-  launchNeedTool: "Indica una herramienta: opencode | openclaw | hermes | claude",
+  launchNeedTool: "Indica una herramienta: opencode | openclaw | hermes | claude | antigravity",
+  launchAntigravityTitle: "ANTIGRAVITY — GEMMA 4 LOCAL",
+  launchAntigravityHint:
+    "Solo explica. Antigravity no es un destino de ollama launch. --yes escribe una config OpenAI-compatible de loopback solo si un tag local de Gemma 4 cabe. No descarga tags cloud ni checkpoints LiteRT.",
+  launchCloudBlocked: "Un tag cloud no es un destino de tarea local.",
+  launchNonLoopback: "La base URL no es loopback. Se rechaza.",
+  launchNeedOut: "Pasa --out para escribir. No se escribió nada.",
+  launchConfigPlan: "Config (no se escribe salvo --out y --yes):",
+  launchConfigWrote: "Escrito {file}. No se lanzó Antigravity.",
+  launchLiteRtDetectOnly: "El checkpoint LiteRT es solo detección. Pudu-AI no lo descarga ni hace pip install.",
+  repoVaultTitle: "AGENT LAB — GRAFO DE BÓVEDA",
+  aboutRepoVault: "Grafo de wikilinks markdown. Arista EXTRACTED solo si ambas notas existen. Un enlace roto queda no resuelto, nunca inventado.",
+  repoExportNeedFrom: "Pasa --from graph.json",
+  repoExportNeedOut: "Pasa --out DIR",
+  repoExportDry: "Solo plan de export. No se escribió nada.",
+  repoExportWrote: "Se escribieron {count} notas.",
+  repoExportSkipped: "Notas editadas a mano, no pisadas: {files}",
   launchUnknown: "Integración desconocida.",
   launchPulling: "Descargando {model} con ollama pull…",
   launchPullFail: "Falló ollama pull.",
@@ -249,9 +275,13 @@ Uso:
   npx pudu-ai launch
   npx pudu-ai launch opencode
   npx pudu-ai launch opencode --yes
+  npx pudu-ai launch antigravity
+  npx pudu-ai launch antigravity gemma4:e4b --out ./antigravity.local.json --yes
   npx pudu-ai repo search CONSULTA
   npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
   npx pudu-ai repo graph
+  npx pudu-ai repo graph --vault RUTA
+  npx pudu-ai repo export --from graph.json --out DIR
   npx pudu-ai repo harness --task "arreglar auth"
 
 Flags:
@@ -265,7 +295,10 @@ Flags:
   --for           code,video,image,transcription,chat
   --scope         installed | all
   --priority      speed | balanced | quality
-  --yes           Ejecuta pull/launch solo si el modelo es elegible
+  --yes           Ejecuta pull/launch, o escribe config/export local, solo si es elegible
+  --vault         Bóveda markdown para repo graph
+  --out           Ruta de escritura para config Antigravity o export Obsidian
+  --from          JSON del grafo para repo export
   --repo          Raíz del repositorio para Agent Lab
   --structural    Patrón ast-grep para repo search
   --intent        TEXT | STRUCTURAL | RELATIONSHIP | IMPACT | SEMANTIC | UNKNOWN
