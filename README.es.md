@@ -43,11 +43,14 @@ npx pudu-ai tasks --for code --lang es
 npx pudu-ai benchmark qwen3:8b --json --preset quick
 npx pudu-ai doctor --lang es
 npx pudu-ai launch opencode
+npx pudu-ai launch antigravity --lang es
+npx pudu-ai launch antigravity gemma4:e4b --out ./antigravity.local.json --yes
 npx pudu-ai repo search validate_user --json
 npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY' --repo .
+npx pudu-ai repo graph --vault ~/vault --json --lang es
 ```
 
-Flags: `--json` `--csv` `--no-network` `--no-color` `--verbose` `--preset` `--lang en|es` `--repo` `--structural` `--intent` `--glob` `--limit`
+Flags: `--json` `--csv` `--no-network` `--no-color` `--verbose` `--preset` `--lang en|es` `--repo` `--structural` `--intent` `--glob` `--limit` `--vault` `--out` `--from` `--yes`
 
 ## Agent Lab (vista previa)
 
@@ -58,11 +61,12 @@ Búsqueda determinista de repositorio. Python 3.10+, `rg` y `ast-grep` opcionale
 
 ```bash
 npx pudu-ai repo search validate_user --repo . --json --lang es
+npx pudu-ai repo graph --vault ~/vault --out /tmp/pudu-obsidian --yes --lang es
 ```
 
-Hace falta `python3` en PATH. Si faltan `rg` o `ast-grep`, el JSON dice `available: false`; no inventa coincidencias.
+Hace falta `python3` en PATH para la búsqueda y el grafo AST. El grafo de bóveda y el export a Obsidian no. Si faltan `rg` o `ast-grep`, el JSON dice `available: false`; no inventa coincidencias.
 
-La iteración 1 solo incluye `repo search`. Grafo, context pack y agentes aún no.
+En el TUI, **[S] Setup** y **[7]** instala Antigravity con `brew install --cask antigravity`, o lo abre si ya está. No hace curl-pipe ni arranca un agente. `launch antigravity` solo explica si un Gemma 4 local cabe; escribe la config de loopback con `--yes` y `--out`. Un tag `:cloud` queda bloqueado. Spec: `docs/spec/05-local-workbench.es.md`.
 
 ## Privacidad
 

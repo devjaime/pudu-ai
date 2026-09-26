@@ -59,11 +59,15 @@ npx pudu-ai report --markdown
 npx pudu-ai launch
 npx pudu-ai launch opencode
 npx pudu-ai launch opencode --yes
+npx pudu-ai launch antigravity
+npx pudu-ai launch antigravity gemma4:e4b --out ./antigravity.local.json --yes
 npx pudu-ai repo search validate_user --json
 npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY' --repo .
+npx pudu-ai repo graph --vault ~/vault --json
+npx pudu-ai repo graph --vault ~/vault --out /tmp/pudu-obsidian --yes
 ```
 
-Flags: `--json` `--csv` `--no-network` `--no-color` `--verbose` `--preset quick|standard|stress` `--lang en|es` `--for` `--scope` `--priority` `--repo` `--structural` `--intent` `--glob` `--limit`
+Flags: `--json` `--csv` `--no-network` `--no-color` `--verbose` `--preset quick|standard|stress` `--lang en|es` `--for` `--scope` `--priority` `--repo` `--structural` `--intent` `--glob` `--limit` `--vault` `--out` `--from` `--yes`
 
 ```bash
 npx pudu-ai --lang es
@@ -130,8 +134,11 @@ Pudu-AI can explain and, **only if a recommended model fits this hardware**, pul
 | OpenClaw | [docs.ollama.com/integrations/openclaw](https://docs.ollama.com/integrations/openclaw) | `npx pudu-ai launch openclaw` |
 | Hermes | [docs.ollama.com/integrations/hermes](https://docs.ollama.com/integrations/hermes) | `npx pudu-ai launch hermes` |
 | Claude Code | [docs.ollama.com/integrations/claude-code](https://docs.ollama.com/integrations/claude-code) | `npx pudu-ai launch claude` |
+| Antigravity | [local models](https://antigravity.google/docs/sdk/local-models) | `npx pudu-ai launch antigravity` |
 
 Without `--yes` the command only explains eligibility (grade S–B, coding/chat use case, measured t/s floor when a benchmark exists). It will **not** `ollama pull`, install, or `ollama launch` unless `--yes` is set **and** the gate passes. Pudu-AI never curl-pipes installers.
+
+Antigravity is not an `ollama launch` target. It checks a local Gemma 4 tag (`e2b`, `e4b`, `12b`, `26b`, `31b`) against unified memory and writes a loopback config (`http://127.0.0.1:11434/v1`) only with `--yes` and `--out`. Cloud tags (`gemma4:cloud`) are blocked. In the TUI, **[S] Setup** then **[7]** installs the Homebrew cask `antigravity`, or opens the app if it is already there. That does not start a local agent.
 
 ```bash
 npx pudu-ai launch
@@ -149,11 +156,15 @@ Deterministic repository search. Optional Python 3.10+, `rg`, and `ast-grep`. No
 npx pudu-ai repo search validate_user --repo . --json
 npx pudu-ai repo search --structural 'def $FUNC($$$ARGS): $$$BODY'
 npx pudu-ai repo graph --repo .
+npx pudu-ai repo graph --vault ~/vault --json
+npx pudu-ai repo export --from graph.json --out /tmp/pudu-obsidian --yes
 npx pudu-ai repo harness --task "fix validate_user" --json
 npx pudu-ai repo search validate_user --lang es
 ```
 
-Requires `python3` on PATH. If `rg` or `ast-grep` is missing, JSON reports `available: false` instead of inventing hits.
+Requires `python3` on PATH for code search and the Python AST graph. The vault graph and Obsidian export do not. If `rg` or `ast-grep` is missing, JSON reports `available: false` instead of inventing hits.
+
+`--vault` reads markdown wikilinks. A missing note is unresolved, not an edge. `--out` without `--yes` prints the export plan and writes nothing. Spec: `docs/spec/05-local-workbench.md`.
 
 ## Privacy
 

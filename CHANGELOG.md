@@ -1,11 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.2.24 — 2026-09-26
 
 ### Added
 
-- Pudu Agent Lab spec and `pudu-ai repo search` (rg + ast-grep via Python JSON protocol)
-- Docs in English and Spanish: `docs/spec/agent-lab.md`, `docs/spec/agent-lab.es.md`, `docs/agent-lab-usage.md`, `docs/agent-lab-usage.es.md`, `README.es.md`
+- `pudu-ai launch antigravity` — local Gemma 4 eligibility against loopback Ollama. `--yes --out` writes a config. Cloud tags and unfit 26B/31B stay blocked. No `ollama launch`, no curl-pipe.
+- TUI Setup `[7]` installs Antigravity with `brew install --cask antigravity`, or opens it if already installed.
+- `pudu-ai repo graph --vault` — markdown wikilink graph. Dangling links are unresolved, never invented.
+- `pudu-ai repo export` / `--out` — Obsidian markdown export. Writes only with `--yes`, and does not clobber hand-edited notes.
+- Spec: `docs/spec/05-local-workbench.md`
 
 ## 0.2.23 — 2026-09-13
 
