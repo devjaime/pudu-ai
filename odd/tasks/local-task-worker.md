@@ -57,13 +57,13 @@ The slice enables a reproducible PyCon demonstration of deterministic retrieval 
 
 ## Tasks
 
-- [ ] **LTW-001 — Secure Python task core**
+- [x] **LTW-001 — Secure Python task core**
   - Route: delegated (`odd-worker`); multiple non-trivial Python files trigger writer delegation.
   - Write failing tests first for task parsing, loopback endpoint validation, Ollama response parsing, missing metrics, unavailable Ollama, and no installed models.
   - Implement task contracts and the bounded Ollama client using stdlib.
   - Acceptance: unit tests prove the HTTP client never uses cloud endpoints, proxies, redirects, or invented metrics.
-  - Checks: focused Python unit tests.
-  - Evidence: pending.
+  - Checks: `python3 -m unittest discover -s python/tests -v` — 11 tests passed. HTTP is mocked; no Ollama/network call.
+  - Evidence: RED — same command first failed importing the not-yet-created client module (after fixing test import path), then the new transport test caught that the opener factory omitted an empty proxy handler; GREEN — after explicitly constructing a no-proxy opener, the same command passed all 11 tests. Runtime harness: N/A; no runtime flow exists in LTW-001. Rollback boundary: remove `python/pudu_agent/task.py`, `python/pudu_agent/model_client.py`, and `python/tests/test_task_core.py`, and revert this LTW-001 evidence only. Authored line count: approximately 300 additions/deletions including this tracker update (under 400). Commit: pending before commit; replace with actual identity after commit.
 
 - [ ] **LTW-002 — Deterministic local task flow**
   - Route: delegated (`odd-worker`); flow spans analyzer, router, context, verifier, and telemetry modules.
@@ -102,8 +102,8 @@ The slice enables a reproducible PyCon demonstration of deterministic retrieval 
 
 - Feature branch created from `main` while preserving the pre-existing dirty working tree.
 - Architecture review completed before implementation.
-- No source implementation has started.
+- LTW-001 implemented the text-only task contract and loopback-only bounded stdlib Ollama client; mocked unit tests pass.
 
 ## Next Step
 
-Begin LTW-001 with an observed RED test.
+Begin LTW-002 with an observed RED test.
