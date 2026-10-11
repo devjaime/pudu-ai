@@ -73,7 +73,7 @@ En el TUI, **[S] Setup** y **[7]** instala Antigravity con `brew install --cask 
 Ejecuta tareas de texto con un modelo Ollama local. El contexto del repositorio es acotado; no aplica ediciones ni ejecuta comandos generados, y rechaza los tags de modelos cloud.
 
 ```bash
-npx pudu-ai task run --task "Resume el flujo de autenticación" --repo . --model auto --json
+npx pudu-ai task run --task "Resume el flujo de autenticación" --repo . --model auto --json --no-network
 ```
 
 La prueba de integración con Ollama es opt-in (`PUDU_INTEGRATION=1`). Ver la [guía en español](docs/agent-lab-usage.es.md), la [guía en inglés](docs/agent-lab-usage.md) y el [diagrama del flujo](docs/diagrams/local-task-worker-flow.html).
