@@ -61,3 +61,26 @@ npm test
 Los casos de integración se omiten si no hay `python3`, `rg` o `ast-grep`.
 
 Fixtures: `tests/fixtures/repos/python-small`, `tests/fixtures/repos/python-cross-module`.
+
+## Worker de tareas local
+
+Ejecutá una tarea de solo texto con un modelo Ollama ya instalado localmente. No aplica ediciones ni ejecuta comandos generados:
+
+```bash
+npx pudu-ai task run --task "Resume el flujo de autenticación" --repo . --model auto --json
+npx pudu-ai task run --task "Revisa patrones riesgosos" --kind code_review --repo . --model qwen3:8b
+```
+
+`--kind` acepta `analysis`, `summary`, `code_review`, `test_generation` o `documentation`; `--model auto` elige de forma determinista salvo que haya telemetría local histórica con evidencia de verificación estructural. El modelo explícito debe estar instalado. Forma de ejemplo (ilustrativa, no es salida observada):
+
+```json
+{"schemaVersion":1,"ok":true,"op":"task","taskId":"<id-local>","status":"success","model":"<modelo-local-instalado>","content":"<respuesta-del-modelo>","metrics":{"prompt_tokens":null,"completion_tokens":null,"total_tokens":null}}
+```
+
+La verificación es solo estructural; no confirma exactitud factual. El worker limita el contexto de texto, excluye rutas sensibles y nunca ejecuta código del modelo. Los timeouts HTTP de Ollama aplican a cada operación de socket y no garantizan cancelación total de extremo a extremo. Hace falta `python3` y Ollama local activo; se rechazan tags cloud. La demo se ejecuta con `python3 examples/pycon_local_worker.py`.
+
+Prueba live opt-in (requiere Ollama local y un modelo instalado):
+
+```bash
+PUDU_INTEGRATION=1 python3 -m unittest discover -s python/tests -p 'test_task_live.py' -v
+```

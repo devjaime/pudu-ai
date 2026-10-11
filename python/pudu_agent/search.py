@@ -325,6 +325,48 @@ def handle_search(req: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def handle_task(req: dict[str, Any]) -> dict[str, Any]:
+    """Run one bounded local task and always return a stable protocol envelope."""
+    from pathlib import Path
+    from pudu_agent.flow import run_task
+    from pudu_agent.model_client import OllamaClient
+    from pudu_agent.task import Task
+
+    task_id = req.get("taskId") if isinstance(req.get("taskId"), str) else ""
+    base = {"schemaVersion": PROTOCOL_VERSION, "op": "task", "taskId": task_id}
+    try:
+        repo = Path(req.get("repo", ".")).expanduser().resolve()
+        if not repo.is_dir():
+            raise ValueError("repo is not a directory")
+        prompt = req.get("task")
+        model = req.get("model")
+        kind = req.get("kind", "analysis")
+        task = Task.from_dict({"id": task_id, "kind": kind, "prompt": prompt,
+                               "repository": str(repo), "model": model})
+        client = OllamaClient()
+        client.health()
+        if not client.list_models():
+            raise ValueError("no eligible local Ollama model is installed")
+        result = run_task(task, repo, client)
+        response = {**base, "ok": result.status == "success", "status": result.status,
+                    "content": result.content, "model": result.route.model if result.route else None,
+                    "provenance": {"model": result.route.origin if result.route else None,
+                                   "effort": result.analysis.origin if result.analysis else None,
+                                   "verification": "STRUCTURAL"},
+                    "metrics": result.metrics or {"prompt_tokens": None, "completion_tokens": None,
+                                "total_tokens": None, "total_duration": None, "load_duration": None,
+                                "eval_duration": None, "tokens_per_second": None},
+                    "verification": ({"level": result.verification.level, "status": result.verification.status,
+                                     "factual_correctness_checked": False} if result.verification else None),
+                    "failedStep": result.failed_step, "error": result.error_code}
+        return response
+    except Exception as exc:
+        return {**base, "ok": False, "error": str(exc), "status": "failed",
+                "provenance": {"model": "DERIVED"}, "metrics": {"prompt_tokens": None,
+                "completion_tokens": None, "total_tokens": None, "total_duration": None,
+                "load_duration": None, "eval_duration": None, "tokens_per_second": None}}
+
+
 def main() -> int:
     try:
         req = read_request()
@@ -332,6 +374,10 @@ def main() -> int:
         write_response(error_response(str(exc)))
         return 1
     op = req.get("op") or "search"
+    if op == "task":
+        response = handle_task(req)
+        write_response(response)
+        return 0 if response.get("ok") else 1
     if op == "ping":
         write_response({"schemaVersion": PROTOCOL_VERSION, "ok": True, "op": "ping"})
         return 0

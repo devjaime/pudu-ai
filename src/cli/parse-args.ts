@@ -9,6 +9,7 @@ export type CliCommand =
   | "doctor"
   | "report"
   | "tasks"
+  | "task"
   | "launch"
   | "setup"
   | "repo";
@@ -38,6 +39,8 @@ export type CliArgs = {
   limit?: number;
   globs: string[];
   task?: string;
+  model?: string;
+  kind?: string;
   vault?: string;
   out?: string;
   from?: string;
@@ -57,6 +60,8 @@ const VALUE_FLAGS = new Set([
   "--limit",
   "--glob",
   "--task",
+  "--model",
+  "--kind",
   "--vault",
   "--out",
   "--from",
@@ -104,6 +109,7 @@ export function parseArgs(argv: string[]): CliArgs {
     "doctor",
     "report",
     "tasks",
+    "task",
     "launch",
     "setup",
     "repo",
@@ -140,6 +146,8 @@ export function parseArgs(argv: string[]): CliArgs {
     limit,
     globs: flagValues(args, "--glob"),
     task: flagValue(args, "--task"),
+    model: flagValue(args, "--model"),
+    kind: flagValue(args, "--kind"),
     vault: flagValue(args, "--vault"),
     out: flagValue(args, "--out"),
     from: flagValue(args, "--from"),
