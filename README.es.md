@@ -68,6 +68,16 @@ Hace falta `python3` en PATH para la búsqueda y el grafo AST. El grafo de bóve
 
 En el TUI, **[S] Setup** y **[7]** instala Antigravity con `brew install --cask antigravity`, o lo abre si ya está. No hace curl-pipe ni arranca un agente. `launch antigravity` solo explica si un Gemma 4 local cabe; escribe la config de loopback con `--yes` y `--out`. Un tag `:cloud` queda bloqueado. Spec: `docs/spec/05-local-workbench.es.md`.
 
+## Worker de tareas local (experimental)
+
+Ejecuta tareas de texto con un modelo Ollama local. El contexto del repositorio es acotado; no aplica ediciones ni ejecuta comandos generados, y rechaza los tags de modelos cloud.
+
+```bash
+npx pudu-ai task run --task "Resume el flujo de autenticación" --repo . --model auto --json
+```
+
+La prueba de integración con Ollama es opt-in (`PUDU_INTEGRATION=1`). Ver la [guía en español](docs/agent-lab-usage.es.md), la [guía en inglés](docs/agent-lab-usage.md) y el [diagrama del flujo](docs/diagrams/local-task-worker-flow.html).
+
 ## Privacidad
 
 Local-first. Benchmarks, rutas de modelos e identificadores de máquina se quedan en `~/.pudu-ai/`. Nada se sube. La red es opcional (catálogo CanIRun; `--no-network` la desactiva). Agent Lab no envía el repositorio a ninguna API.
