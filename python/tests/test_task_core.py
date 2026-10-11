@@ -85,6 +85,13 @@ class OllamaClientTests(unittest.TestCase):
         with self.assertRaises(OllamaError):
             self.client.select_model("gemma4:31b-cloud")
 
+    @mock.patch("pudu_agent.model_client.urlopen")
+    def test_missing_explicit_preferred_model_does_not_fall_back(self, urlopen):
+        urlopen.return_value = self.response({"models": [{"name": "alpha:latest"}]})
+        with self.assertRaises(OllamaError):
+            self.client.select_model("missing:latest")
+        self.assertEqual(self.client.select_model("alpha:latest"), "alpha:latest")
+
     def test_transport_disables_proxies_and_redirects(self):
         import urllib.request
         from pudu_agent.model_client import _NoRedirect, _opener

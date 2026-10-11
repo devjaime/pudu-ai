@@ -68,6 +68,12 @@ class GenerateResult:
 
 
 class OllamaClient:
+    """Local Ollama client; timeout bounds socket operations, not total wall time.
+
+    urllib can continue an in-flight response while socket reads keep making progress;
+    it does not provide a synchronous end-to-end cancellation deadline.
+    """
+
     def __init__(self, endpoint: str = "http://127.0.0.1:11434", *, timeout: float = 10.0,
                  max_response_bytes: int = MAX_RESPONSE_BYTES):
         if timeout <= 0:
@@ -117,7 +123,11 @@ class OllamaClient:
         if preferred is not None and _is_cloud_tag(preferred):
             raise OllamaError("cloud model tags are not supported")
         models = self.list_models()
-        return preferred if preferred in models else (models[0] if models else None)
+        if preferred is not None:
+            if preferred not in models:
+                raise OllamaError("requested local model is not installed")
+            return preferred
+        return models[0] if models else None
 
     def generate(self, model: str, prompt: str) -> GenerateResult:
         if not isinstance(model, str) or not model or _is_cloud_tag(model):
