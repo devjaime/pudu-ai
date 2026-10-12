@@ -1,0 +1,190 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Flujo del trabajador local de tareas",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "cli",
+      "label": "Interfaz local"
+    },
+    {
+      "id": "runtime",
+      "label": "Runtime local"
+    },
+    {
+      "id": "evidence",
+      "label": "Evidencia"
+    }
+  ],
+  "phases": [
+    {
+      "id": "request",
+      "label": "Solicitud y análisis",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "prepare",
+      "label": "Preparación local",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "execute",
+      "label": "Ejecución y retorno",
+      "fromCol": 4,
+      "toCol": 5
+    }
+  ],
+  "mainPath": [
+    "cli",
+    "analyze",
+    "context",
+    "router",
+    "worker",
+    "verify",
+    "telemetry",
+    "result"
+  ],
+  "nodes": [
+    {
+      "id": "cli",
+      "lane": "cli",
+      "col": 0,
+      "type": "frontend",
+      "label": "CLI + puente JSON",
+      "sublabel": "pudu-ai task run · --no-network",
+      "width": 154
+    },
+    {
+      "id": "analyze",
+      "lane": "runtime",
+      "col": 1,
+      "type": "backend",
+      "label": "Crear y analizar tarea",
+      "sublabel": "TaskRequest · kind y riesgo",
+      "width": 154
+    },
+    {
+      "id": "context",
+      "lane": "runtime",
+      "col": 2,
+      "type": "security",
+      "label": "Contexto acotado",
+      "sublabel": "archivos explícitos del repo",
+      "tag": "límites de bytes y UTF-8",
+      "width": 154
+    },
+    {
+      "id": "router",
+      "lane": "runtime",
+      "col": 3,
+      "type": "backend",
+      "label": "Router de modelo local",
+      "sublabel": "selección explícita o auto",
+      "tag": "sin fallback silencioso",
+      "width": 154
+    },
+    {
+      "id": "worker",
+      "lane": "runtime",
+      "col": 4,
+      "type": "backend",
+      "label": "Loop del worker",
+      "sublabel": "Ollama por loopback",
+      "tag": "sin shell ni escritura",
+      "width": 154
+    },
+    {
+      "id": "verify",
+      "lane": "evidence",
+      "col": 4,
+      "type": "security",
+      "label": "Verificación estructural",
+      "sublabel": "contrato JSON y evidencia",
+      "width": 180
+    },
+    {
+      "id": "telemetry",
+      "lane": "evidence",
+      "col": 5,
+      "type": "database",
+      "label": "Telemetry JSONL",
+      "sublabel": "métricas y provenance",
+      "width": 154
+    },
+    {
+      "id": "result",
+      "lane": "cli",
+      "col": 5,
+      "type": "backend",
+      "label": "Resultado CLI",
+      "sublabel": "respuesta estructurada",
+      "width": 154
+    }
+  ],
+  "edges": [
+    {
+      "id": "cli-analyze",
+      "from": "cli",
+      "to": "analyze",
+      "label": "TaskRequest"
+    },
+    {
+      "id": "analyze-context",
+      "from": "analyze",
+      "to": "context"
+    },
+    {
+      "id": "context-router",
+      "from": "context",
+      "to": "router"
+    },
+    {
+      "id": "router-worker",
+      "from": "router",
+      "to": "worker"
+    },
+    {
+      "id": "worker-verify",
+      "from": "worker",
+      "to": "verify"
+    },
+    {
+      "id": "verify-telemetry",
+      "from": "verify",
+      "to": "telemetry",
+      "label": "registrar resultado"
+    },
+    {
+      "id": "telemetry-result",
+      "from": "telemetry",
+      "to": "result",
+      "label": "retorno local",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Ejecución local y fallos",
+      "items": [
+        "--no-network; Ollama solo por loopback",
+        "Sin cloud, shell ni herramientas de escritura",
+        "Errores estructurados: comando, modelo o salida inválidos"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Evidencia local",
+      "items": [
+        "Verificación exige JSON válido y evidencia",
+        "Telemetry repo-local: métricas y provenance"
+      ]
+    }
+  ]
+}
