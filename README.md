@@ -166,6 +166,16 @@ Requires `python3` on PATH for code search and the Python AST graph. The vault g
 
 `--vault` reads markdown wikilinks. A missing note is unresolved, not an edge. `--out` without `--yes` prints the export plan and writes nothing. Spec: `docs/spec/05-local-workbench.md`.
 
+## Experimental local task worker
+
+Runs a text-only task with a local Ollama model. Repository context is bounded; generated code or commands are not applied or executed, and cloud model tags are rejected.
+
+```bash
+npx pudu-ai task run --task "Summarize the authentication flow" --repo . --model auto --json --no-network
+```
+
+The live Ollama integration test is opt-in (`PUDU_INTEGRATION=1`). See the [English guide](docs/agent-lab-usage.md), [Spanish guide](docs/agent-lab-usage.es.md), and [workflow diagram](docs/diagrams/local-task-worker-flow.html).
+
 ## Privacy
 
 Local-first. Benchmarks, model paths, and machine identifiers stay in `~/.pudu-ai/`. Nothing is uploaded. Network is optional and used only for the CanIRun catalog (`--no-network` disables it).

@@ -60,6 +60,10 @@ async function openLab(session: Awaited<ReturnType<typeof loadSession>>, preset?
 
 export async function run(args: CliArgs): Promise<number> {
   setLocale(resolveLocale(args.lang));
+  if (args.command === "task") {
+    const taskCommand = await import("./task-run.js");
+    if (taskCommand.dispatchesTaskBeforeSession(args)) return taskCommand.runTaskCommand(args);
+  }
   if (args.help) {
     process.stdout.write(`${helpText()}\n`);
     return 0;
