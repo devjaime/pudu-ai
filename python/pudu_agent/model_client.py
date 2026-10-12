@@ -1,6 +1,7 @@
 """Small, bounded stdlib HTTP client for a local Ollama instance."""
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -24,7 +25,7 @@ def validate_endpoint(endpoint: str) -> str:
         port = parsed.port
     except ValueError:
         raise ValueError("endpoint must be a valid loopback URL") from None
-    if parsed.scheme != "http" or host not in {"localhost", "127.0.0.1", "::1"}:
+    if parsed.scheme != "http" or host not in {"127.0.0.1", "::1"}:
         raise ValueError("Ollama endpoint must use HTTP on loopback")
     if parsed.username is not None or parsed.password is not None:
         raise ValueError("endpoint credentials are not allowed")
@@ -55,16 +56,25 @@ def urlopen(request: Request, timeout: float):
 
 @dataclass(frozen=True)
 class GenerateResult:
-    text: str
+    model: str
+    content: str
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
+    total_tokens: int | None = None
     total_duration: int | None = None
     load_duration: int | None = None
-    prompt_eval_count: int | None = None
-    eval_count: int | None = None
     eval_duration: int | None = None
+    tokens_per_second: float | None = None
 
 
 class OllamaClient:
-    def __init__(self, endpoint: str = "http://localhost:11434", *, timeout: float = 10.0,
+    """Local Ollama client; timeout bounds socket operations, not total wall time.
+
+    urllib can continue an in-flight response while socket reads keep making progress;
+    it does not provide a synchronous end-to-end cancellation deadline.
+    """
+
+    def __init__(self, endpoint: str = "http://127.0.0.1:11434", *, timeout: float = 10.0,
                  max_response_bytes: int = MAX_RESPONSE_BYTES):
         if timeout <= 0:
             raise ValueError("timeout must be positive")
@@ -105,16 +115,19 @@ class OllamaClient:
             name = item.get("name") if isinstance(item, dict) else None
             if not isinstance(name, str) or not name:
                 raise OllamaError("Ollama returned an invalid model entry")
-            if _is_cloud_tag(name):
-                raise OllamaError("cloud model tags are not supported")
-            names.append(name)
+            if not _is_cloud_tag(name):
+                names.append(name)
         return names
 
     def select_model(self, preferred: str | None = None) -> str | None:
-        models = self.list_models()
         if preferred is not None and _is_cloud_tag(preferred):
             raise OllamaError("cloud model tags are not supported")
-        return preferred if preferred in models else (models[0] if models else None)
+        models = self.list_models()
+        if preferred is not None:
+            if preferred not in models:
+                raise OllamaError("requested local model is not installed")
+            return preferred
+        return models[0] if models else None
 
     def generate(self, model: str, prompt: str) -> GenerateResult:
         if not isinstance(model, str) or not model or _is_cloud_tag(model):
@@ -122,19 +135,31 @@ class OllamaClient:
         if not isinstance(prompt, str) or not prompt:
             raise ValueError("prompt must be non-empty text")
         data = self._request("/api/generate", {"model": model, "prompt": prompt, "stream": False})
-        text = data.get("response")
-        if not isinstance(text, str):
+        content = data.get("response")
+        if not isinstance(content, str):
             raise OllamaError("Ollama generate response is missing text")
+        response_model = data.get("model", model)
+        if not isinstance(response_model, str) or not response_model:
+            raise OllamaError("Ollama generate response has invalid model")
         metrics = {}
-        for field in GenerateResult.__dataclass_fields__:
-            if field == "text":
-                continue
-            value = data.get(field)
+        for field, source in (("prompt_tokens", "prompt_eval_count"), ("completion_tokens", "eval_count"),
+                              ("total_duration", "total_duration"), ("load_duration", "load_duration"),
+                              ("eval_duration", "eval_duration")):
+            value = data.get(source)
             if value is not None and (not isinstance(value, int) or isinstance(value, bool) or value < 0):
-                raise OllamaError(f"Ollama returned invalid metric: {field}")
+                raise OllamaError(f"Ollama returned invalid metric: {source}")
             metrics[field] = value
-        return GenerateResult(text=text, **metrics)
+        prompt_tokens = metrics.pop("prompt_tokens")
+        completion_tokens = metrics.pop("completion_tokens")
+        total_tokens = prompt_tokens + completion_tokens if prompt_tokens is not None and completion_tokens is not None else None
+        eval_duration = metrics["eval_duration"]
+        tokens_per_second = None
+        if completion_tokens is not None and eval_duration is not None and eval_duration > 0:
+            tokens_per_second = completion_tokens / (eval_duration / 1_000_000_000)
+        return GenerateResult(model=response_model, content=content, prompt_tokens=prompt_tokens,
+                              completion_tokens=completion_tokens, total_tokens=total_tokens,
+                              tokens_per_second=tokens_per_second, **metrics)
 
 
 def _is_cloud_tag(name: str) -> bool:
-    return name.rsplit(":", 1)[-1].lower() == "cloud"
+    return re.search(r"(?::cloud|-cloud)$", name, re.IGNORECASE) is not None
