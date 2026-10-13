@@ -3,7 +3,47 @@
   "diagram_type": "workflow",
   "meta": {
     "title": "Flujo del trabajador local de tareas",
-    "quality_profile": "showcase"
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "flujo",
+        "label": "Flujo completo",
+        "focus": [
+          "cli",
+          "analyze",
+          "context",
+          "router",
+          "worker",
+          "verify",
+          "telemetry",
+          "result"
+        ],
+        "note": "De la solicitud al retorno local: contexto, ruta, ejecución y comprobación."
+      },
+      {
+        "id": "fronteras",
+        "label": "Límites y seguridad",
+        "focus": [
+          "analyze",
+          "context",
+          "router",
+          "worker",
+          "telemetry"
+        ],
+        "note": "Qué entra al contexto local, qué excluye y dónde se ejecuta el modelo."
+      },
+      {
+        "id": "salida",
+        "label": "Verificación y fallos",
+        "focus": [
+          "worker",
+          "verify",
+          "telemetry",
+          "result"
+        ],
+        "note": "La forma de la respuesta se comprueba; los fallos vuelven como datos estructurados."
+      }
+    ]
   },
   "lanes": [
     {
@@ -22,20 +62,20 @@
   "phases": [
     {
       "id": "request",
-      "label": "Solicitud y análisis",
+      "label": "Solicitud y alcance",
       "fromCol": 0,
       "toCol": 1
     },
     {
       "id": "prepare",
-      "label": "Preparación local",
+      "label": "Contexto y ruteo local",
       "fromCol": 2,
       "toCol": 3,
       "variant": "emphasis"
     },
     {
       "id": "execute",
-      "label": "Ejecución y retorno",
+      "label": "Ejecución y evidencia",
       "fromCol": 4,
       "toCol": 5
     }
@@ -56,75 +96,80 @@
       "lane": "cli",
       "col": 0,
       "type": "frontend",
-      "label": "CLI + puente JSON",
-      "sublabel": "pudu-ai task run · --no-network",
-      "width": 154
+      "label": "Pudu CLI",
+      "sublabel": "task run",
+      "width": 128,
+      "tag": "5 tipos"
     },
     {
       "id": "analyze",
       "lane": "runtime",
       "col": 1,
       "type": "backend",
-      "label": "Crear y analizar tarea",
-      "sublabel": "TaskRequest · kind y riesgo",
-      "width": 154
+      "label": "Analizar",
+      "sublabel": "tipo → esfuerzo",
+      "width": 128,
+      "tag": "reglas fijas"
     },
     {
       "id": "context",
       "lane": "runtime",
       "col": 2,
       "type": "security",
-      "label": "Contexto acotado",
-      "sublabel": "archivos explícitos del repo",
-      "tag": "límites de bytes y UTF-8",
-      "width": 154
+      "label": "Contexto",
+      "sublabel": "8 arch. · 12 KB · 48 KB",
+      "tag": "solo lectura",
+      "width": 128
     },
     {
       "id": "router",
       "lane": "runtime",
       "col": 3,
       "type": "backend",
-      "label": "Router de modelo local",
-      "sublabel": "selección explícita o auto",
-      "tag": "sin fallback silencioso",
-      "width": 154
+      "label": "Ruteo local",
+      "sublabel": "explícito o historial",
+      "tag": "sin cloud",
+      "width": 128
     },
     {
       "id": "worker",
       "lane": "runtime",
       "col": 4,
       "type": "backend",
-      "label": "Loop del worker",
-      "sublabel": "Ollama por loopback",
-      "tag": "sin shell ni escritura",
-      "width": 154
+      "label": "Ollama local",
+      "sublabel": "HTTP · 127.0.0.1",
+      "tag": "sin shell / edición",
+      "width": 128
     },
     {
       "id": "verify",
       "lane": "evidence",
       "col": 4,
       "type": "security",
-      "label": "Verificación estructural",
-      "sublabel": "contrato JSON y evidencia",
-      "width": 180
+      "label": "Verificación",
+      "sublabel": "JSON / campos pedidos",
+      "width": 128,
+      "tag": "no valida hechos"
     },
     {
       "id": "telemetry",
       "lane": "evidence",
       "col": 5,
       "type": "database",
-      "label": "Telemetry JSONL",
-      "sublabel": "métricas y provenance",
-      "width": 154
+      "label": "Telemetría",
+      "sublabel": "repo local · agregados",
+      "width": 128,
+      "tag": "sin cuerpos"
     },
     {
       "id": "result",
       "lane": "cli",
       "col": 5,
       "type": "backend",
-      "label": "Resultado CLI",
-      "sublabel": "respuesta estructurada",
-      "width": 154
+      "label": "Respuesta JSON",
+      "sublabel": "contenido o error",
+      "width": 128,
+      "tag": "schema v1"
     }
   ],
   "edges": [
@@ -132,58 +177,73 @@
       "id": "cli-analyze",
       "from": "cli",
       "to": "analyze",
-      "label": "TaskRequest"
+      "label": "TaskRequest",
+      "variant": "emphasis"
     },
     {
       "id": "analyze-context",
       "from": "analyze",
-      "to": "context"
+      "to": "context",
+      "label": "tarea + repo"
     },
     {
       "id": "context-router",
       "from": "context",
-      "to": "router"
+      "to": "router",
+      "label": "fragmentos acotados"
     },
     {
       "id": "router-worker",
       "from": "router",
-      "to": "worker"
+      "to": "worker",
+      "label": "modelo instalado"
     },
     {
       "id": "worker-verify",
       "from": "worker",
-      "to": "verify"
+      "to": "verify",
+      "label": "salida del modelo"
     },
     {
       "id": "verify-telemetry",
       "from": "verify",
       "to": "telemetry",
-      "label": "registrar resultado"
+      "label": "resultado y métricas"
     },
     {
       "id": "telemetry-result",
       "from": "telemetry",
       "to": "result",
-      "label": "retorno local",
+      "label": "JSON éxito / fallo",
       "variant": "emphasis"
     }
   ],
   "cards": [
     {
-      "dot": "rose",
-      "title": "Ejecución local y fallos",
+      "dot": "cyan",
+      "title": "Entrada y contexto",
       "items": [
-        "--no-network; Ollama solo por loopback",
-        "Sin cloud, shell ni herramientas de escritura",
-        "Errores estructurados: comando, modelo o salida inválidos"
+        "Tipos: analysis · summary · code_review · test_generation · documentation",
+        "Contexto predeterminado: 8 archivos máx.; 12 KB/archivo y 48 KB total",
+        "Solo lectura: omite secretos, symlinks y directorios excluidos"
       ]
     },
     {
       "dot": "violet",
-      "title": "Evidencia local",
+      "title": "Ruteo y límites",
       "items": [
-        "Verificación exige JSON válido y evidencia",
-        "Telemetry repo-local: métricas y provenance"
+        "Esfuerzo determinista por tipo; repositorio grande puede subir un nivel",
+        "Modelo explícito instalado; auto usa historial verificado o nombre estable",
+        "Ollama solo por loopback. Sin cloud, shell, comandos generados ni cambios de código"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Evidencia, no garantía",
+      "items": [
+        "Comprobación estructural: texto / JSON y campos solicitados; no factualidad",
+        "Telemetría atómica repo-local: métricas y códigos permitidos, sin prompt ni respuesta",
+        "Retorno JSON éxito / fallo; fuera de telemetría, la tarea no escribe archivos"
       ]
     }
   ]
