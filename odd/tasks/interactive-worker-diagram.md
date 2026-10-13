@@ -25,17 +25,17 @@ The current diagram should teach what this version actually does without implyin
 - [x] IW-1 Verified accepted task kinds, bounded context defaults, local-only model route, structural verifier, redacted telemetry, and structured protocol against implementation. Viewer chrome fallback is English because Spanish `meta.locale` is unsupported.
 - [x] IW-2 Revised the JSON source with three curated views and clearer cards; regenerated HTML only through `deliver`.
 - [x] IW-3 Final showcase validation passed 9/9, 0 errors/warnings; `visual-check` passed all four required sizes with no overflow; inspected light/dark screenshots at 1440×900 and 2048×1320; `git diff --check` passed. Authored line count: 193 (JSON source 152 additions+deletions; tracker 41 additions; generated HTML/screenshots excluded). Update checker ran once: installed 2.17.0-dev.1, latest 3.0.1 (normal); user notified; skill unchanged.
-- [ ] IW-4 Re-read this tracker and commit the completed work unit.
+- [x] IW-4 Re-read tracker and commit completed work unit with Conventional Commit message; no push.
 
 ## Evidence
-- Progress: IW-1 and IW-2 complete. Branch: `codex/interactive-worker-diagram`.
+- Progress: IW-1 through IW-4 complete. Branch: `codex/interactive-worker-diagram`.
 - Viewer chrome and `<html lang>` fall back to English; authored diagram is Spanish and omits `meta.locale`.
 - First successful validate: 9/9 showcase checks, 0 errors, 0 warnings.
 - Delivery: spec SHA-256 `d2a5e4d4538d4dfb9efae53f4fcb7a9d29d85c817bed96bdfcb91fe56229d610`; HTML SHA-256 `ab318b2bc8aa083a5644ea11951ef07f1717c104ea2ec8365258af521d0136fd`; 9/9 checks, 0 errors/warnings.
 - Browser evidence: `visual-check` passed; required 1440×900, 1600×1000, 1920×1080, 2048×1320 containment measurements pass; endpoint light/dark captures complete. Readability at 1440 has 7.75px minimum projected text.
 - Perceptual review: inspected 1440×900 light/dark and 2048×1320 light/dark screenshots; composition readable, contained, no obvious crossings or clipping.
 - Verification: final validation and whitespace checks passed.
-- Commit: pending.
+- Work-unit commit: `45b2cf98a377b3964472a625d03d4ac61a0d9188` (`docs(diagram): explain local task worker interactively`). Tracker evidence commit: `docs(task): record diagram closeout` (created immediately after this note is committed).
 
 ## Next step
-Commit the complete diagram, generated browser evidence, and tracker as one work unit; then record the commit SHA.
+Complete; do not push. The delivered branch contains the diagram work-unit commit and its tracker follow-up.
