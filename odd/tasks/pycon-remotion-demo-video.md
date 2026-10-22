@@ -28,7 +28,7 @@ The talk needs a polished, reproducible demonstration of repository understandin
 | ID | Task | Route and trigger evidence | Status |
 |---|---|---|---|
 | T1 | Capture fixture CLI evidence; pin toolchain; add timeline, caption manifest, and invariant tests | Delegated direct writer; preparation plus test-backed data/toolchain unit; slice 1 | Done |
-| T2 | Implement Remotion composition and diagram pan/zoom; render and verify MP4; inspect frames; document final evidence | Delegated direct writer; composition + rendering/docs unit; slice 2 | In progress |
+| T2 | Implement Remotion composition and diagram pan/zoom; render and verify MP4; inspect frames; document final evidence | Delegated direct writer; composition + rendering/docs unit; slice 2 | Done |
 
 
 ## Acceptance criteria
@@ -68,7 +68,8 @@ Strict TDD is enabled by the repository's explicit AGENTS.md instruction. Exact 
 - Final contact sheet and three worker-pan samples visually reviewed; scene progression, safe margins, contrast, caption legibility, and all primary diagram nodes were present. The pan viewport was adjusted after the first review showed side/bottom clipping; final inspected still fits the full primary flow.
 - git diff --check passed.
 - Slice 1 commit: 1f0d72195e6a3b9149fb12f493ca78b6c711c42e (feat(pycon): add deterministic demo timeline contract), 292 authored added lines excluding generated package-lock; files: tracker, VTT, package manifest, tsconfig, Vitest config, timeline, and tests. This is intended PR 1. Rollback boundary: reverting this commit removes the demo toolchain contract, timeline/captions, tests, and tracker; the render-composition slice is not committed yet.
-- Slice 2 is intended PR 2 in stacked-to-main order and will add composition, local diagram asset, render documentation, MP4 ignore rule, and closeout evidence. Forecast approximately 400 authored additions/deletions excluding generated lock, MP4, and copied PNG; exact count and SHA pending. Do not push or create PRs.
+- Slice 2 commit: 9a2de08180a696cf6a2f2b5e63f5764afa00c2a0 (feat(pycon): build Agent Lab Remotion composition), 400 authored changed lines by git numstat (generated lock, ignored MP4, and copied PNG excluded). Intended PR 2 follows PR 1 after merge, stacked-to-main. It adds composition/source, diagram asset, docs, render scripts, and MP4 ignore rule. Rollback boundary: reverting slice 2 removes the composition and copied diagram asset, README, scripts, and MP4 ignore entry while preserving the slice 1 timeline, tests, captions, and package foundation. The local MP4 is ignored and can be removed independently at the requested path.
+- Rollback boundary for slice 1: reverting 1f0d72195e6a3b9149fb12f493ca78b6c711c42e removes toolchain contract, deterministic timeline/captions/tests, and tracker; slice 2 depends on it.
 
 ## Next step
-Slice 1 is committed locally. Next, add composition entry/source, diagram asset, render README and ignore rule; rerun checks and commit slice 2, record its exact SHA/count and rollback boundary, and leave push/PR decisions to the user.
+Implementation and verification are complete. No push or pull request was created; push/PR choices remain with the user.
