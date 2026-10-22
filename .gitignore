@@ -9,3 +9,6 @@ coverage/
 __pycache__/
 *.pyc
 .pudu-ai/
+
+# Local PyCon demo render; keep source, captions, and verification tracked.
+/docs/demos/pycon-2026/pycon-2026-agent-lab-demo.mp4

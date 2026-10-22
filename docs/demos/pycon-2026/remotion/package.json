@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "compositions": "remotion compositions src/index.tsx",
+    "render": "remotion render src/index.tsx PyConAgentLab ../pycon-2026-agent-lab-demo.mp4 --codec=h264 --overwrite --browser-executable='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'"
   },
   "dependencies": {
     "@remotion/cli": "4.0.537",
