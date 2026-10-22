@@ -1,0 +1,45 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:07.000
+LLMs frente a repositorios gigantes. Que cada paso se apoye en evidencia visible.
+
+2
+00:00:07.000 --> 00:00:12.000
+Abrimos el fixture Python público: tests/fixtures/repos/python-small.
+
+3
+00:00:12.000 --> 00:00:19.000
+La consulta literal validate_user produjo 4 coincidencias con rg.
+
+4
+00:00:19.000 --> 00:00:25.000
+Incluye una mención en notes.txt y tres líneas de auth.py.
+
+5
+00:00:25.000 --> 00:00:33.000
+El grafo se extrajo con python-ast: 8 nodos y 9 aristas.
+
+6
+00:00:33.000 --> 00:00:45.000
+Dos relaciones de llamada resueltas apuntan a validate_user: authenticate y UserService.check.
+
+7
+00:00:45.000 --> 00:00:54.000
+Son resultados de herramientas y del fixture; no una garantía de verdad.
+
+8
+00:00:54.000 --> 00:01:02.000
+El tiempo medido cambia entre ejecuciones; no lo presentamos como promesa.
+
+9
+00:01:02.000 --> 00:01:12.000
+El diagrama existente muestra el worker local y su contexto acotado.
+
+10
+00:01:12.000 --> 00:01:22.000
+También representa ruteo, verificación y telemetría en el flujo.
+
+11
+00:01:22.000 --> 00:01:30.000
+CLI primero: evidencia concreta para formular mejores preguntas.
