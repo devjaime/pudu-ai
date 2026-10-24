@@ -45,7 +45,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Acceptance: focused tests observe RED then GREEN; repeated runs against the pinned fixture are byte-stable except explicitly variable timing fields; no Transformers file is changed.
   - Forecast: 180–300 authored lines.
 
-- [ ] **PTD-002 — Produce an auditable demo report**
+- [x] **PTD-002 — Produce an auditable demo report**
   - Route: delegated (multiple non-trivial files and documentation generated from evidence).
   - Generate or maintain a stable JSON evidence contract plus a human-readable Markdown report. Include repository identity, state-machine stages, context reduction measurements, claims, limitations, and source citations.
   - Acceptance: schema/contract tests pass; Markdown is derived from the same evidence as JSON; no claim presents candidate impact as complete runtime proof.
@@ -68,7 +68,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | Task | Status | Commit | Verification | Review state |
 |---|---|---|---|---|
 | PTD-001 | Complete | `4df6d9a` | Focused 5/5; full Python suite 42 run, 1 skipped; two CLI runs byte-identical (6,808 bytes); nested-root rejection; fixture clean; independent verifier PASS | RDD disabled/unmanaged; risk assessment unassessable because files were initially untracked, treated as high and independently verified |
-| PTD-002 | Pending | — | — | — |
+| PTD-002 | Complete | `27448a6` | Focused 3/3; full Python suite 45 run, 1 skipped; JSON and Markdown reproduced byte-identically and matched snapshots; 99.55% byte reduction independently recalculated | RDD disabled/unmanaged; untracked assessment treated as high and independently verified PASS |
 | PTD-003 | Pending | — | — | — |
 | PTD-004 | Pending | — | — | — |
 
@@ -78,4 +78,4 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## Next step
 
-Implement PTD-002 by deriving auditable JSON and Markdown artifacts from the verified evidence collector.
+Implement PTD-003 by rebuilding the Remotion walkthrough around the verified Transformers evidence report.
