@@ -38,7 +38,7 @@ class FakeClient:
 
 
 class TransformersOllamaDemoTests(unittest.TestCase):
-    def run_demo(self, args, *, client=None, input_value="1", evidence=None, endpoint=None):
+    def run_demo(self, args, *, client=None, input_value="1", evidence=None, endpoint=None, timeout=None):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
         client = client or FakeClient()
@@ -47,8 +47,10 @@ class TransformersOllamaDemoTests(unittest.TestCase):
             "revision": "18329f1065382e54db698e242cf98bd3f3e5a766"}, "evidence": {"definition": []}}
         client.endpoint_calls = []
 
-        def client_factory(validated_endpoint=None):
+        def client_factory(validated_endpoint=None, **kwargs):
             client.endpoint_calls.append(validated_endpoint)
+            client.timeout_calls = getattr(client, "timeout_calls", [])
+            client.timeout_calls.append(kwargs.get("timeout"))
             return client
 
         with patch("pudu_agent.transformers_ollama_demo.PROJECT_ROOT", Path(temp.name)), \
@@ -59,6 +61,10 @@ class TransformersOllamaDemoTests(unittest.TestCase):
             cli_args = [*args, "--repository", temp.name]
             if endpoint is not None:
                 cli_args.extend(["--ollama-url", endpoint])
+            if timeout is not None:
+                cli_args.extend(["--ollama-timeout-seconds", str(timeout)])
+            if getattr(args, "ollama_timeout_seconds", None) is not None:
+                cli_args.extend(["--ollama-timeout-seconds", str(args.ollama_timeout_seconds)])
             status = main(cli_args, client_factory=client_factory, input_fn=lambda _: input_value)
         return status, client, collect, "".join(call.args[0] for call in output.call_args_list), Path(temp.name)
 
@@ -70,6 +76,7 @@ class TransformersOllamaDemoTests(unittest.TestCase):
         self.assertEqual(generate_call[1], "qwen2.5:7b")
         self.assertEqual(generate_call[2], {"format": "json", "options": {"temperature": 0, "seed": 20260520}})
         self.assertEqual(client.endpoint_calls, ["http://127.0.0.1:11434"])
+        self.assertEqual(client.timeout_calls, [120.0])
         self.assertIn('"findings": []', output)
         manifest = json.loads(next((root / ".pudu-ai" / "pycon-demo").glob("*.json")).read_text())
         self.assertEqual(manifest["model"], {"tag": "qwen2.5:7b", "digest": "sha256:abc"})
@@ -90,14 +97,40 @@ class TransformersOllamaDemoTests(unittest.TestCase):
         client = FakeClient(models=[ModelInfo("qwen2.5:7b", "sha256:abc"), ModelInfo("llama3:8b", "sha256:def")],
                             result=GenerateResult("llama3:8b", '{"schema":"pudu.transformers-ollama-analysis/v1","summary":"Review needed","findings":[]}'))
         status, client, _, output, root = self.run_demo(["--interactive"], client=client, input_value="1",
-                                                        endpoint="http://127.0.0.1:11435/")
+                                                        endpoint="http://127.0.0.1:11435/", timeout=90)
         self.assertEqual(status, 0)
         self.assertIn("1)", output)
         self.assertIn("sha256:def", output)
         self.assertEqual(client.endpoint_calls, ["http://127.0.0.1:11435"])
+        self.assertEqual(client.timeout_calls, [90.0])
         self.assertIn(("generate", "llama3:8b", {"format": "json", "options": {"temperature": 0, "seed": 20260520}}), client.calls)
         manifest = json.loads(next((root / ".pudu-ai" / "pycon-demo").glob("*.json")).read_text())
         self.assertEqual(manifest["ollama_endpoint"], "http://127.0.0.1:11435")
+        self.assertEqual(manifest["ollama_timeout_seconds"], 90.0)
+
+    def test_explicit_timeout_is_forwarded_and_recorded(self):
+        args = SimpleNamespace(repository=Path("."), ollama_timeout_seconds=45.5)
+        status, client, _, _, root = self.run_demo(["--model", "qwen2.5:7b"], client=FakeClient(),
+                                                   timeout=args.ollama_timeout_seconds)
+        self.assertEqual(status, 0)
+        self.assertEqual(client.timeout_calls, [45.5])
+        manifest = json.loads(next((root / ".pudu-ai" / "pycon-demo").glob("*.json")).read_text())
+        self.assertEqual(manifest["ollama_timeout_seconds"], 45.5)
+
+    def test_invalid_timeout_is_rejected_before_collector_or_client_creation(self):
+        for timeout in (True, float("nan"), float("inf"), 0, -1, 600.1, 10**400):
+            with self.subTest(timeout=timeout), tempfile.TemporaryDirectory() as tmp:
+                args = SimpleNamespace(repository=Path(tmp), ollama_url="http://127.0.0.1:11434",
+                                       ollama_timeout_seconds=timeout, model="qwen2.5:7b", interactive=False)
+                collector_calls = []
+                factory_calls = []
+                with patch("pudu_agent.transformers_ollama_demo.PROJECT_ROOT", Path(tmp)), \
+                     patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(tmp)), \
+                     patch("pudu_agent.transformers_ollama_demo.collect_evidence", side_effect=collector_calls.append):
+                    with self.assertRaises(ValueError):
+                        run_demo(args, client_factory=lambda *a, **kw: factory_calls.append((a, kw)))
+                self.assertEqual(collector_calls, [])
+                self.assertEqual(factory_calls, [])
 
     def test_rejects_fixture_identity_before_any_ollama_call(self):
         client = FakeClient()

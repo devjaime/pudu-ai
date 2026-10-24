@@ -157,22 +157,22 @@ OLLAMA_HOST=127.0.0.1:11435 ollama list
 Automático, con el tag exacto copiado de `ollama list`:
 
 ```sh
-PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --ollama-url http://127.0.0.1:11435 --model 'TAG_LOCAL_EXACTO'
+PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --ollama-url http://127.0.0.1:11435 --ollama-timeout-seconds 120 --model 'TAG_LOCAL_EXACTO'
 ```
 
 O interactivo, para revisar tag y digest antes de seleccionar:
 
 ```sh
-PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --ollama-url http://127.0.0.1:11435 --interactive
+PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --ollama-url http://127.0.0.1:11435 --ollama-timeout-seconds 120 --interactive
 ```
 
-Ambas modalidades exigen el fixture fijado en `$DEMO_ROOT/transformers`, que es la ruta predeterminada del CLI. El comando valida identidad/commit/etiqueta, prepara evidencia acotada, selecciona un modelo local elegible, consulta la versión del servidor, genera con formato JSON y valida el contrato estructural. En éxito muestra el resumen interpretativo, la ruta del manifiesto y una advertencia de que validez JSON no significa corrección factual. `temperature=0` y `seed=20260520` fijan opciones, pero no garantizan texto idéntico entre versiones o hardware.
+Ambas modalidades exigen el fixture fijado en `$DEMO_ROOT/transformers`, que es la ruta predeterminada del CLI. El comando valida identidad/commit/etiqueta, prepara evidencia acotada, selecciona un modelo local elegible, consulta la versión del servidor, genera con formato JSON y valida el contrato estructural. El timeout predeterminado es 120 segundos (`--ollama-timeout-seconds`, rango `>0` a `600`); los arranques en frío pueden superar los 10 segundos. Este valor limita operaciones de socket, no garantiza una duración total máxima. En éxito muestra el resumen interpretativo, la ruta del manifiesto y una advertencia de que validez JSON no significa corrección factual. `temperature=0` y `seed=20260520` fijan opciones, pero no garantizan texto idéntico entre versiones o hardware.
 
 El manifiesto redactado se escribe atómicamente en `.pudu-ai/pycon-demo/` (ignorado por Git). Registra hashes y metadatos —incluidos tag, digest, versiones, opciones, métricas observadas y estado de validación—, no el prompt, la evidencia ni la respuesta completos. Los informes deterministas comprometidos siguen diciendo `MODEL_ANALYSIS: NOT_RUN`: una corrida viva crea un registro separado e ignorado y **no reescribe esos snapshots**.
 
 ### Confianza, fallos y fallback
 
-El cliente usa el endpoint loopback explícito `http://127.0.0.1:11435` y rechaza tags cloud; eso define el límite de transporte de esta demo, no una garantía general sobre la configuración de todo servidor Ollama. `OLLAMA_NO_CLOUD=1` expresa la configuración solicitada por quien opera el proceso, no una atestación entregada por la API. El texto del modelo es dato no confiable: JSON válido no equivale a hechos correctos, y la herramienta nunca ejecuta comandos, parches ni llamadas sugeridas por el modelo.
+El cliente usa el endpoint loopback explícito `http://127.0.0.1:11435` y rechaza tags cloud; eso define el límite de transporte de esta demo, no una garantía general sobre la configuración de todo servidor Ollama. `OLLAMA_NO_CLOUD=1` expresa la configuración solicitada por quien opera el proceso, no una atestación entregada por la API. El timeout no es un deadline extremo a extremo: una generación puede tardar más mientras haya progreso en las operaciones de socket. El texto del modelo es dato no confiable: JSON válido no equivale a hechos correctos, y la herramienta nunca ejecuta comandos, parches ni llamadas sugeridas por el modelo.
 
 Si el servidor no está activo, no hay modelo local elegible, el tag no coincide exactamente, el fixture falla su verificación o la respuesta no cumple el contrato, el proceso informa el error y termina con código distinto de cero; no crea un manifiesto de éxito. No inicie ni detenga servicios ni descargue modelos para rescatar la charla. Vuelva a los informes deterministas y al video previamente verificado (`pycon-2026-transformers-demo.mp4`); confirme antes que el MP4 esté disponible en el equipo de presentación: este checkout de trabajo no incluye el archivo ignorado. La limitación debe seguir nombrándose como `MODEL_ANALYSIS: NOT_RUN` en esos snapshots.
 

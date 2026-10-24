@@ -25,6 +25,8 @@ PROMPT_VERSION = "prompt-v1"
 SCHEMA_VERSION = "pudu.transformers-ollama-analysis/v1"
 GENERATION_OPTIONS = {"temperature": 0, "seed": 20260520}
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
+DEFAULT_OLLAMA_TIMEOUT_SECONDS = 120.0
+MAX_OLLAMA_TIMEOUT_SECONDS = 600.0
 MAX_EVIDENCE_BYTES = 64 * 1024
 MAX_RESPONSE_BYTES = 64 * 1024
 ASSET_ROOT = Path(__file__).resolve().parents[2] / "docs/demos/pycon-2026/ollama"
@@ -38,6 +40,17 @@ def _canonical_bytes(value):
 
 def _sha256(value):
     return hashlib.sha256(value).hexdigest()
+
+
+def _validate_timeout(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError("Ollama timeout must be a finite number from greater than 0 to 600 seconds")
+    try:
+        if not 0 < value <= MAX_OLLAMA_TIMEOUT_SECONDS:
+            raise ValueError
+        return float(value)
+    except (OverflowError, ValueError):
+        raise ValueError("Ollama timeout must be a finite number from greater than 0 to 600 seconds") from None
 
 
 def _validate_fixture(evidence):
@@ -177,6 +190,7 @@ def _write_manifest(directory, manifest):
 
 def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
     endpoint = validate_endpoint(args.ollama_url)
+    timeout_seconds = _validate_timeout(getattr(args, "ollama_timeout_seconds", DEFAULT_OLLAMA_TIMEOUT_SECONDS))
     if Path(args.repository).resolve() != FIXTURE_ROOT.resolve():
         raise ValueError(f"fixture root must be exactly {FIXTURE_ROOT}")
     evidence = collect_evidence(args.repository)
@@ -190,7 +204,7 @@ def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
     schema_bytes = schema_path.read_bytes()
     prompt = prompt_bytes.decode("utf-8")
     schema = json.loads(schema_bytes)
-    model_client = client_factory(endpoint)
+    model_client = client_factory(endpoint, timeout=timeout_seconds)
     model = _choose_model(model_client, args, input_fn)
     server_version = model_client.server_version()
     started = time.monotonic()
@@ -214,6 +228,7 @@ def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
         "response_schema": {"version": SCHEMA_VERSION, "sha256": _sha256(schema_bytes), "bytes": len(schema_bytes)},
         "model": {"tag": model.tag, "digest": model.digest},
         "ollama_endpoint": endpoint,
+        "ollama_timeout_seconds": timeout_seconds,
         "ollama_version": server_version,
         "generation_options": dict(GENERATION_OPTIONS),
         "application_wall_latency_ms": wall_latency_ms,
@@ -233,6 +248,8 @@ def main(argv=None, *, client_factory=OllamaClient, input_fn=input):
     parser.add_argument("--repository", type=Path, default=FIXTURE_ROOT, help="exact pinned Transformers fixture root")
     parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL,
                         help="loopback Ollama endpoint (default: %(default)s)")
+    parser.add_argument("--ollama-timeout-seconds", type=float, default=DEFAULT_OLLAMA_TIMEOUT_SECONDS,
+                        help="socket-operation timeout in seconds, from >0 to 600 (default: %(default)g); not an end-to-end deadline")
     args = parser.parse_args(argv)
     try:
         response, manifest_path = run_demo(args, client_factory=client_factory, input_fn=input_fn)
