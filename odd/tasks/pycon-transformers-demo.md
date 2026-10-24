@@ -81,12 +81,20 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Rollback boundary: revert the correction commit to restore `790abac`; revert `790abac` separately only to remove the original client API unit. No unrelated behavior or fixture files are included.
   - Forecast/actual: original 140–240 authored lines / 129 authored additions and deletions; correction changed only this client, its focused tests, and the PTD-005 evidence in this tracker.
 
-- [ ] **PTD-006 — Add the interactive reproducible Ollama demo**
+- [x] **PTD-006 — Add the interactive reproducible Ollama demo**
   - Route: delegated (new orchestration, validation, persistence, CLI UX, and tests).
   - Feed only the bounded deterministic Transformers evidence into a versioned prompt and JSON contract. Add interactive installed-model selection and automatic mode with an explicit model selector.
   - Persist an atomic redacted run manifest under ignored `.pudu-ai/pycon-demo/` containing fixture, evidence, prompt/schema, model/runtime, options, telemetry, validation, and response hashes without storing full evidence or response by default.
   - Acceptance: strict TDD observes RED then GREEN; offline/fake-client tests cover success and failures; repeated fixture preparation is byte-stable; no model output is executed or promoted to factual proof.
   - Forecast: 260–400 authored lines.
+  - Commit: `e9a177f feat(pycon): add reproducible Transformers Ollama demo` (367 authored changed lines: 363 additions, 4 deletions; within forecast).
+  - Implementation: added `python/pudu_agent/transformers_ollama_demo.py` with exact fixture-root enforcement and collector verification before client construction; explicit `--model TAG` automatic mode; bounded interactive selection of installed tag+digest models; fixed `temperature=0`/seed `20260520`; exact response-model identity check; stdlib structural validation; and atomic redacted manifests. Added versioned prompt/schema assets under `docs/demos/pycon-2026/ollama/`. Output is a Spanish presentation summary plus JSON; responses are explicitly model interpretation and structural validity is not factual validation. Manifests include fixture, evidence/prompt/schema/response hashes and sizes, model identity, server version, options, wall latency, observed token/duration fields only, and validation state; prompt/evidence/response text is omitted.
+  - Route evidence: delegated writer route as planned because orchestration, tests, prompt/schema assets, and the task record are coordinated non-trivial changes. The session's scoped exploration established the existing collector and client contracts; implementation stayed in this worktree and did not edit the Transformers fixture.
+  - TDD evidence: RED — `PYTHONPATH=python python3 -m unittest python.tests.test_transformers_ollama_demo -v` failed on import because the new module did not exist. GREEN — focused suite passed 7/7 after implementation. REFACTOR — extracted observed-metric projection and hardened exact fixture-root validation; focused suite passed 8/8.
+  - Verification: focused `PYTHONPATH=python python3 -m unittest python.tests.test_transformers_ollama_demo -v` — 8 passed; full `PYTHONPATH=python python3 -m unittest discover -s python/tests -v` — 59 run, 1 skipped, remaining passed; offline CLI rehearsal through `main()` with fake Ollama client passed both automatic and interactive flows, including cancellation/invalid selection and no network; `git diff --check` — passed. Two canonical collector runs were byte-identical (5,076 bytes); collector returned exact pinned identity `v5.20.2` / `18329f1065382e54db698e242cf98bd3f3e5a766`; fixture `git status --porcelain` was empty. No Ollama server/model was contacted.
+  - Schema/manifest decisions: response contract `pudu.transformers-ollama-analysis/v1` requires a summary and at most 12 `INFERRED`/`UNRESOLVED` findings with bounded strings and evidence-reference arrays; only stdlib JSON/shape checks are used. Manifest schema is `pudu.transformers-ollama-manifest/v1`, written by fsync + atomic replace under ignored `.pudu-ai/pycon-demo/`.
+  - Rollback boundary: revert the PTD-006 work-unit commit to remove the new module, its tests, prompt/schema assets, and this task evidence; prior deterministic snapshots, PTD-005 client behavior, and external fixture remain untouched.
+  - Risks: temperature zero and fixed seed do not guarantee identical output across runtimes; model claims are not factual proof. Interactive user wait is outside measured generation wall latency. Manifest names/timestamps are intentionally unstable; deterministic evidence, prompt, and schema bytes are hash-addressed.
 
 - [ ] **PTD-007 — Document and rehearse the one-command workflow**
   - Route: delegated (cross-checks executable commands, generated manifest, and presentation narrative).
@@ -103,7 +111,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | PTD-003 | Complete | `ecce5f2`, `a1f2f5e` | Tests 11/11; typecheck; two compositions discovered; 1920×1080/30 fps/90 s H.264 render; VTT/scene alignment; visual inspection; SHA-256 `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3` | RDD disabled/unmanaged; high/unassessable candidate independently verified PASS; delivered as 140-line and 75-line stacked units |
 | PTD-004 | Complete | `2e48c82` | Runbook link audit 15/15; Python suite 45 run, 1 skipped; reports reproduce exactly; Remotion 11/11, typecheck, two compositions; MP4 checksum/ffprobe; fixture clean | Independent verifier unavailable because the delegated account hit its usage limit; parent completed structural readback and all applicable deterministic checks |
 | PTD-005 | Complete | `790abac` + `fix(ollama): harden response metadata validation` | Initial RED/GREEN 20/20; correction RED reproduced both verifier findings; correction GREEN focused 21/21, full suite 51 run, 1 skipped; diff check clean; external fixture porcelain empty | Initial RDD state not queried by executor; parent verifier found two P2s, both corrected in a separate scoped commit |
-| PTD-006 | Pending | — | TDD not started | Awaiting PTD-005 |
+| PTD-006 | Complete | `e9a177f` | RED import failure; focused 8/8; full suite 59 run, 1 skipped; fake/offline CLI paths passed; repeated fixture evidence byte-stable at 5,076 bytes; diff check passed | RDD disabled/unmanaged; parent to assess/review writer commit |
 | PTD-007 | Pending | — | Not started | Awaiting executable workflow |
 
 ## Capability boundary
@@ -119,4 +127,4 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## Next step
 
-Implement PTD-005 with strict TDD, then continue through the Ollama demo and runbook work units. Push or pull-request creation still requires explicit authorization.
+Continue with PTD-007 to document and rehearse the one-command workflow. Push or pull-request creation still requires explicit authorization.

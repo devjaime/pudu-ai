@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pudu.transformers-ollama-analysis/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "summary", "findings"],
+  "properties": {
+    "schema": {"const": "pudu.transformers-ollama-analysis/v1"},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 1000},
+    "findings": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "claim", "rationale", "evidence_refs"],
+        "properties": {
+          "label": {"enum": ["INFERRED", "UNRESOLVED"]},
+          "claim": {"type": "string", "minLength": 1, "maxLength": 500},
+          "rationale": {"type": "string", "minLength": 1, "maxLength": 1000},
+          "evidence_refs": {"type": "array", "maxItems": 8, "items": {"type": "string", "maxLength": 240}}
+        }
+      }
+    }
+  }
+}
