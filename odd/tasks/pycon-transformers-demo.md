@@ -38,7 +38,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 
 ## Tasks
 
-- [ ] **PTD-001 — Capture deterministic repository evidence**
+- [x] **PTD-001 — Capture deterministic repository evidence**
   - Route: delegated (`4+` files and executable behavior).
   - Add a standard-library Python demo command or script that validates the fixture identity and emits bounded, deterministic evidence for the generation definition, pipeline caller, model inheritance, configuration surface, and relevant tests.
   - Record every command, path, line range, relationship type, and unresolved boundary.
@@ -67,7 +67,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 
 | Task | Status | Commit | Verification | Review state |
 |---|---|---|---|---|
-| PTD-001 | Pending | — | — | — |
+| PTD-001 | Complete | `4df6d9a` | Focused 5/5; full Python suite 42 run, 1 skipped; two CLI runs byte-identical (6,808 bytes); nested-root rejection; fixture clean; independent verifier PASS | RDD disabled/unmanaged; risk assessment unassessable because files were initially untracked, treated as high and independently verified |
 | PTD-002 | Pending | — | — | — |
 | PTD-003 | Pending | — | — | — |
 | PTD-004 | Pending | — | — | — |
@@ -78,4 +78,4 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## Next step
 
-Implement PTD-001 with strict TDD and preserve the first reproducible evidence snapshot.
+Implement PTD-002 by deriving auditable JSON and Markdown artifacts from the verified evidence collector.
