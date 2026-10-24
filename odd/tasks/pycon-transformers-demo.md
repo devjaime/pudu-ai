@@ -99,6 +99,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Correction TDD: RED — focused suite failed three confinement assertions: the CLI accepted and wrote to an arbitrary manifest directory, and both symlink-component variants followed the link to the outside directory. GREEN — focused suite passed 10/10 after the fix.
   - Correction verification: full Python suite 61 run, 1 skipped; `git diff --check` passed; external Transformers fixture porcelain empty. New direct regression tests assert arbitrary-path rejection/absence and rejection of symlinked `.pudu-ai` and `pycon-demo` components without outside writes.
   - Correction rollback boundary: revert the separate PTD-006 confinement correction commit to restore the original manifest-path behavior; this reintroduces the reproduced P1. The original demo implementation commit and PTD-007 remain separate.
+  - Correction commit: `881393f fix(pycon): confine Ollama demo manifests`.
 
 - [ ] **PTD-007 — Document and rehearse the one-command workflow**
   - Route: delegated (cross-checks executable commands, generated manifest, and presentation narrative).
@@ -115,7 +116,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | PTD-003 | Complete | `ecce5f2`, `a1f2f5e` | Tests 11/11; typecheck; two compositions discovered; 1920×1080/30 fps/90 s H.264 render; VTT/scene alignment; visual inspection; SHA-256 `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3` | RDD disabled/unmanaged; high/unassessable candidate independently verified PASS; delivered as 140-line and 75-line stacked units |
 | PTD-004 | Complete | `2e48c82` | Runbook link audit 15/15; Python suite 45 run, 1 skipped; reports reproduce exactly; Remotion 11/11, typecheck, two compositions; MP4 checksum/ffprobe; fixture clean | Independent verifier unavailable because the delegated account hit its usage limit; parent completed structural readback and all applicable deterministic checks |
 | PTD-005 | Complete | `790abac` + `fix(ollama): harden response metadata validation` | Initial RED/GREEN 20/20; correction RED reproduced both verifier findings; correction GREEN focused 21/21, full suite 51 run, 1 skipped; diff check clean; external fixture porcelain empty | Initial RDD state not queried by executor; parent verifier found two P2s, both corrected in a separate scoped commit |
-| PTD-006 | Complete | `9cfc869` + confinement correction pending | Original RED/GREEN; P1 confinement RED reproduced arbitrary and symlink writes, then focused GREEN 10/10; full suite 61 run, 1 skipped; fixture clean; diff check passed | Writer did not query RDD state; parent to assess/route correction commit |
+| PTD-006 | Complete | `9cfc869`, `881393f` | Original RED/GREEN; P1 confinement RED reproduced arbitrary and symlink writes, then focused GREEN 10/10; full suite 61 run, 1 skipped; fixture clean; diff check passed | Writer did not query RDD state; parent to assess/route correction commit |
 | PTD-007 | Pending | — | Not started | Awaiting executable workflow |
 
 ## Capability boundary
