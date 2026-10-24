@@ -31,6 +31,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | Investigation | Candidate impact of changing `GenerationMixin.generate` |
 | Evidence labels | `CONFIRMED`, `INFERRED`, or `UNRESOLVED` |
 | Ollama execution | Automatic mode requires an explicit installed model; interactive mode offers verified installed choices |
+| Ollama endpoint | Explicit loopback endpoint only; live local-only rehearsal uses a separate server with `OLLAMA_NO_CLOUD=1` |
 | Reproducibility | Versioned prompt/schema, controlled options, model tag and digest, evidence hash, response hash, and measured telemetry |
 | Model boundary | Structural JSON validity is verified; factual correctness remains a separate human/tool validation step |
 | TDD | Strict; RED → GREEN → REFACTOR for executable behavior |
@@ -114,6 +115,13 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Correction verification: reran CLI help, focused tests (10/10), full Python suite (61 run, 1 skipped), added-link/path audit, `git diff --check`, and external fixture clean check; all passed. No Ollama service or model was started or installed.
   - Correction rollback boundaries: revert `589540b` only to restore the prior PTD-007 imperatives; revert the tracker-only evidence correction separately to restore the prior task-record wording. Neither touches Python behavior, snapshots, Remotion source, MP4, or the fixture.
 
+
+- [ ] **PTD-008 — Rehearse against an isolated local-only Ollama endpoint**
+  - Route: delegated (CLI contract, tests, bilingual operational docs, and live runtime verification).
+  - Add an explicit loopback-only Ollama endpoint option so the demo can target a separate server started with `OLLAMA_NO_CLOUD=1` without stopping or reconfiguring the shared daemon.
+  - Acceptance: strict TDD observes RED then GREEN for endpoint forwarding/rejection; automatic and interactive modes use the selected endpoint; docs show the isolated-server preparation; a live run uses an already installed model and records a redacted manifest; no model is pulled and no shared service is stopped.
+  - Forecast: 120–220 authored lines plus ignored runtime manifest.
+
 ## Progress and evidence
 
 | Task | Status | Commit | Verification | Review state |
@@ -125,6 +133,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | PTD-005 | Complete | `790abac` + `fix(ollama): harden response metadata validation` | Initial RED/GREEN 20/20; correction RED reproduced both verifier findings; correction GREEN focused 21/21, full suite 51 run, 1 skipped; diff check clean; external fixture porcelain empty | Initial RDD state not queried by executor; parent verifier found two P2s, both corrected in a separate scoped commit |
 | PTD-006 | Complete | `9cfc869`, `881393f` | Original RED/GREEN; P1 confinement RED reproduced arbitrary and symlink writes, then focused GREEN 10/10; full suite 61 run, 1 skipped; fixture clean; diff check passed | Writer did not query RDD state; parent to assess/route correction commit |
 | PTD-007 | Complete | `8bd2d24`, `589540b` | CLI help; focused 10/10; full 61 run, 1 skipped; added links/paths; diff check; fixture clean. Live Ollama unavailable (client 0.30.11; no local server/model verified; no live inference claimed). Independent documentation correction: stale commit reference and regional imperatives fixed. | RDD disabled/unmanaged; documentation-only structural readback |
+| PTD-008 | Pending | — | TDD not started; shared server local-only status unconfirmed | Awaiting isolated endpoint implementation and live rehearsal |
 
 ## Capability boundary
 
@@ -139,4 +148,4 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## Next step
 
-PTD-007 is documented and verified; the next step is a live rehearsal only when Ollama is already available with an installed local model. Push or pull-request creation still requires explicit authorization.
+Implement PTD-008, then rehearse against a separate loopback Ollama server configured with `OLLAMA_NO_CLOUD=1` and an already installed model. Push or pull-request creation still requires explicit authorization.
