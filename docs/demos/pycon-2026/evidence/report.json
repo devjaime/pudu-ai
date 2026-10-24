@@ -1,0 +1,266 @@
+{
+  "claims": [
+    {
+      "id": "definition",
+      "qualification": null,
+      "sources": [
+        {
+          "label": "CONFIRMED",
+          "line_end": 4342,
+          "line_start": 495,
+          "path": "src/transformers/generation/utils.py",
+          "relationship": "defines generation mixin"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 2999,
+          "line_start": 2569,
+          "path": "src/transformers/generation/utils.py",
+          "relationship": "defines generate method"
+        }
+      ],
+      "status": "CONFIRMED",
+      "summary": "The pinned source defines GenerationMixin and its generate method.",
+      "title": "GenerationMixin.generate definition"
+    },
+    {
+      "id": "pipeline",
+      "qualification": null,
+      "sources": [
+        {
+          "label": "CONFIRMED",
+          "line_end": 394,
+          "line_start": 394,
+          "path": "src/transformers/pipelines/text_generation.py",
+          "relationship": "calls generate on model"
+        }
+      ],
+      "status": "CONFIRMED",
+      "summary": "The text-generation pipeline contains a lexical call to model.generate.",
+      "title": "Text-generation pipeline caller"
+    },
+    {
+      "id": "inheritance",
+      "qualification": null,
+      "sources": [
+        {
+          "label": "CONFIRMED",
+          "line_end": 666,
+          "line_start": 590,
+          "path": "src/transformers/models/afmoe/modeling_afmoe.py",
+          "relationship": "inherits from GenerationMixin"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 453,
+          "line_start": 394,
+          "path": "src/transformers/models/afmoe/modular_afmoe.py",
+          "relationship": "inherits from GenerationMixin"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 475,
+          "line_start": 404,
+          "path": "src/transformers/models/apertus/modeling_apertus.py",
+          "relationship": "inherits from GenerationMixin"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 477,
+          "line_start": 406,
+          "path": "src/transformers/models/arcee/modeling_arcee.py",
+          "relationship": "inherits from GenerationMixin"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 773,
+          "line_start": 701,
+          "path": "src/transformers/models/aria/modeling_aria.py",
+          "relationship": "inherits from GenerationMixin"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 1116,
+          "line_start": 979,
+          "path": "src/transformers/models/aria/modeling_aria.py",
+          "relationship": "inherits from GenerationMixin"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 638,
+          "line_start": 566,
+          "path": "src/transformers/models/audioflamingo3/modeling_audioflamingo3.py",
+          "relationship": "inherits from GenerationMixin"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 36,
+          "line_start": 35,
+          "path": "src/transformers/models/auto/modeling_auto.py",
+          "relationship": "inherits from GenerationMixin"
+        }
+      ],
+      "status": "INFERRED",
+      "summary": "The bounded AST scan found 8 model classes declaring GenerationMixin inheritance; runtime participation is not established.",
+      "title": "Model inheritance candidates"
+    },
+    {
+      "id": "configuration",
+      "qualification": null,
+      "sources": [
+        {
+          "label": "CONFIRMED",
+          "line_end": 1376,
+          "line_start": 100,
+          "path": "src/transformers/generation/configuration_utils.py",
+          "relationship": "defines the public generation configuration contract"
+        }
+      ],
+      "status": "CONFIRMED",
+      "summary": "The public GenerationConfig declaration is present in the pinned source.",
+      "title": "Generation configuration contract"
+    },
+    {
+      "id": "tests",
+      "qualification": null,
+      "sources": [
+        {
+          "label": "CONFIRMED",
+          "line_end": 224,
+          "line_start": 224,
+          "path": "tests/generation/test_continuous_batching.py",
+          "relationship": "test invokes generate"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 1299,
+          "line_start": 1297,
+          "path": "tests/generation/test_continuous_batching.py",
+          "relationship": "test invokes generate"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 1467,
+          "line_start": 1462,
+          "path": "tests/generation/test_continuous_batching.py",
+          "relationship": "test invokes generate"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 64,
+          "line_start": 64,
+          "path": "tests/generation/test_flash_attention_parity.py",
+          "relationship": "test invokes generate"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 72,
+          "line_start": 72,
+          "path": "tests/generation/test_flash_attention_parity.py",
+          "relationship": "test invokes generate"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 110,
+          "line_start": 108,
+          "path": "tests/generation/test_flash_attention_parity.py",
+          "relationship": "test invokes generate"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 59,
+          "line_start": 59,
+          "path": "tests/generation/test_streamers.py",
+          "relationship": "test invokes generate"
+        },
+        {
+          "label": "CONFIRMED",
+          "line_end": 76,
+          "line_start": 76,
+          "path": "tests/generation/test_streamers.py",
+          "relationship": "test invokes generate"
+        }
+      ],
+      "status": "CONFIRMED",
+      "summary": "The bounded AST scan found 8 lexical generate() test call sites; tests were not executed by this collector.",
+      "title": "Test source references"
+    },
+    {
+      "id": "runtime-impact",
+      "qualification": "Candidate impact only.",
+      "sources": [],
+      "status": "UNRESOLVED",
+      "summary": "Static source evidence cannot prove complete runtime impact or dynamic dispatch.",
+      "title": "Complete runtime impact"
+    }
+  ],
+  "collector_commands": [
+    "git rev-parse HEAD",
+    "git describe --tags --exact-match HEAD",
+    "AST scan src/transformers/generation/utils.py for GenerationMixin and generate",
+    "AST scan src/transformers/pipelines/text_generation.py for generate calls",
+    "AST scan sorted src/transformers/models/**/*.py for GenerationMixin inheritance (max 600 files, 8 results)",
+    "AST scan sorted tests/**/*.py for generate calls (max 600 files, 8 results)"
+  ],
+  "context_reduction": {
+    "byte_reduction_percent": 99.55,
+    "cited_source_file_bytes": 816502,
+    "cited_source_files": 13,
+    "evidence_metadata_bytes": 3682,
+    "interpretation": "A deterministic byte-size comparison only; metadata is not semantically equivalent to source code and bytes are not tokens.",
+    "measurement": "metadata bytes compared with full cited source-file bytes"
+  },
+  "investigation": {
+    "question": "What code is a candidate impact surface if GenerationMixin.generate changes?",
+    "target": "GenerationMixin.generate"
+  },
+  "limitations": [
+    "AST evidence does not resolve dynamic dispatch, registries, generated mappings, native extensions, or all runtime paths.",
+    "The bounded test scan returns at most eight lexical generate() call sites; it does not execute tests or prove assertions.",
+    "Model inheritance and pipeline calls are candidate impact, not proof that a specific runtime uses these paths.",
+    "Evidence is a bounded source-level candidate-impact set, not a complete dependency graph or runtime proof.",
+    "Context reduction is a file-byte comparison of metadata against full cited source files, not a token or semantic-equivalence measurement.",
+    "Model analysis is NOT_RUN; no model inference or weights were used."
+  ],
+  "queries": [
+    "class GenerationMixin",
+    "def generate",
+    "TextGenerationPipeline model.generate",
+    "GenerationMixin inheritance",
+    "GenerationConfig",
+    "tests calling generate"
+  ],
+  "repository": {
+    "name": "huggingface/transformers",
+    "revision": "18329f1065382e54db698e242cf98bd3f3e5a766",
+    "tag": "v5.20.2"
+  },
+  "schema": "pudu.transformers-demo-report/v1",
+  "stages": [
+    {
+      "detail": "Collector validated the exact Git checkout root, commit, and tag.",
+      "name": "FIXTURE_IDENTITY",
+      "status": "VERIFIED"
+    },
+    {
+      "detail": "Collector inspected configured source paths and bounded sorted model/test Python file sets.",
+      "name": "BOUNDED_PYTHON_AST_EVIDENCE",
+      "status": "COMPLETED"
+    },
+    {
+      "detail": "Report generated from the in-memory evidence object; byte measurement covers cited files only.",
+      "name": "REPORT_AND_CONTEXT_MEASUREMENT",
+      "status": "COMPLETED"
+    },
+    {
+      "detail": "This report command does not execute Transformers tests or model code.",
+      "name": "RUNTIME_TESTS",
+      "status": "NOT_RUN"
+    },
+    {
+      "detail": "No model call was performed for this artifact.",
+      "name": "MODEL_ANALYSIS",
+      "status": "NOT_RUN"
+    }
+  ]
+}
