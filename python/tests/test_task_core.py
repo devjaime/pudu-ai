@@ -95,6 +95,14 @@ class OllamaClientTests(unittest.TestCase):
             self.client.list_model_details()
 
     @mock.patch("pudu_agent.model_client.urlopen")
+    def test_malformed_cloud_digest_does_not_break_local_model_listing(self, urlopen):
+        urlopen.return_value = self.response({"models": [
+            {"name": "cloud:cloud", "digest": 7},
+            {"name": "local:latest", "digest": "sha256:abc"},
+        ]})
+        self.assertEqual(self.client.list_models(), ["local:latest"])
+
+    @mock.patch("pudu_agent.model_client.urlopen")
     def test_server_version_is_validated(self, urlopen):
         urlopen.return_value = self.response({"version": "0.6.8"})
         self.assertEqual(self.client.server_version(), "0.6.8")
@@ -175,6 +183,7 @@ class OllamaClientTests(unittest.TestCase):
             {"options": []},
             {"options": {"temperature": True}},
             {"options": {"temperature": 3}},
+            {"options": {"temperature": 10**400}},
             {"options": {"seed": -1}},
             {"options": {"seed": True}},
             {"options": {"num_ctx": 4096}},

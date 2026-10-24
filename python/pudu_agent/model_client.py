@@ -1,7 +1,6 @@
 """Small, bounded stdlib HTTP client for a local Ollama instance."""
 
 import json
-import math
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -128,11 +127,12 @@ class OllamaClient:
             name = item.get("name") if isinstance(item, dict) else None
             if not isinstance(name, str) or not name:
                 raise OllamaError("Ollama returned an invalid model entry")
+            if _is_cloud_tag(name):
+                continue
             digest = item.get("digest")
             if digest is not None and (not isinstance(digest, str) or not digest):
                 raise OllamaError("Ollama returned an invalid model digest")
-            if not _is_cloud_tag(name):
-                details.append(ModelInfo(tag=name, digest=digest))
+            details.append(ModelInfo(tag=name, digest=digest))
         return details
 
     def server_version(self) -> str:
@@ -211,7 +211,7 @@ def _validate_generation_options(options: dict[str, Any] | None) -> dict[str, in
     if "temperature" in options:
         temperature = options["temperature"]
         if (not isinstance(temperature, (int, float)) or isinstance(temperature, bool)
-                or not math.isfinite(temperature) or not 0 <= temperature <= 2):
+                or not 0 <= temperature <= 2):
             raise ValueError("temperature must be a finite number between 0 and 2")
         result["temperature"] = temperature
     if "seed" in options:
