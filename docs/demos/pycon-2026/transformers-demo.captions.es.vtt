@@ -1,0 +1,28 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:07.000
+LLMs frente a repositorios gigantes: una investigación estática sobre Transformers.
+
+00:00:07.000 --> 00:00:17.000
+La búsqueda literal puede ser ruidosa. Es la motivación; ripgrep no se ejecutó en este informe.
+
+00:00:17.000 --> 00:00:29.000
+Checkout verificado en Transformers v5.20.2.
+
+00:00:29.000 --> 00:00:42.000
+El análisis AST encontró definiciones, una llamada de pipeline, herencia declarada y referencias de tests.
+
+00:00:42.000 --> 00:00:54.000
+Trece archivos citados: 3.682 bytes de metadatos frente a 816.502 bytes de fuentes.
+
+00:00:54.000 --> 00:01:04.000
+Ejecución de tests y análisis de modelo: NOT_RUN. No medimos esas etapas.
+
+00:01:04.000 --> 00:01:14.000
+Identidad y reporte verificados; el análisis AST quedó acotado a conjuntos configurados.
+
+00:01:14.000 --> 00:01:23.000
+Reducción de bytes del 99,55%; no son tokens ni equivalencia semántica. AST no prueba impacto completo.
+
+00:01:23.000 --> 00:01:30.000
+Las relaciones candidatas orientan la investigación; no certifican causalidad. Validá rutas concretas antes de concluir.
