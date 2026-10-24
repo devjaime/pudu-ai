@@ -176,6 +176,12 @@ npx pudu-ai task run --task "Summarize the authentication flow" --repo . --model
 
 The live Ollama integration test is opt-in (`PUDU_INTEGRATION=1`). See the [English guide](docs/agent-lab-usage.md), [Spanish guide](docs/agent-lab-usage.es.md), and [workflow diagram](docs/diagrams/local-task-worker-flow.html).
 
+## PyCon 2026 Transformers + Ollama demo
+
+**English quick path:** With the pinned Transformers fixture and an already-running local Ollama server/model, run `ollama list`, copy an exact installed `NAME`, then from the repository root run `PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --model 'EXACT_INSTALLED_TAG'` (or use `--interactive`). It writes a separate redacted manifest under ignored `.pudu-ai/pycon-demo/`; it does not change the committed deterministic reports. No model downloads are part of the talk. See the [full Spanish runbook](docs/demos/pycon-2026/DEMO_RUNBOOK.es.md).
+
+**Español — acceso rápido:** Con el fixture fijado y Ollama local ya activo con un modelo instalado, ejecutá `ollama list`, copiá un `NAME` exacto y, desde la raíz del repositorio, usá `PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --model 'TAG_LOCAL_EXACTO'` (o `--interactive`). La corrida crea un manifiesto redactado separado en `.pudu-ai/pycon-demo/`, ignorado por Git; no modifica los informes deterministas comprometidos. No se descargan modelos durante la charla. Consultá el [runbook completo en español](docs/demos/pycon-2026/DEMO_RUNBOOK.es.md).
+
 ## Privacy
 
 Local-first. Benchmarks, model paths, and machine identifiers stay in `~/.pudu-ai/`. Nothing is uploaded. Network is optional and used only for the CanIRun catalog (`--no-network` disables it).

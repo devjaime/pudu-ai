@@ -101,11 +101,15 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Correction rollback boundary: revert the separate PTD-006 confinement correction commit to restore the original manifest-path behavior; this reintroduces the reproduced P1. The original demo implementation commit and PTD-007 remain separate.
   - Correction commit: `881393f fix(pycon): confine Ollama demo manifests`.
 
-- [ ] **PTD-007 — Document and rehearse the one-command workflow**
+- [x] **PTD-007 — Document and rehearse the one-command workflow**
   - Route: delegated (cross-checks executable commands, generated manifest, and presentation narrative).
-  - Add one automatic command and one interactive command to the Spanish runbook. Preserve the existing deterministic `MODEL_ANALYSIS: NOT_RUN` snapshot as the no-model baseline and explain that live Ollama runs create separate ignored manifests.
+  - Add one automatic command and one interactive command to the Spanish runbook, plus concise English and neutral-professional Spanish quick paths in the root README linking to the full runbook. Preserve the existing deterministic `MODEL_ANALYSIS: NOT_RUN` snapshot as the no-model baseline and explain that live Ollama runs create separate ignored manifests.
   - Acceptance: commands and paths exist; deterministic tests and a fake-runtime rehearsal pass; a live run is attempted only when an already-running Ollama server and installed model are available; limitations state that temperature zero and a fixed seed do not guarantee identical text across runtimes.
   - Forecast: 100–180 authored lines.
+  - Implementation: extended `docs/demos/pycon-2026/DEMO_RUNBOOK.es.md` with the Ollama no-download preflight, exact-tag automatic and interactive commands, expected stages, redacted manifest behavior, trust boundary, failure behavior, and 3-minute optional segment while retaining the deterministic 9-minute demo and 30-minute talk. Added English/Spanish concise entry points to `README.md`.
+  - Verification: `PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --help` — passed; `PYTHONPATH=python python3 -m unittest python.tests.test_transformers_ollama_demo -v` — 10/10 passed; `PYTHONPATH=python python3 -m unittest discover -s python/tests -v` — 61 run, 1 skipped (live Ollama integration opt-in); added relative links checked (README→Spanish runbook, demo module, prompt/schema assets), all targets exist. Manifest destination was verified in code and `.gitignore`; it is created only by successful live execution. `git diff --check` — passed; external fixture `git status --porcelain` — empty. `ollama --version` — exit 0, client 0.30.11; reports no running instance. `ollama list` — exit 1, could not connect to `127.0.0.1:11434` (`operation not permitted`). No live demo run was attempted because the local server/model availability was not established; no service was started and no model was pulled. Fake-runtime CLI paths are covered by the focused tests. The existing ignored MP4 is absent from this managed worktree; the runbook flags it for presentation-machine preflight and no video was changed.
+  - Rollback boundary: revert the PTD-007 docs commit to remove only this runbook/README/tracker update; deterministic report snapshots, Ollama implementation/assets, Remotion source, generated MP4, and external fixture are untouched.
+  - Commit: `eeba77e docs(pycon): add Ollama demo runbook` (65 authored changed lines: 58 additions, 7 deletions).
 
 ## Progress and evidence
 
@@ -117,7 +121,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | PTD-004 | Complete | `2e48c82` | Runbook link audit 15/15; Python suite 45 run, 1 skipped; reports reproduce exactly; Remotion 11/11, typecheck, two compositions; MP4 checksum/ffprobe; fixture clean | Independent verifier unavailable because the delegated account hit its usage limit; parent completed structural readback and all applicable deterministic checks |
 | PTD-005 | Complete | `790abac` + `fix(ollama): harden response metadata validation` | Initial RED/GREEN 20/20; correction RED reproduced both verifier findings; correction GREEN focused 21/21, full suite 51 run, 1 skipped; diff check clean; external fixture porcelain empty | Initial RDD state not queried by executor; parent verifier found two P2s, both corrected in a separate scoped commit |
 | PTD-006 | Complete | `9cfc869`, `881393f` | Original RED/GREEN; P1 confinement RED reproduced arbitrary and symlink writes, then focused GREEN 10/10; full suite 61 run, 1 skipped; fixture clean; diff check passed | Writer did not query RDD state; parent to assess/route correction commit |
-| PTD-007 | Pending | — | Not started | Awaiting executable workflow |
+| PTD-007 | Complete | `eeba77e` | CLI help; focused 10/10; full 61 run, 1 skipped; added links/paths; diff check; fixture clean. Live Ollama unavailable (client 0.30.11; no local server/model verified; no live inference claimed). | RDD disabled/unmanaged; documentation-only structural readback |
 
 ## Capability boundary
 
@@ -132,4 +136,4 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## Next step
 
-Continue with PTD-007 to document and rehearse the one-command workflow. Push or pull-request creation still requires explicit authorization.
+PTD-007 is documented and verified; the next step is a live rehearsal only when Ollama is already available with an installed local model. Push or pull-request creation still requires explicit authorization.

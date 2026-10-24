@@ -129,15 +129,56 @@ Medición registrada: **3.682 / 816.502 bytes**, 13 archivos citados, **99,55 %*
 | 7:15–8:15 | Presentar los límites | No se ejecutó ripgrep ni ast-grep como medición comparativa; no se hizo traversal completo de grafo, prueba de runtime ni llamada a modelo. La siguiente capa puede entregar esta evidencia acotada a modelos locales o de frontera. |
 | 8:15–9:00 | Cerrar o activar fallback | Si la demo en vivo sigue disponible, abrir el [MP4 verificado](pycon-2026-transformers-demo.mp4); resumir que la evidencia reduce contexto inspeccionable sin cerrar la pregunta de impacto en runtime. |
 
+## Capa opcional de Ollama — 3 minutos, sin descargas
+
+El guion de nueve minutos anterior sigue siendo el demo determinista completo. Si ya hay un servidor Ollama local activo y un modelo instalado, se puede sumar esta capa al bloque de demostración; no instales ni descargues nada durante la charla. Si no están disponibles, conserva los snapshots `MODEL_ANALYSIS: NOT_RUN` y el MP4 como fallback.
+
+### Preflight: solo lectura
+
+Desde `$PUDU_ROOT`, comprobar el cliente y los modelos que ya están instalados:
+
+```sh
+ollama --version
+ollama list
+```
+
+`ollama list` muestra los nombres/tags locales en la columna `NAME` y un ID de digest abreviado. Copiá el `NAME` exacto para el modo automático. El modo interactivo consulta los metadatos locales y muestra cada tag elegible junto con su digest completo antes de elegir. La ejecución consulta además `/api/version`; el manifiesto registra esa versión del servidor, mientras `ollama --version` identifica el cliente CLI. No uses tags `:cloud` ni ejecutes `ollama pull`.
+
+### Ejecutar (elegir una modalidad)
+
+Automático, con el tag exacto copiado de `ollama list`:
+
+```sh
+PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --model 'TAG_LOCAL_EXACTO'
+```
+
+O interactivo, para revisar tag y digest antes de seleccionar:
+
+```sh
+PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --interactive
+```
+
+Ambas modalidades exigen el fixture fijado en `$DEMO_ROOT/transformers`, que es la ruta predeterminada del CLI. El comando valida identidad/commit/etiqueta, prepara evidencia acotada, selecciona un modelo local elegible, consulta la versión del servidor, genera con formato JSON y valida el contrato estructural. En éxito muestra el resumen interpretativo, la ruta del manifiesto y una advertencia de que validez JSON no significa corrección factual. `temperature=0` y `seed=20260520` fijan opciones, pero no garantizan texto idéntico entre versiones o hardware.
+
+El manifiesto redactado se escribe atómicamente en `.pudu-ai/pycon-demo/` (ignorado por Git). Registra hashes y metadatos —incluidos tag, digest, versiones, opciones, métricas observadas y estado de validación—, no el prompt, la evidencia ni la respuesta completos. Los informes deterministas comprometidos siguen diciendo `MODEL_ANALYSIS: NOT_RUN`: una corrida viva crea un registro separado e ignorado y **no reescribe esos snapshots**.
+
+### Confianza, fallos y fallback
+
+El cliente usa loopback (`127.0.0.1`) y rechaza tags cloud; eso define el límite de transporte de esta demo, no una garantía general sobre la configuración de todo servidor Ollama. El texto del modelo es dato no confiable: JSON válido no equivale a hechos correctos, y la herramienta nunca ejecuta comandos, parches ni llamadas sugeridas por el modelo.
+
+Si el servidor no está activo, no hay modelo local elegible, el tag no coincide exactamente, el fixture falla su verificación o la respuesta no cumple el contrato, el proceso informa el error y termina con código distinto de cero; no crea un manifiesto de éxito. No inicies ni detengas servicios ni descargues modelos para rescatar la charla. Volvé a los informes deterministas y al video previamente verificado (`pycon-2026-transformers-demo.mp4`); confirma antes que el MP4 esté disponible en el equipo de presentación: este checkout de trabajo no incluye el archivo ignorado. La limitación debe seguir nombrándose como `MODEL_ANALYSIS: NOT_RUN` en esos snapshots.
+
+La secuencia combinada conserva los nueve minutos deterministas y añade, si el preflight ya está disponible, 3 minutos: 0:00–0:30 mirar versión/lista; 0:30–1:00 ejecutar una modalidad; 1:00–2:00 leer etapas/salida y el manifiesto; 2:00–3:00 explicar el límite de confianza y volver al fallback si algo falla.
+
 ## Secuencia completa de charla — 30 minutos
 
 | Minutos | Bloque | Objetivo |
 |---|---|---|
 | 0–3 | Apertura y problema | Presentar el costo de buscar impacto en un repositorio grande y formular una pregunta concreta. |
 | 3–6 | Caso y límites | Presentar `GenerationMixin.generate`, el snapshot fijado y la diferencia entre evidencia de código y prueba de runtime. |
-| 6–15 | Demostración | Ejecutar el guion de nueve minutos: identidad, colección, ubicaciones, estados y medición. |
-| 15–20 | Lectura crítica | Distinguir `CONFIRMED`, `INFERRED` y `UNRESOLVED`; explicar por qué las ubicaciones de herencia no prueban uso dinámico. |
-| 20–24 | Siguiente capa de análisis | Explicar cómo los modelos locales y de frontera podrían consumir evidencia acotada. No atribuir calidad, latencia ni resultado a una ejecución inexistente: `MODEL_ANALYSIS` está `NOT_RUN`. |
+| 6–18 | Demostración | Mantener los nueve minutos deterministas: identidad, colección, ubicaciones, estados y medición; añadir hasta tres minutos de Ollama solo si el servidor y un modelo ya están disponibles. |
+| 18–21 | Lectura crítica | Distinguir `CONFIRMED`, `INFERRED` y `UNRESOLVED`; explicar por qué las ubicaciones de herencia no prueban uso dinámico. |
+| 21–24 | Siguiente capa de análisis | Explicar cómo modelos locales y de frontera podrían consumir evidencia acotada. Si no se ejecutó Ollama, no atribuir calidad, latencia ni resultado: `MODEL_ANALYSIS` está `NOT_RUN`. |
 | 24–27 | Fallos y reproducibilidad | Mostrar verificaciones de identidad y comparar snapshots; cubrir fallback con los artefactos guardados. |
 | 27–30 | Límites y cierre | Repetir qué se observó, qué sigue abierto y el takeaway: automatizar la recolección trazable; mantener las conclusiones bajo control humano. |
 
