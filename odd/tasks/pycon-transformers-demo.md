@@ -57,7 +57,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Acceptance: timeline tests, typecheck, composition listing, and final render pass; overlays remain readable at presentation resolution; the video uses only verified claims from the evidence artifact.
   - Forecast: 220–360 authored lines plus generated media.
 
-- [ ] **PTD-004 — Write the Spanish presentation runbook and close verification**
+- [x] **PTD-004 — Write the Spanish presentation runbook and close verification**
   - Route: delegated (cross-checks code, evidence, and media).
   - Create a concise Spanish Markdown runbook with setup, exact live commands, expected output, narration, fallback plan, limitations, and the final 30-minute talk sequence.
   - Acceptance: all referenced paths and commands exist; a fresh verifier reruns applicable checks; final artifacts and commit identities are recorded below.
@@ -70,7 +70,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | PTD-001 | Complete | `4df6d9a` | Focused 5/5; full Python suite 42 run, 1 skipped; two CLI runs byte-identical (6,808 bytes); nested-root rejection; fixture clean; independent verifier PASS | RDD disabled/unmanaged; risk assessment unassessable because files were initially untracked, treated as high and independently verified |
 | PTD-002 | Complete | `27448a6` | Focused 3/3; full Python suite 45 run, 1 skipped; JSON and Markdown reproduced byte-identically and matched snapshots; 99.55% byte reduction independently recalculated | RDD disabled/unmanaged; untracked assessment treated as high and independently verified PASS |
 | PTD-003 | Complete | `ecce5f2`, `a1f2f5e` | Tests 11/11; typecheck; two compositions discovered; 1920×1080/30 fps/90 s H.264 render; VTT/scene alignment; visual inspection; SHA-256 `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3` | RDD disabled/unmanaged; high/unassessable candidate independently verified PASS; delivered as 140-line and 75-line stacked units |
-| PTD-004 | Pending | — | — | — |
+| PTD-004 | Complete | `2e48c82` | Runbook link audit 15/15; Python suite 45 run, 1 skipped; reports reproduce exactly; Remotion 11/11, typecheck, two compositions; MP4 checksum/ffprobe; fixture clean | Independent verifier unavailable because the delegated account hit its usage limit; parent completed structural readback and all applicable deterministic checks |
 
 ## Capability boundary
 
@@ -78,4 +78,4 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## Next step
 
-Implement PTD-004 by writing the Spanish presentation runbook, synchronizing final artifacts to Kingston, and running closeout verification.
+Fast-forward the verified branch and copy the ignored MP4 into the external Kingston demo workspace, then record final synchronization evidence.
