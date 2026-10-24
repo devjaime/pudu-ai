@@ -135,11 +135,19 @@ El guion de nueve minutos anterior sigue siendo el demo determinista completo. S
 
 ### Preflight: solo lectura
 
-Desde `$PUDU_ROOT`, comprobar el cliente y los modelos que ya están instalados:
+Para evitar reconfigurar o detener el daemon compartido, confirme que el puerto `11435` esté libre y ejecute en una terminal separada un servidor Ollama local-only:
+
+```sh
+OLLAMA_HOST=127.0.0.1:11435 OLLAMA_NO_CLOUD=1 ollama serve
+```
+
+Esta configuración es una afirmación del operador al iniciar el proceso; la API no ofrece una atestación que pruebe que el servidor no reenviará solicitudes a la nube. No detenga ni reconfigure el daemon compartido. Reutilice únicamente modelos ya instalados y visibles para esta instancia: no ejecute `ollama pull`.
+
+Desde `$PUDU_ROOT`, comprobar el cliente y los modelos visibles para el servidor aislado:
 
 ```sh
 ollama --version
-ollama list
+OLLAMA_HOST=127.0.0.1:11435 ollama list
 ```
 
 `ollama list` muestra los nombres/tags locales en la columna `NAME` y un ID de digest abreviado. Copie el `NAME` exacto para el modo automático. El modo interactivo consulta los metadatos locales y muestra cada tag elegible junto con su digest completo antes de elegir. La ejecución consulta además `/api/version`; el manifiesto registra esa versión del servidor, mientras `ollama --version` identifica el cliente CLI. No utilice tags `:cloud` ni ejecute `ollama pull`.
@@ -149,13 +157,13 @@ ollama list
 Automático, con el tag exacto copiado de `ollama list`:
 
 ```sh
-PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --model 'TAG_LOCAL_EXACTO'
+PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --ollama-url http://127.0.0.1:11435 --model 'TAG_LOCAL_EXACTO'
 ```
 
 O interactivo, para revisar tag y digest antes de seleccionar:
 
 ```sh
-PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --interactive
+PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --ollama-url http://127.0.0.1:11435 --interactive
 ```
 
 Ambas modalidades exigen el fixture fijado en `$DEMO_ROOT/transformers`, que es la ruta predeterminada del CLI. El comando valida identidad/commit/etiqueta, prepara evidencia acotada, selecciona un modelo local elegible, consulta la versión del servidor, genera con formato JSON y valida el contrato estructural. En éxito muestra el resumen interpretativo, la ruta del manifiesto y una advertencia de que validez JSON no significa corrección factual. `temperature=0` y `seed=20260520` fijan opciones, pero no garantizan texto idéntico entre versiones o hardware.
@@ -164,7 +172,7 @@ El manifiesto redactado se escribe atómicamente en `.pudu-ai/pycon-demo/` (igno
 
 ### Confianza, fallos y fallback
 
-El cliente usa loopback (`127.0.0.1`) y rechaza tags cloud; eso define el límite de transporte de esta demo, no una garantía general sobre la configuración de todo servidor Ollama. El texto del modelo es dato no confiable: JSON válido no equivale a hechos correctos, y la herramienta nunca ejecuta comandos, parches ni llamadas sugeridas por el modelo.
+El cliente usa el endpoint loopback explícito `http://127.0.0.1:11435` y rechaza tags cloud; eso define el límite de transporte de esta demo, no una garantía general sobre la configuración de todo servidor Ollama. `OLLAMA_NO_CLOUD=1` expresa la configuración solicitada por quien opera el proceso, no una atestación entregada por la API. El texto del modelo es dato no confiable: JSON válido no equivale a hechos correctos, y la herramienta nunca ejecuta comandos, parches ni llamadas sugeridas por el modelo.
 
 Si el servidor no está activo, no hay modelo local elegible, el tag no coincide exactamente, el fixture falla su verificación o la respuesta no cumple el contrato, el proceso informa el error y termina con código distinto de cero; no crea un manifiesto de éxito. No inicie ni detenga servicios ni descargue modelos para rescatar la charla. Vuelva a los informes deterministas y al video previamente verificado (`pycon-2026-transformers-demo.mp4`); confirme antes que el MP4 esté disponible en el equipo de presentación: este checkout de trabajo no incluye el archivo ignorado. La limitación debe seguir nombrándose como `MODEL_ANALYSIS: NOT_RUN` en esos snapshots.
 

@@ -6,11 +6,12 @@ import unittest
 import uuid
 from contextlib import redirect_stderr
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from pudu_agent.model_client import GenerateResult, ModelInfo, OllamaError
 import pudu_agent.transformers_ollama_demo as demo_module
-from pudu_agent.transformers_ollama_demo import main
+from pudu_agent.transformers_ollama_demo import main, run_demo
 
 
 class FakeClient:
@@ -37,20 +38,28 @@ class FakeClient:
 
 
 class TransformersOllamaDemoTests(unittest.TestCase):
-    def run_demo(self, args, *, client=None, input_value="1", evidence=None):
+    def run_demo(self, args, *, client=None, input_value="1", evidence=None, endpoint=None):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
         client = client or FakeClient()
         evidence = evidence or {"schema": "pudu.transformers-evidence/v1", "repository": {
             "name": "huggingface/transformers", "tag": "v5.20.2",
             "revision": "18329f1065382e54db698e242cf98bd3f3e5a766"}, "evidence": {"definition": []}}
+        client.endpoint_calls = []
+
+        def client_factory(validated_endpoint=None):
+            client.endpoint_calls.append(validated_endpoint)
+            return client
+
         with patch("pudu_agent.transformers_ollama_demo.PROJECT_ROOT", Path(temp.name)), \
              patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(temp.name)), \
              patch("pudu_agent.transformers_ollama_demo.collect_evidence", return_value=evidence) as collect, \
              patch("builtins.input", return_value=input_value), \
              patch("sys.stdout.write") as output:
-            status = main([*args, "--repository", temp.name],
-                          client_factory=lambda: client, input_fn=lambda _: input_value)
+            cli_args = [*args, "--repository", temp.name]
+            if endpoint is not None:
+                cli_args.extend(["--ollama-url", endpoint])
+            status = main(cli_args, client_factory=client_factory, input_fn=lambda _: input_value)
         return status, client, collect, "".join(call.args[0] for call in output.call_args_list), Path(temp.name)
 
     def test_automatic_mode_requires_explicit_installed_model_and_runs_json_generation(self):
@@ -60,6 +69,7 @@ class TransformersOllamaDemoTests(unittest.TestCase):
         generate_call = next(call for call in client.calls if call[0] == "generate")
         self.assertEqual(generate_call[1], "qwen2.5:7b")
         self.assertEqual(generate_call[2], {"format": "json", "options": {"temperature": 0, "seed": 20260520}})
+        self.assertEqual(client.endpoint_calls, ["http://127.0.0.1:11434"])
         self.assertIn('"findings": []', output)
         manifest = json.loads(next((root / ".pudu-ai" / "pycon-demo").glob("*.json")).read_text())
         self.assertEqual(manifest["model"], {"tag": "qwen2.5:7b", "digest": "sha256:abc"})
@@ -79,11 +89,15 @@ class TransformersOllamaDemoTests(unittest.TestCase):
     def test_interactive_selection_is_bounded_and_requires_digest(self):
         client = FakeClient(models=[ModelInfo("qwen2.5:7b", "sha256:abc"), ModelInfo("llama3:8b", "sha256:def")],
                             result=GenerateResult("llama3:8b", '{"schema":"pudu.transformers-ollama-analysis/v1","summary":"Review needed","findings":[]}'))
-        status, client, _, output, _ = self.run_demo(["--interactive"], client=client, input_value="1")
+        status, client, _, output, root = self.run_demo(["--interactive"], client=client, input_value="1",
+                                                        endpoint="http://127.0.0.1:11435/")
         self.assertEqual(status, 0)
         self.assertIn("1)", output)
         self.assertIn("sha256:def", output)
+        self.assertEqual(client.endpoint_calls, ["http://127.0.0.1:11435"])
         self.assertIn(("generate", "llama3:8b", {"format": "json", "options": {"temperature": 0, "seed": 20260520}}), client.calls)
+        manifest = json.loads(next((root / ".pudu-ai" / "pycon-demo").glob("*.json")).read_text())
+        self.assertEqual(manifest["ollama_endpoint"], "http://127.0.0.1:11435")
 
     def test_rejects_fixture_identity_before_any_ollama_call(self):
         client = FakeClient()
@@ -142,6 +156,33 @@ class TransformersOllamaDemoTests(unittest.TestCase):
                     with self.assertRaises((OSError, ValueError)):
                         demo_module._write_manifest(project / ".pudu-ai" / "pycon-demo", manifest)
                 self.assertEqual(list(outside.iterdir()), [])
+
+    def test_invalid_endpoint_is_rejected_before_collector_or_client_creation(self):
+        endpoints = ("https://127.0.0.1:11435", "http://user:pass@127.0.0.1:11435",
+                     "http://192.0.2.10:11435")
+        for endpoint in endpoints:
+            with self.subTest(endpoint=endpoint), tempfile.TemporaryDirectory() as tmp:
+                args = SimpleNamespace(repository=Path(tmp), ollama_url=endpoint,
+                                       model="qwen2.5:7b", interactive=False)
+                evidence_calls = []
+                client_calls = []
+                client = FakeClient()
+
+                def client_factory(validated_endpoint=None):
+                    client_calls.append(validated_endpoint)
+                    return client
+
+                def collector(root):
+                    evidence_calls.append(root)
+                    raise AssertionError("collector must not run for an invalid endpoint")
+
+                with patch("pudu_agent.transformers_ollama_demo.PROJECT_ROOT", Path(tmp)), \
+                     patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(tmp)), \
+                     patch("pudu_agent.transformers_ollama_demo.collect_evidence", side_effect=collector):
+                    with self.assertRaises(ValueError):
+                        run_demo(args, client_factory=client_factory)
+                self.assertEqual(evidence_calls, [])
+                self.assertEqual(client_calls, [])
 
     def test_invalid_json_and_model_identity_are_rejected(self):
         client = FakeClient(result=GenerateResult("qwen2.5:7b", "not json"))

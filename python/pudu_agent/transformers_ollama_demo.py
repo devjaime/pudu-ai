@@ -11,7 +11,7 @@ import sys
 import time
 import uuid
 
-from pudu_agent.model_client import ModelInfo, OllamaClient
+from pudu_agent.model_client import ModelInfo, OllamaClient, validate_endpoint
 from pudu_agent.transformers_evidence import collect_evidence
 
 
@@ -24,6 +24,7 @@ FIXTURE_ROOT = Path("/Volumes/KINGSTON/pudu-pycon-2026/transformers")
 PROMPT_VERSION = "prompt-v1"
 SCHEMA_VERSION = "pudu.transformers-ollama-analysis/v1"
 GENERATION_OPTIONS = {"temperature": 0, "seed": 20260520}
+DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 MAX_EVIDENCE_BYTES = 64 * 1024
 MAX_RESPONSE_BYTES = 64 * 1024
 ASSET_ROOT = Path(__file__).resolve().parents[2] / "docs/demos/pycon-2026/ollama"
@@ -175,6 +176,7 @@ def _write_manifest(directory, manifest):
 
 
 def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
+    endpoint = validate_endpoint(args.ollama_url)
     if Path(args.repository).resolve() != FIXTURE_ROOT.resolve():
         raise ValueError(f"fixture root must be exactly {FIXTURE_ROOT}")
     evidence = collect_evidence(args.repository)
@@ -188,7 +190,7 @@ def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
     schema_bytes = schema_path.read_bytes()
     prompt = prompt_bytes.decode("utf-8")
     schema = json.loads(schema_bytes)
-    model_client = client_factory()
+    model_client = client_factory(endpoint)
     model = _choose_model(model_client, args, input_fn)
     server_version = model_client.server_version()
     started = time.monotonic()
@@ -211,6 +213,7 @@ def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
         "prompt": {"version": PROMPT_VERSION, "sha256": _sha256(prompt_bytes), "bytes": len(prompt_bytes)},
         "response_schema": {"version": SCHEMA_VERSION, "sha256": _sha256(schema_bytes), "bytes": len(schema_bytes)},
         "model": {"tag": model.tag, "digest": model.digest},
+        "ollama_endpoint": endpoint,
         "ollama_version": server_version,
         "generation_options": dict(GENERATION_OPTIONS),
         "application_wall_latency_ms": wall_latency_ms,
@@ -228,6 +231,8 @@ def main(argv=None, *, client_factory=OllamaClient, input_fn=input):
     group.add_argument("--model", help="exact installed model tag required for automatic mode")
     group.add_argument("--interactive", action="store_true", help="select an installed model by number")
     parser.add_argument("--repository", type=Path, default=FIXTURE_ROOT, help="exact pinned Transformers fixture root")
+    parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL,
+                        help="loopback Ollama endpoint (default: %(default)s)")
     args = parser.parse_args(argv)
     try:
         response, manifest_path = run_demo(args, client_factory=client_factory, input_fn=input_fn)
