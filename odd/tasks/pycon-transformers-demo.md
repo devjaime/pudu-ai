@@ -51,7 +51,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Acceptance: schema/contract tests pass; Markdown is derived from the same evidence as JSON; no claim presents candidate impact as complete runtime proof.
   - Forecast: 140–240 authored lines.
 
-- [ ] **PTD-003 — Update and render the Remotion walkthrough**
+- [x] **PTD-003 — Update and render the Remotion walkthrough**
   - Route: delegated (timeline, composition, tests, captions, and rendered media).
   - Replace the generic demonstration story with the pinned Transformers investigation, showing literal search, AST filtering, graph expansion, bounded context, model roles, deterministic verification, and metrics.
   - Acceptance: timeline tests, typecheck, composition listing, and final render pass; overlays remain readable at presentation resolution; the video uses only verified claims from the evidence artifact.
@@ -69,7 +69,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 |---|---|---|---|---|
 | PTD-001 | Complete | `4df6d9a` | Focused 5/5; full Python suite 42 run, 1 skipped; two CLI runs byte-identical (6,808 bytes); nested-root rejection; fixture clean; independent verifier PASS | RDD disabled/unmanaged; risk assessment unassessable because files were initially untracked, treated as high and independently verified |
 | PTD-002 | Complete | `27448a6` | Focused 3/3; full Python suite 45 run, 1 skipped; JSON and Markdown reproduced byte-identically and matched snapshots; 99.55% byte reduction independently recalculated | RDD disabled/unmanaged; untracked assessment treated as high and independently verified PASS |
-| PTD-003 | Pending | — | — | — |
+| PTD-003 | Complete | `ecce5f2`, `a1f2f5e` | Tests 11/11; typecheck; two compositions discovered; 1920×1080/30 fps/90 s H.264 render; VTT/scene alignment; visual inspection; SHA-256 `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3` | RDD disabled/unmanaged; high/unassessable candidate independently verified PASS; delivered as 140-line and 75-line stacked units |
 | PTD-004 | Pending | — | — | — |
 
 ## Capability boundary
@@ -78,4 +78,4 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## Next step
 
-Implement PTD-003 by rebuilding the Remotion walkthrough around the verified Transformers evidence report.
+Implement PTD-004 by writing the Spanish presentation runbook, synchronizing final artifacts to Kingston, and running closeout verification.
