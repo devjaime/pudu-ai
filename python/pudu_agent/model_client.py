@@ -1,6 +1,7 @@
 """Small, bounded stdlib HTTP client for a local Ollama instance."""
 
 import json
+import math
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -67,6 +68,14 @@ class GenerateResult:
     tokens_per_second: float | None = None
 
 
+@dataclass(frozen=True)
+class ModelInfo:
+    """Installed model identity used for reproducibility manifests."""
+
+    tag: str
+    digest: str | None
+
+
 class OllamaClient:
     """Local Ollama client; timeout bounds socket operations, not total wall time.
 
@@ -106,18 +115,34 @@ class OllamaClient:
         return True
 
     def list_models(self) -> list[str]:
+        return [model.tag for model in self.list_model_details()]
+
+    def list_model_details(self) -> list[ModelInfo]:
+        """List local installed models with their API-provided digest when present."""
         data = self._request("/api/tags")
         models = data.get("models")
         if not isinstance(models, list):
             raise OllamaError("Ollama model response is missing models")
-        names = []
+        details = []
         for item in models:
             name = item.get("name") if isinstance(item, dict) else None
             if not isinstance(name, str) or not name:
                 raise OllamaError("Ollama returned an invalid model entry")
+            digest = item.get("digest")
+            if digest is not None and (not isinstance(digest, str) or not digest):
+                raise OllamaError("Ollama returned an invalid model digest")
             if not _is_cloud_tag(name):
-                names.append(name)
-        return names
+                details.append(ModelInfo(tag=name, digest=digest))
+        return details
+
+    def server_version(self) -> str:
+        """Return the bounded server version reported by ``/api/version``."""
+        data = self._request("/api/version")
+        version = data.get("version")
+        if (not isinstance(version, str) or not version.strip() or len(version) > 128
+                or any(ord(character) < 32 or ord(character) == 127 for character in version)):
+            raise OllamaError("Ollama version response has an invalid version")
+        return version
 
     def select_model(self, preferred: str | None = None) -> str | None:
         if preferred is not None and _is_cloud_tag(preferred):
@@ -129,12 +154,21 @@ class OllamaClient:
             return preferred
         return models[0] if models else None
 
-    def generate(self, model: str, prompt: str) -> GenerateResult:
+    def generate(self, model: str, prompt: str, *, format: str | None = None,
+                 options: dict[str, Any] | None = None) -> GenerateResult:
         if not isinstance(model, str) or not model or _is_cloud_tag(model):
             raise ValueError("a local model name is required")
         if not isinstance(prompt, str) or not prompt:
             raise ValueError("prompt must be non-empty text")
-        data = self._request("/api/generate", {"model": model, "prompt": prompt, "stream": False})
+        if format is not None and format != "json":
+            raise ValueError("format must be 'json' when specified")
+        validated_options = _validate_generation_options(options)
+        payload: dict[str, Any] = {"model": model, "prompt": prompt, "stream": False}
+        if format is not None:
+            payload["format"] = format
+        if validated_options is not None:
+            payload["options"] = validated_options
+        data = self._request("/api/generate", payload)
         content = data.get("response")
         if not isinstance(content, str):
             raise OllamaError("Ollama generate response is missing text")
@@ -163,3 +197,26 @@ class OllamaClient:
 
 def _is_cloud_tag(name: str) -> bool:
     return re.search(r"(?::cloud|-cloud)$", name, re.IGNORECASE) is not None
+
+
+def _validate_generation_options(options: dict[str, Any] | None) -> dict[str, int | float] | None:
+    if options is None:
+        return None
+    if not isinstance(options, dict):
+        raise ValueError("generation options must be an object")
+    allowed = {"temperature", "seed"}
+    if set(options) - allowed:
+        raise ValueError("generation options contain an unsupported field")
+    result: dict[str, int | float] = {}
+    if "temperature" in options:
+        temperature = options["temperature"]
+        if (not isinstance(temperature, (int, float)) or isinstance(temperature, bool)
+                or not math.isfinite(temperature) or not 0 <= temperature <= 2):
+            raise ValueError("temperature must be a finite number between 0 and 2")
+        result["temperature"] = temperature
+    if "seed" in options:
+        seed = options["seed"]
+        if not isinstance(seed, int) or isinstance(seed, bool) or not 0 <= seed <= 2**31 - 1:
+            raise ValueError("seed must be a non-negative 32-bit integer")
+        result["seed"] = seed
+    return result

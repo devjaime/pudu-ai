@@ -67,11 +67,16 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Acceptance: all referenced paths and commands exist; a fresh verifier reruns applicable checks; final artifacts and commit identities are recorded below.
   - Forecast: 120–200 authored lines.
 
-- [ ] **PTD-005 — Extend the Ollama client contract**
+- [x] **PTD-005 — Extend the Ollama client contract**
   - Route: delegated (client behavior and tests span multiple non-trivial files).
   - Preserve model tag and digest from `/api/tags`, capture the Ollama server version when available, and support explicit JSON formatting plus controlled generation options.
   - Acceptance: strict TDD observes RED then GREEN; requests include only allow-listed reproducibility options; existing callers remain compatible; client tests cover malformed and missing runtime metadata.
-  - Forecast: 140–240 authored lines.
+  - Implementation: added immutable `ModelInfo` and `list_model_details()` while retaining `list_models()` as `list[str]`; digest is preserved when provided and remains optional for older/mocked responses. Added bounded `server_version()` parsing for `/api/version`. Generation accepts only `format="json"` and an options object containing `temperature` (finite 0–2) and/or `seed` (non-negative 32-bit integer); unknown fields and invalid shapes are rejected. Existing loopback transport, response cap, cloud-tag filter, and request privacy behavior are unchanged.
+  - Route evidence: delegated writer route retained from the task plan because the client contract and its tests are separate non-trivial files; no additional exploration was needed beyond the client, focused tests, and known callers.
+  - TDD evidence: RED — `PYTHONPATH=python python3 -m unittest python.tests.test_task_core -v` failed at test-module import with `ImportError: cannot import name 'ModelInfo'`, confirming the new contract was absent. GREEN — the same command passed 20/20 tests after implementation. Refactor — hardened version parsing against blank, over-128-character, and control-character values; focused tests remained green.
+  - Verification: `PYTHONPATH=python python3 -m unittest python.tests.test_task_core -v` — 20 passed; `PYTHONPATH=python python3 -m unittest discover -s python/tests -v` — 50 run, 1 skipped, all others passed; `git diff --check` — passed; `git -C /Volumes/KINGSTON/pudu-pycon-2026/transformers status --porcelain` — empty. Runtime harness: N/A; all client requests are covered with mocked HTTP responses and no Ollama server/model is required.
+  - Rollback boundary: revert only this work-unit commit to remove the client API additions, validation, tests, and this tracker entry; no unrelated behavior or fixture files are included.
+  - Forecast/actual: 140–240 authored lines / 129 authored additions and deletions combined across client, tests, and tracker.
 
 - [ ] **PTD-006 — Add the interactive reproducible Ollama demo**
   - Route: delegated (new orchestration, validation, persistence, CLI UX, and tests).
@@ -94,7 +99,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | PTD-002 | Complete | `27448a6` | Focused 3/3; full Python suite 45 run, 1 skipped; JSON and Markdown reproduced byte-identically and matched snapshots; 99.55% byte reduction independently recalculated | RDD disabled/unmanaged; untracked assessment treated as high and independently verified PASS |
 | PTD-003 | Complete | `ecce5f2`, `a1f2f5e` | Tests 11/11; typecheck; two compositions discovered; 1920×1080/30 fps/90 s H.264 render; VTT/scene alignment; visual inspection; SHA-256 `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3` | RDD disabled/unmanaged; high/unassessable candidate independently verified PASS; delivered as 140-line and 75-line stacked units |
 | PTD-004 | Complete | `2e48c82` | Runbook link audit 15/15; Python suite 45 run, 1 skipped; reports reproduce exactly; Remotion 11/11, typecheck, two compositions; MP4 checksum/ffprobe; fixture clean | Independent verifier unavailable because the delegated account hit its usage limit; parent completed structural readback and all applicable deterministic checks |
-| PTD-005 | Pending | — | TDD not started | Awaiting implementation |
+| PTD-005 | Complete | this work-unit commit | RED import failure; GREEN focused 20/20; full suite 50 run, 1 skipped; diff check clean; external fixture porcelain empty | RDD state not queried by executor; no review claim made |
 | PTD-006 | Pending | — | TDD not started | Awaiting PTD-005 |
 | PTD-007 | Pending | — | Not started | Awaiting executable workflow |
 

@@ -7,7 +7,7 @@ from urllib.error import URLError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from pudu_agent.model_client import OllamaClient, OllamaError, validate_endpoint
+from pudu_agent.model_client import ModelInfo, OllamaClient, OllamaError, validate_endpoint
 from pudu_agent.task import Task, TaskKind
 
 
@@ -79,6 +79,33 @@ class OllamaClientTests(unittest.TestCase):
         self.assertIsNone(self.client.select_model())
 
     @mock.patch("pudu_agent.model_client.urlopen")
+    def test_model_details_preserve_tag_and_digest_while_list_models_stays_compatible(self, urlopen):
+        payload = {"models": [{"name": "llama3:latest", "model": "llama3:latest", "digest": "sha256:abc"}]}
+        urlopen.return_value = self.response(payload)
+        self.assertEqual(self.client.list_model_details(), [ModelInfo(tag="llama3:latest", digest="sha256:abc")])
+        urlopen.return_value = self.response(payload)
+        self.assertEqual(self.client.list_models(), ["llama3:latest"])
+
+    @mock.patch("pudu_agent.model_client.urlopen")
+    def test_model_details_accept_missing_digest_but_reject_malformed_digest(self, urlopen):
+        urlopen.return_value = self.response({"models": [{"name": "llama3:latest"}]})
+        self.assertEqual(self.client.list_model_details(), [ModelInfo(tag="llama3:latest", digest=None)])
+        urlopen.return_value = self.response({"models": [{"name": "llama3:latest", "digest": 7}]})
+        with self.assertRaises(OllamaError):
+            self.client.list_model_details()
+
+    @mock.patch("pudu_agent.model_client.urlopen")
+    def test_server_version_is_validated(self, urlopen):
+        urlopen.return_value = self.response({"version": "0.6.8"})
+        self.assertEqual(self.client.server_version(), "0.6.8")
+        self.assertEqual(urlopen.call_args.args[0].full_url, "http://127.0.0.1:11434/api/version")
+        for payload in ({}, {"version": ""}, {"version": " "}, {"version": 7},
+                        {"version": "v" * 129}, {"version": "v1\ninvalid"}):
+            urlopen.return_value = self.response(payload)
+            with self.subTest(payload=payload), self.assertRaises(OllamaError):
+                self.client.server_version()
+
+    @mock.patch("pudu_agent.model_client.urlopen")
     def test_rejects_cloud_model_tags(self, urlopen):
         urlopen.return_value = self.response({"models": [{"name": "gemma4:31b-cloud"}, {"name": "qwen:cloud"}, {"name": "llama3:latest"}]})
         self.assertEqual(self.client.list_models(), ["llama3:latest"])
@@ -132,6 +159,28 @@ class OllamaClientTests(unittest.TestCase):
         self.assertEqual((result.prompt_tokens, result.completion_tokens, result.total_tokens), (7, 5, 12))
         self.assertEqual(result.tokens_per_second, 2.5)
         self.assertEqual((result.total_duration, result.load_duration, result.eval_duration), (3_000_000_000, 1_000_000_000, 2_000_000_000))
+
+    @mock.patch("pudu_agent.model_client.urlopen")
+    def test_generate_allows_json_format_and_reproducibility_options(self, urlopen):
+        urlopen.return_value = self.response({"response": "{}"})
+        self.client.generate("llama3:latest", "prompt", format="json", options={"temperature": 0, "seed": 17})
+        request = json.loads(urlopen.call_args.args[0].data)
+        self.assertEqual(request["format"], "json")
+        self.assertEqual(request["options"], {"temperature": 0, "seed": 17})
+
+    def test_generate_rejects_invalid_format_and_options(self):
+        for kwargs in (
+            {"format": "yaml"},
+            {"format": {"type": "object"}},
+            {"options": []},
+            {"options": {"temperature": True}},
+            {"options": {"temperature": 3}},
+            {"options": {"seed": -1}},
+            {"options": {"seed": True}},
+            {"options": {"num_ctx": 4096}},
+        ):
+            with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
+                self.client.generate("llama3:latest", "prompt", **kwargs)
 
     @mock.patch("pudu_agent.model_client.urlopen", side_effect=URLError("offline"))
     def test_unavailable_ollama_becomes_domain_error(self, _urlopen):
