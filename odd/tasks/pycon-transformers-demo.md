@@ -141,7 +141,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | PTD-005 | Complete | `790abac` + `fix(ollama): harden response metadata validation` | Initial RED/GREEN 20/20; correction RED reproduced both verifier findings; correction GREEN focused 21/21, full suite 51 run, 1 skipped; diff check clean; external fixture porcelain empty | Initial RDD state not queried by executor; parent verifier found two P2s, both corrected in a separate scoped commit |
 | PTD-006 | Complete | `9cfc869`, `881393f` | Original RED/GREEN; P1 confinement RED reproduced arbitrary and symlink writes, then focused GREEN 10/10; full suite 61 run, 1 skipped; fixture clean; diff check passed | Writer did not query RDD state; parent to assess/route correction commit |
 | PTD-007 | Complete | `8bd2d24`, `589540b` | CLI help; focused 10/10; full 61 run, 1 skipped; added links/paths; diff check; fixture clean. Live Ollama unavailable (client 0.30.11; no local server/model verified; no live inference claimed). Independent documentation correction: stale commit reference and regional imperatives fixed. | RDD disabled/unmanaged; documentation-only structural readback |
-| PTD-008 | Pending | — | TDD not started; shared server local-only status unconfirmed | Awaiting isolated endpoint implementation and live rehearsal |
+| PTD-008 | Pending live acceptance | `2b96299`, `6e5d735` | Implementation and strict TDD complete: focused 11/11; full suite 62 run, 1 skipped; CLI help, docs command audit, diff check, and fixture clean passed. No live Ollama rehearsal claimed. | Offline fake-client evidence complete; live rehearsal against separate local-only endpoint remains pending |
 
 ## Capability boundary
 

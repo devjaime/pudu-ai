@@ -133,7 +133,7 @@ Medición registrada: **3.682 / 816.502 bytes**, 13 archivos citados, **99,55 %*
 
 El guion de nueve minutos anterior sigue siendo el demo determinista completo. Si ya hay un servidor Ollama local activo y un modelo instalado, se puede sumar esta capa al bloque de demostración; no instale ni descargue nada durante la charla. Si no están disponibles, conserve los snapshots `MODEL_ANALYSIS: NOT_RUN` y el MP4 como fallback.
 
-### Preflight: solo lectura
+### Preparar un servidor local-only separado
 
 Para evitar reconfigurar o detener el daemon compartido, confirme que el puerto `11435` esté libre y ejecute en una terminal separada un servidor Ollama local-only:
 
