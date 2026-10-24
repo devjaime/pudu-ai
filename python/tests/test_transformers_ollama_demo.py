@@ -1,11 +1,15 @@
 import hashlib
+import io
 import json
 import tempfile
 import unittest
+import uuid
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
 
 from pudu_agent.model_client import GenerateResult, ModelInfo, OllamaError
+import pudu_agent.transformers_ollama_demo as demo_module
 from pudu_agent.transformers_ollama_demo import main
 
 
@@ -40,11 +44,12 @@ class TransformersOllamaDemoTests(unittest.TestCase):
         evidence = evidence or {"schema": "pudu.transformers-evidence/v1", "repository": {
             "name": "huggingface/transformers", "tag": "v5.20.2",
             "revision": "18329f1065382e54db698e242cf98bd3f3e5a766"}, "evidence": {"definition": []}}
-        with patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(temp.name)), \
+        with patch("pudu_agent.transformers_ollama_demo.PROJECT_ROOT", Path(temp.name)), \
+             patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(temp.name)), \
              patch("pudu_agent.transformers_ollama_demo.collect_evidence", return_value=evidence) as collect, \
              patch("builtins.input", return_value=input_value), \
              patch("sys.stdout.write") as output:
-            status = main([*args, "--repository", temp.name, "--manifest-dir", str(Path(temp.name) / ".pudu-ai")],
+            status = main([*args, "--repository", temp.name],
                           client_factory=lambda: client, input_fn=lambda _: input_value)
         return status, client, collect, "".join(call.args[0] for call in output.call_args_list), Path(temp.name)
 
@@ -56,7 +61,7 @@ class TransformersOllamaDemoTests(unittest.TestCase):
         self.assertEqual(generate_call[1], "qwen2.5:7b")
         self.assertEqual(generate_call[2], {"format": "json", "options": {"temperature": 0, "seed": 20260520}})
         self.assertIn('"findings": []', output)
-        manifest = json.loads(next((root / ".pudu-ai").rglob("*.json")).read_text())
+        manifest = json.loads(next((root / ".pudu-ai" / "pycon-demo").glob("*.json")).read_text())
         self.assertEqual(manifest["model"], {"tag": "qwen2.5:7b", "digest": "sha256:abc"})
         self.assertEqual(manifest["validation"], {"status": "structurally_valid", "factual_correctness_checked": False})
         self.assertNotIn("prompt_text", manifest)
@@ -92,13 +97,51 @@ class TransformersOllamaDemoTests(unittest.TestCase):
         client = FakeClient()
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
-        with patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(temp.name) / "expected"), \
+        with patch("pudu_agent.transformers_ollama_demo.PROJECT_ROOT", Path(temp.name)), \
+             patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(temp.name) / "expected"), \
              patch("pudu_agent.transformers_ollama_demo.collect_evidence") as collect:
-            status = main(["--model", "qwen2.5:7b", "--repository", temp.name,
-                           "--manifest-dir", str(Path(temp.name) / ".pudu-ai")], client_factory=lambda: client)
+            status = main(["--model", "qwen2.5:7b", "--repository", temp.name], client_factory=lambda: client)
         self.assertNotEqual(status, 0)
         collect.assert_not_called()
         self.assertEqual(client.calls, [])
+
+    def test_cli_rejects_arbitrary_manifest_path_without_creating_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            arbitrary = Path(tmp) / "outside"
+            errors = io.StringIO()
+            evidence = {"schema": "pudu.transformers-evidence/v1", "repository": {
+                "name": "huggingface/transformers", "tag": "v5.20.2",
+                "revision": "18329f1065382e54db698e242cf98bd3f3e5a766"}, "evidence": {"definition": []}}
+            with patch("pudu_agent.transformers_ollama_demo.PROJECT_ROOT", Path(tmp)), \
+                 patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(tmp)), \
+                 patch("pudu_agent.transformers_ollama_demo.collect_evidence", return_value=evidence), \
+                 redirect_stderr(errors):
+                try:
+                    status = main(["--model", "qwen2.5:7b", "--repository", tmp,
+                                   "--manifest-dir", str(arbitrary)], client_factory=FakeClient)
+                except SystemExit as exc:
+                    status = exc.code
+            self.assertFalse(arbitrary.exists())
+            self.assertNotEqual(status, 0)
+
+    def test_manifest_writer_rejects_symlink_directory_without_writing_outside(self):
+        for symlink_component in (".pudu-ai", "pycon-demo"):
+            with self.subTest(symlink_component=symlink_component), tempfile.TemporaryDirectory() as tmp:
+                project = Path(tmp) / "project"
+                outside = Path(tmp) / "outside"
+                project.mkdir()
+                outside.mkdir()
+                if symlink_component == ".pudu-ai":
+                    (project / ".pudu-ai").symlink_to(outside, target_is_directory=True)
+                else:
+                    ai_dir = project / ".pudu-ai"
+                    ai_dir.mkdir()
+                    (ai_dir / "pycon-demo").symlink_to(outside, target_is_directory=True)
+                manifest = {"run_id": str(uuid.uuid4()), "secret": "redacted"}
+                with patch.object(demo_module, "PROJECT_ROOT", project):
+                    with self.assertRaises((OSError, ValueError)):
+                        demo_module._write_manifest(project / ".pudu-ai" / "pycon-demo", manifest)
+                self.assertEqual(list(outside.iterdir()), [])
 
     def test_invalid_json_and_model_identity_are_rejected(self):
         client = FakeClient(result=GenerateResult("qwen2.5:7b", "not json"))

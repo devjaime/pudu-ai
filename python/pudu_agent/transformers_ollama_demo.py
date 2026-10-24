@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import stat
 import sys
 import time
 import uuid
@@ -26,6 +27,8 @@ GENERATION_OPTIONS = {"temperature": 0, "seed": 20260520}
 MAX_EVIDENCE_BYTES = 64 * 1024
 MAX_RESPONSE_BYTES = 64 * 1024
 ASSET_ROOT = Path(__file__).resolve().parents[2] / "docs/demos/pycon-2026/ollama"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+MANIFEST_RELATIVE = Path(".pudu-ai") / "pycon-demo"
 
 
 def _canonical_bytes(value):
@@ -103,21 +106,72 @@ def _observed_metrics(result):
     return {field: getattr(result, field) for field in fields if getattr(result, field) is not None}
 
 
-def _write_manifest(directory, manifest):
-    directory.mkdir(parents=True, exist_ok=True)
-    destination = directory / f"{manifest['run_id']}.json"
-    temporary = destination.with_suffix(".json.tmp")
+def _open_manifest_directory():
+    if not hasattr(os, "O_NOFOLLOW") or not hasattr(os, "O_DIRECTORY"):
+        raise OSError("platform cannot safely enforce manifest path confinement")
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    current_fd = os.open(PROJECT_ROOT, flags)
     try:
-        with temporary.open("x", encoding="utf-8") as stream:
+        for component in MANIFEST_RELATIVE.parts:
+            try:
+                info = os.stat(component, dir_fd=current_fd, follow_symlinks=False)
+            except FileNotFoundError:
+                try:
+                    os.mkdir(component, mode=0o700, dir_fd=current_fd)
+                except FileExistsError:
+                    pass
+                info = os.stat(component, dir_fd=current_fd, follow_symlinks=False)
+            if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+                raise ValueError("manifest path contains a symlink or non-directory component")
+            next_fd = os.open(component, flags, dir_fd=current_fd)
+            os.close(current_fd)
+            current_fd = next_fd
+        result_fd = current_fd
+        current_fd = -1
+        return result_fd
+    finally:
+        if current_fd != -1:
+            os.close(current_fd)
+
+
+def _write_manifest(directory, manifest):
+    expected_directory = PROJECT_ROOT / MANIFEST_RELATIVE
+    if Path(directory) != expected_directory:
+        raise ValueError("manifest directory is fixed to this project's ignored .pudu-ai/pycon-demo")
+    run_id = manifest.get("run_id") if isinstance(manifest, dict) else None
+    try:
+        if str(uuid.UUID(run_id)) != run_id:
+            raise ValueError
+    except (ValueError, TypeError, AttributeError):
+        raise ValueError("manifest run_id must be a canonical UUID") from None
+
+    directory_fd = _open_manifest_directory()
+    destination = f"{run_id}.json"
+    temporary = f".{run_id}.json.tmp"
+    descriptor = None
+    temporary_created = False
+    try:
+        descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600,
+                             dir_fd=directory_fd)
+        temporary_created = True
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            descriptor = None
             json.dump(manifest, stream, ensure_ascii=False, indent=2, sort_keys=True)
             stream.write("\n")
             stream.flush()
             os.fsync(stream.fileno())
-        os.replace(temporary, destination)
+        os.replace(temporary, destination, src_dir_fd=directory_fd, dst_dir_fd=directory_fd)
+        temporary_created = False
     finally:
-        if temporary.exists():
-            temporary.unlink()
-    return destination
+        if descriptor is not None:
+            os.close(descriptor)
+        if temporary_created:
+            try:
+                os.unlink(temporary, dir_fd=directory_fd)
+            except FileNotFoundError:
+                pass
+        os.close(directory_fd)
+    return expected_directory / destination
 
 
 def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
@@ -164,7 +218,7 @@ def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
         "validation": {"status": "structurally_valid", "factual_correctness_checked": False},
         "response": {"sha256": _sha256(response_bytes), "bytes": len(response_bytes)},
     }
-    manifest_path = _write_manifest(args.manifest_dir, manifest)
+    manifest_path = _write_manifest(PROJECT_ROOT / MANIFEST_RELATIVE, manifest)
     return response, manifest_path
 
 
@@ -174,7 +228,6 @@ def main(argv=None, *, client_factory=OllamaClient, input_fn=input):
     group.add_argument("--model", help="exact installed model tag required for automatic mode")
     group.add_argument("--interactive", action="store_true", help="select an installed model by number")
     parser.add_argument("--repository", type=Path, default=FIXTURE_ROOT, help="exact pinned Transformers fixture root")
-    parser.add_argument("--manifest-dir", type=Path, default=Path(".pudu-ai/pycon-demo"), help="redacted manifest directory")
     args = parser.parse_args(argv)
     try:
         response, manifest_path = run_demo(args, client_factory=client_factory, input_fn=input_fn)
