@@ -6,7 +6,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "compositions": "remotion compositions src/index.tsx",
-    "render": "remotion render src/index.tsx PyConAgentLab ../pycon-2026-agent-lab-demo.mp4 --codec=h264 --overwrite --browser-executable='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'"
+    "render": "remotion render src/index.tsx PyConAgentLab ../pycon-2026-agent-lab-demo.mp4 --codec=h264 --overwrite --browser-executable='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'",
+    "render-transformers": "remotion render src/index.tsx PyConTransformersDemo ../pycon-2026-transformers-demo.mp4 --codec=h264 --overwrite"
   },
   "dependencies": {
     "@remotion/cli": "4.0.537",
