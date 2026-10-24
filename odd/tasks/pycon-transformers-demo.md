@@ -76,6 +76,13 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 
 Pudu can locate literal references, inspect Python AST structure, extract direct edges, and query candidate relationships. It cannot yet prove complete runtime impact across dynamic registries, late binding, generated mappings, or native extensions. The presentation must keep those boundaries visible rather than hiding them behind an LLM summary.
 
+## External synchronization
+
+- Kingston Pudu worktree fast-forwarded through `47157ab` on `codex/pycon-transformers-demo`.
+- Pinned Transformers fixture remains clean at `18329f1065382e54db698e242cf98bd3f3e5a766` (`v5.20.2`).
+- Ignored MP4 copied to the external worktree and verified as SHA-256 `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3`.
+- No branch was pushed and no pull request was opened.
+
 ## Next step
 
-Fast-forward the verified branch and copy the ignored MP4 into the external Kingston demo workspace, then record final synchronization evidence.
+Rehearse with `docs/demos/pycon-2026/DEMO_RUNBOOK.es.md`; push or open the stacked pull requests only after explicit authorization.
