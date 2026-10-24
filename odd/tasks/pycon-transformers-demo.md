@@ -4,7 +4,7 @@ Build a reproducible PyCon 2026 demonstration that investigates the impact of ch
 
 ## Objective
 
-Produce an evidence-backed demo, a rendered Remotion video, and a Spanish runbook that can be presented live without network access, model downloads, or modifications to the target repository.
+Produce an evidence-backed demo, a rendered Remotion video, an interactive reproducible Ollama execution, and a Spanish runbook that can be presented live without network access, model downloads, or modifications to the target repository.
 
 ## Problem
 
@@ -18,7 +18,8 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 
 - Edit only this Pudu-AI worktree.
 - Treat sibling `../transformers` as read-only fixture data.
-- Do not download model weights or require GPU execution.
+- Do not download model weights or require GPU execution. Reuse only models already installed in the local Ollama runtime.
+- Treat every model response as untrusted data; never execute generated commands, patches, or tool calls.
 - Local commits are authorized; pushing and pull-request creation require a separate user decision.
 - Delegated implementation and verification are explicitly authorized by the user.
 
@@ -29,6 +30,9 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | Target fixture | `huggingface/transformers` tag `v5.20.2`, commit `18329f1065382e54db698e242cf98bd3f3e5a766` |
 | Investigation | Candidate impact of changing `GenerationMixin.generate` |
 | Evidence labels | `CONFIRMED`, `INFERRED`, or `UNRESOLVED` |
+| Ollama execution | Automatic mode requires an explicit installed model; interactive mode offers verified installed choices |
+| Reproducibility | Versioned prompt/schema, controlled options, model tag and digest, evidence hash, response hash, and measured telemetry |
+| Model boundary | Structural JSON validity is verified; factual correctness remains a separate human/tool validation step |
 | TDD | Strict; RED → GREEN → REFACTOR for executable behavior |
 | Python runner | `PYTHONPATH=python python3 -m unittest discover -s python/tests -v` |
 | Remotion checks | `npm test`, `npm run typecheck`, `npm run compositions`, then `npm run render` |
@@ -63,6 +67,25 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Acceptance: all referenced paths and commands exist; a fresh verifier reruns applicable checks; final artifacts and commit identities are recorded below.
   - Forecast: 120–200 authored lines.
 
+- [ ] **PTD-005 — Extend the Ollama client contract**
+  - Route: delegated (client behavior and tests span multiple non-trivial files).
+  - Preserve model tag and digest from `/api/tags`, capture the Ollama server version when available, and support explicit JSON formatting plus controlled generation options.
+  - Acceptance: strict TDD observes RED then GREEN; requests include only allow-listed reproducibility options; existing callers remain compatible; client tests cover malformed and missing runtime metadata.
+  - Forecast: 140–240 authored lines.
+
+- [ ] **PTD-006 — Add the interactive reproducible Ollama demo**
+  - Route: delegated (new orchestration, validation, persistence, CLI UX, and tests).
+  - Feed only the bounded deterministic Transformers evidence into a versioned prompt and JSON contract. Add interactive installed-model selection and automatic mode with an explicit model selector.
+  - Persist an atomic redacted run manifest under ignored `.pudu-ai/pycon-demo/` containing fixture, evidence, prompt/schema, model/runtime, options, telemetry, validation, and response hashes without storing full evidence or response by default.
+  - Acceptance: strict TDD observes RED then GREEN; offline/fake-client tests cover success and failures; repeated fixture preparation is byte-stable; no model output is executed or promoted to factual proof.
+  - Forecast: 260–400 authored lines.
+
+- [ ] **PTD-007 — Document and rehearse the one-command workflow**
+  - Route: delegated (cross-checks executable commands, generated manifest, and presentation narrative).
+  - Add one automatic command and one interactive command to the Spanish runbook. Preserve the existing deterministic `MODEL_ANALYSIS: NOT_RUN` snapshot as the no-model baseline and explain that live Ollama runs create separate ignored manifests.
+  - Acceptance: commands and paths exist; deterministic tests and a fake-runtime rehearsal pass; a live run is attempted only when an already-running Ollama server and installed model are available; limitations state that temperature zero and a fixed seed do not guarantee identical text across runtimes.
+  - Forecast: 100–180 authored lines.
+
 ## Progress and evidence
 
 | Task | Status | Commit | Verification | Review state |
@@ -71,6 +94,9 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | PTD-002 | Complete | `27448a6` | Focused 3/3; full Python suite 45 run, 1 skipped; JSON and Markdown reproduced byte-identically and matched snapshots; 99.55% byte reduction independently recalculated | RDD disabled/unmanaged; untracked assessment treated as high and independently verified PASS |
 | PTD-003 | Complete | `ecce5f2`, `a1f2f5e` | Tests 11/11; typecheck; two compositions discovered; 1920×1080/30 fps/90 s H.264 render; VTT/scene alignment; visual inspection; SHA-256 `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3` | RDD disabled/unmanaged; high/unassessable candidate independently verified PASS; delivered as 140-line and 75-line stacked units |
 | PTD-004 | Complete | `2e48c82` | Runbook link audit 15/15; Python suite 45 run, 1 skipped; reports reproduce exactly; Remotion 11/11, typecheck, two compositions; MP4 checksum/ffprobe; fixture clean | Independent verifier unavailable because the delegated account hit its usage limit; parent completed structural readback and all applicable deterministic checks |
+| PTD-005 | Pending | — | TDD not started | Awaiting implementation |
+| PTD-006 | Pending | — | TDD not started | Awaiting PTD-005 |
+| PTD-007 | Pending | — | Not started | Awaiting executable workflow |
 
 ## Capability boundary
 
@@ -85,4 +111,4 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## Next step
 
-Rehearse with `docs/demos/pycon-2026/DEMO_RUNBOOK.es.md`; push or open the stacked pull requests only after explicit authorization.
+Implement PTD-005 with strict TDD, then continue through the Ollama demo and runbook work units. Push or pull-request creation still requires explicit authorization.
