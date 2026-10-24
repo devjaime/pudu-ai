@@ -131,7 +131,7 @@ Medición registrada: **3.682 / 816.502 bytes**, 13 archivos citados, **99,55 %*
 
 ## Capa opcional de Ollama — 3 minutos, sin descargas
 
-El guion de nueve minutos anterior sigue siendo el demo determinista completo. Si ya hay un servidor Ollama local activo y un modelo instalado, se puede sumar esta capa al bloque de demostración; no instales ni descargues nada durante la charla. Si no están disponibles, conserva los snapshots `MODEL_ANALYSIS: NOT_RUN` y el MP4 como fallback.
+El guion de nueve minutos anterior sigue siendo el demo determinista completo. Si ya hay un servidor Ollama local activo y un modelo instalado, se puede sumar esta capa al bloque de demostración; no instale ni descargue nada durante la charla. Si no están disponibles, conserve los snapshots `MODEL_ANALYSIS: NOT_RUN` y el MP4 como fallback.
 
 ### Preflight: solo lectura
 
@@ -142,7 +142,7 @@ ollama --version
 ollama list
 ```
 
-`ollama list` muestra los nombres/tags locales en la columna `NAME` y un ID de digest abreviado. Copiá el `NAME` exacto para el modo automático. El modo interactivo consulta los metadatos locales y muestra cada tag elegible junto con su digest completo antes de elegir. La ejecución consulta además `/api/version`; el manifiesto registra esa versión del servidor, mientras `ollama --version` identifica el cliente CLI. No uses tags `:cloud` ni ejecutes `ollama pull`.
+`ollama list` muestra los nombres/tags locales en la columna `NAME` y un ID de digest abreviado. Copie el `NAME` exacto para el modo automático. El modo interactivo consulta los metadatos locales y muestra cada tag elegible junto con su digest completo antes de elegir. La ejecución consulta además `/api/version`; el manifiesto registra esa versión del servidor, mientras `ollama --version` identifica el cliente CLI. No utilice tags `:cloud` ni ejecute `ollama pull`.
 
 ### Ejecutar (elegir una modalidad)
 
@@ -166,7 +166,7 @@ El manifiesto redactado se escribe atómicamente en `.pudu-ai/pycon-demo/` (igno
 
 El cliente usa loopback (`127.0.0.1`) y rechaza tags cloud; eso define el límite de transporte de esta demo, no una garantía general sobre la configuración de todo servidor Ollama. El texto del modelo es dato no confiable: JSON válido no equivale a hechos correctos, y la herramienta nunca ejecuta comandos, parches ni llamadas sugeridas por el modelo.
 
-Si el servidor no está activo, no hay modelo local elegible, el tag no coincide exactamente, el fixture falla su verificación o la respuesta no cumple el contrato, el proceso informa el error y termina con código distinto de cero; no crea un manifiesto de éxito. No inicies ni detengas servicios ni descargues modelos para rescatar la charla. Volvé a los informes deterministas y al video previamente verificado (`pycon-2026-transformers-demo.mp4`); confirma antes que el MP4 esté disponible en el equipo de presentación: este checkout de trabajo no incluye el archivo ignorado. La limitación debe seguir nombrándose como `MODEL_ANALYSIS: NOT_RUN` en esos snapshots.
+Si el servidor no está activo, no hay modelo local elegible, el tag no coincide exactamente, el fixture falla su verificación o la respuesta no cumple el contrato, el proceso informa el error y termina con código distinto de cero; no crea un manifiesto de éxito. No inicie ni detenga servicios ni descargue modelos para rescatar la charla. Vuelva a los informes deterministas y al video previamente verificado (`pycon-2026-transformers-demo.mp4`); confirme antes que el MP4 esté disponible en el equipo de presentación: este checkout de trabajo no incluye el archivo ignorado. La limitación debe seguir nombrándose como `MODEL_ANALYSIS: NOT_RUN` en esos snapshots.
 
 La secuencia combinada conserva los nueve minutos deterministas y añade, si el preflight ya está disponible, 3 minutos: 0:00–0:30 mirar versión/lista; 0:30–1:00 ejecutar una modalidad; 1:00–2:00 leer etapas/salida y el manifiesto; 2:00–3:00 explicar el límite de confianza y volver al fallback si algo falla.
 
