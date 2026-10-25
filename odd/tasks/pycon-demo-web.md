@@ -76,7 +76,7 @@ The current CLI, runbook, manifest, and video are individually reproducible, but
 | PDW-002 | Complete (review correction applied) | `b0a0407` + `05807e1` + tracker evidence follow-ups | Latest: 22 focused UI/API tests, 2 Node state tests, 15 demo tests, full suite 88 passed (1 expected live-Ollama skip); syntax, CLI help, diff check and fixture cleanliness passed | RDD clone-local disabled/unmanaged |
 | PDW-003 | Complete | `bdb4d09` + `3a59027` + `be85550` + final evidence follow-up | 29 focused tests, 2 Node tests, full suite 95 passed (1 expected live-Ollama skip), desktop/mobile browser QA, clean console, and one completed isolated `qwen3:8b` run | RDD clone-local disabled/unmanaged |
 | PDW-004 | Complete | `ad8dd8d` | Value-first contract, 8 UI tests, full 97-test suite (1 expected live-Ollama skip), 2 Node tests, JavaScript/diff checks, and desktop/mobile browser QA | RDD clone-local disabled/unmanaged |
-| PDW-005 | Implemented; visual QA pending | Pending work-unit commit | 9 UI contracts, full 98-test suite (1 expected live-Ollama skip), 2 Node tests, JavaScript/diff checks, and clean pinned fixture | RDD clone-local disabled/unmanaged |
+| PDW-005 | Implemented; visual QA pending | `7d33e80` | 9 UI contracts, full 98-test suite (1 expected live-Ollama skip), 2 Node tests, JavaScript/diff checks, and clean pinned fixture | RDD clone-local disabled/unmanaged |
 
 ## Route evidence
 
