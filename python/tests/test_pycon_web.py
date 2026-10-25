@@ -1,7 +1,11 @@
 import json
+import os
 import threading
+import tempfile
 import time
 import unittest
+from pathlib import Path
+import uuid
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -24,6 +28,7 @@ class WebApiTests(unittest.TestCase):
         self.release_runner = threading.Event()
         self.block_runner = False
         self.runner_error = None
+        self.manifest_id = str(uuid.uuid4())
         self.runner_response = {"schema": "pudu.transformers-ollama-analysis/v1", "summary": "bounded result",
                                 "findings": []}
 
@@ -36,10 +41,15 @@ class WebApiTests(unittest.TestCase):
             if progress_callback:
                 progress_callback("evidence", "Evidence collected")
                 progress_callback("generation", "Generation completed")
-            return self.runner_response, ".pudu-ai/pycon-demo/demo.json"
+            return self.runner_response, f".pudu-ai/pycon-demo/{self.manifest_id}.json"
 
+        self.root = tempfile.TemporaryDirectory()
+        self.addCleanup(self.root.cleanup)
+        self.project_root = Path(self.root.name)
+        self._write_assets()
         self.service = DemoService(client_factory=lambda endpoint, **kwargs: self.client,
                                     runner=runner, fixture_exists=lambda: True)
+        self.service.project_root = self.project_root
         self.server = create_server(self.service)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
@@ -50,6 +60,23 @@ class WebApiTests(unittest.TestCase):
         self.server.shutdown()
         self.server.server_close()
         self.thread.join(timeout=2)
+
+    def _write_assets(self):
+        assets = {
+            "docs/demos/pycon-2026/evidence/report.json": '{"schema":"pudu.report/v1"}',
+            "docs/demos/pycon-2026/evidence/report.md": "# Deterministic report\n",
+            "docs/demos/pycon-2026/DEMO_RUNBOOK.es.md": "# Guía de demostración\n",
+            "docs/demos/pycon-2026/transformers-demo.captions.es.vtt": "WEBVTT\n",
+            "docs/demos/pycon-2026/pycon-2026-transformers-demo.mp4": "fake-video",
+        }
+        for relative, content in assets.items():
+            path = self.project_root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+        manifest = self.project_root / ".pudu-ai" / "pycon-demo" / f"{self.manifest_id}.json"
+        manifest.parent.mkdir(parents=True)
+        manifest.write_text('{"model":{"tag":"local"},"api_key":"example-secret",'
+                            '"details":"/Volumes/KINGSTON/private"}', encoding="utf-8")
 
     def request(self, path, method="GET", body=None, headers=None):
         payload = None if body is None else json.dumps(body).encode()
@@ -127,13 +154,87 @@ class WebApiTests(unittest.TestCase):
         failed = self.service.get_run(run_id)
         self.assertEqual(failed["status"], "failed")
         self.assertLessEqual(len(failed["error"]), 400)
+        exposed = json.dumps({"status": failed, "events": self.service.get_events(run_id)})
+        self.assertNotIn("injected failure", exposed)
+        self.assertNotIn("API_KEY=", exposed)
         self.runner_error = None
         self.runner_response = {"summary": "x" * (16 * 1024), "findings": []}
         second = json.load(self.request("/api/runs", "POST", {"model": "qwen2.5:7b", "digest": "sha256:abc"}))["run_id"]
         deadline = time.monotonic() + 1
         while self.service.get_run(second)["status"] == "queued" and time.monotonic() < deadline:
             time.sleep(0.005)
-        self.assertEqual(self.service.get_run(second)["status"], "failed")
+        bounded = self.service.get_run(second)
+        self.assertEqual(bounded["status"], "completed")
+        self.assertLessEqual(len(json.dumps(bounded).encode("utf-8")), 16 * 1024)
+
+    def test_model_output_is_redacted_and_projected_recursively(self):
+        self.runner_response = {
+            "schema": "pudu.transformers-ollama-analysis/v1",
+            "summary": "WORKSPACE_API_KEY=example-secret /Volumes/KINGSTON/private C:\\Users\\Jane\\private.txt " + "z" * 5000,
+            "findings": [{"label": "UNRESOLVED", "claim": "Authorization: Bearer bearer-secret",
+                          "rationale": "Nested secret", "evidence_refs": ["python/pudu_agent/demo.py:23",
+                          "../secret", "/private/path"]}],
+            "nested": {"API_KEY": "nested-secret", "deep": {"message": "token=deep-secret"}},
+        }
+        run_id = json.load(self.request("/api/runs", "POST", {"model": "qwen2.5:7b", "digest": "sha256:abc"}))[
+            "run_id"]
+        deadline = time.monotonic() + 1
+        while self.service.get_run(run_id)["status"] == "queued" and time.monotonic() < deadline:
+            time.sleep(0.005)
+        body = json.dumps(self.service.get_run(run_id), ensure_ascii=False)
+        for secret in ("example-secret", "KINGSTON/private", "C:\\\\Users", "Jane\\\\private.txt",
+                       "bearer-secret", "nested-secret", "deep-secret"):
+            self.assertNotIn(secret, body)
+        self.assertIn("python/pudu_agent/demo.py:23", body)
+        self.assertNotIn("../secret", body)
+        self.assertLessEqual(len(body.encode("utf-8")), 16 * 1024)
+
+    def test_exception_text_is_not_exposed_in_status_or_events(self):
+        self.runner_error = RuntimeError("API_KEY=runner-secret C:\\private\\credential.txt")
+        run_id = json.load(self.request("/api/runs", "POST", {"model": "qwen2.5:7b", "digest": "sha256:abc"}))[
+            "run_id"]
+        deadline = time.monotonic() + 1
+        while self.service.get_run(run_id)["status"] == "queued" and time.monotonic() < deadline:
+            time.sleep(0.005)
+        payload = json.dumps({"status": self.service.get_run(run_id), "events": self.service.get_events(run_id)})
+        self.assertNotIn("runner-secret", payload)
+        self.assertNotIn("credential.txt", payload)
+        self.assertEqual(self.service.get_run(run_id)["error"], "Analysis failed.")
+
+    def test_manifest_route_is_uuid_confined_and_redacted(self):
+        response = json.load(self.request(f"/api/manifests/{self.manifest_id}"))
+        body = json.dumps(response)
+        self.assertNotIn("example-secret", body)
+        self.assertNotIn("/Volumes/KINGSTON/private", body)
+        with self.assertRaises(HTTPError) as raised:
+            self.request("/api/manifests/../secret")
+        self.assertEqual(raised.exception.code, 404)
+        with self.assertRaises(HTTPError):
+            self.request("/api/manifests/not-a-uuid")
+
+    def test_manifest_route_rejects_symlinks_and_oversized_files(self):
+        manifest_dir = self.project_root / ".pudu-ai" / "pycon-demo"
+        (manifest_dir / f"{self.manifest_id}.json").unlink()
+        outside = self.project_root / "outside.json"
+        outside.write_text('{"secret":"outside"}', encoding="utf-8")
+        (manifest_dir / f"{self.manifest_id}.json").symlink_to(outside)
+        with self.assertRaises(HTTPError):
+            self.request(f"/api/manifests/{self.manifest_id}")
+        (manifest_dir / f"{self.manifest_id}.json").unlink()
+        (manifest_dir / f"{self.manifest_id}.json").write_text("x" * (64 * 1024 + 1), encoding="utf-8")
+        with self.assertRaises(HTTPError):
+            self.request(f"/api/manifests/{self.manifest_id}")
+
+    def test_presentation_asset_routes_use_only_the_fixed_allowlist(self):
+        routes = ("report.json", "report.md", "runbook.es.md", "captions.es.vtt", "video.mp4")
+        for route in routes:
+            with self.subTest(route=route):
+                response = self.request(f"/api/presentation/{route}")
+                self.assertTrue(response.headers.get_content_type())
+                self.assertGreater(len(response.read()), 0)
+        for route in ("../../etc/passwd", "unknown.txt", "report.json/../../secret"):
+            with self.subTest(route=route), self.assertRaises(HTTPError):
+                self.request(f"/api/presentation/{route}")
 
     def test_start_rejects_unknown_fields_and_bad_json(self):
         with self.assertRaises(HTTPError):
