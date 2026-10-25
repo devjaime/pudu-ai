@@ -69,7 +69,7 @@ The current CLI, runbook, manifest, and video are individually reproducible, but
 | PDW-001 | Complete (hardened) | `91163e7adac344c908437abea8fa35a615da20d5` + `b1306785164a5309da74bf945f0c5d6ac875fd3d` + `ab5b688f90b2d8899f053e62880e3eefdf83d6a1` | Path-redaction RED reproduced and GREEN/full verification recorded below; this tracker update is the path-correction task-evidence follow-up | RDD disabled/unmanaged |
 | PDW-002 | Complete (review correction applied) | `b0a0407` + `05807e1` + tracker evidence follow-ups | Latest: 22 focused UI/API tests, 2 Node state tests, 15 demo tests, full suite 88 passed (1 expected live-Ollama skip); syntax, CLI help, diff check and fixture cleanliness passed | RDD clone-local disabled/unmanaged |
 | PDW-003 | Complete | `bdb4d09` + `3a59027` + `be85550` + final evidence follow-up | 29 focused tests, 2 Node tests, full suite 95 passed (1 expected live-Ollama skip), desktop/mobile browser QA, clean console, and one completed isolated `qwen3:8b` run | RDD clone-local disabled/unmanaged |
-| PDW-004 | Complete | Pending work-unit commit | Value-first contract, 8 UI tests, full 97-test suite (1 expected live-Ollama skip), 2 Node tests, JavaScript/diff checks, and desktop/mobile browser QA | RDD clone-local disabled/unmanaged |
+| PDW-004 | Complete | `ad8dd8d` | Value-first contract, 8 UI tests, full 97-test suite (1 expected live-Ollama skip), 2 Node tests, JavaScript/diff checks, and desktop/mobile browser QA | RDD clone-local disabled/unmanaged |
 
 ## Route evidence
 
@@ -128,7 +128,7 @@ Repository exploration required more than four files and found no existing Pytho
 - **Honest impact boundary:** the page contrasts the observed unsupported “600+” model claim with 8 bounded inheritance candidates, 1 lexical caller, and 8 lexical test references. It presents 3,682 metadata bytes versus 816,502 cited-file bytes (99.55% smaller by bytes) without claiming token savings, semantic equivalence, or complete runtime impact.
 - **TDD:** RED — the value-first presentation contract failed before the impact section existed. GREEN — 8 focused UI tests pass after adding the narrative and a mobile regression. REFACTOR — browser QA exposed report-grid and long-identifier overflow at 390 px; `minmax(0, 1fr)` and bounded wrapping removed horizontal overflow.
 - **Verification:** full Python suite — PASS, 97 tests with 1 expected live-Ollama skip; Node run-state suite — PASS, 2 tests; JavaScript syntax — PASS; `git diff --check` — PASS. Desktop QA confirmed the value section precedes method, viewport width equals document width, and the browser console has no warnings or errors. Mobile QA at `390x844` confirmed all impact/report cards fit and document `scrollWidth` equals 390 px.
-- **Delivery state:** local work-unit commit pending at tracker update time. RDD remains clone-locally disabled/unmanaged. No push or pull request was performed.
+- **Work-unit commit:** `ad8dd8d` (`feat(pycon): lead demo with change impact`). Revert this commit to restore the previous method-first narrative, UI contract, and responsive behavior. RDD remained clone-locally disabled/unmanaged; no push or pull request was performed.
 
 ## Next step
 
