@@ -160,7 +160,7 @@ Abra `http://127.0.0.1:8765` en el navegador. La página carga el informe y sus 
 
 1. En **Evidencia determinista**, recorra las etapas del informe: identidad `VERIFIED`; recolección acotada de AST e informe `COMPLETED`; `RUNTIME_TESTS` y el análisis del modelo del snapshot como `NOT_RUN`.
 2. En el panel de análisis local, pulse **Actualizar modelos**. El preflight debe indicar disponibilidad y el selector debe mostrar tags instalados con sus digests; el servidor revalida la identidad exacta antes de aceptar la corrida.
-3. Seleccione un modelo de esa lista y pulse **Iniciar análisis local**. La interfaz muestra eventos observados (recolección de evidencia, verificación de modelo/servidor, generación y validación estructural), estado, resumen y hallazgos proyectados/redactados. Una respuesta estructuralmente válida no demuestra que sus afirmaciones sean ciertas.
+3. Seleccione un modelo de esa lista y pulse **Iniciar una corrida**. La interfaz muestra eventos observados (recolección de evidencia, verificación de modelo/servidor, generación y validación estructural), estado, resumen y hallazgos proyectados/redactados. Una respuesta estructuralmente válida no demuestra que sus afirmaciones sean ciertas.
 4. Si el sondeo llega a su horizonte sin estado terminal, la corrida queda pendiente y puede reanudarse con el mismo ID desde el control de continuación. El horizonte de polling no cancela ni termina el trabajo del servidor.
 
 En éxito, el endpoint ofrece un enlace a un manifiesto redactado dentro de `.pudu-ai/pycon-demo/`, ignorado por Git. Los snapshots deterministas no se reescriben: el estado guardado `MODEL_ANALYSIS: NOT_RUN` sigue describiendo esa captura, no la corrida viva.
