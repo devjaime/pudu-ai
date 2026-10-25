@@ -58,6 +58,7 @@ PRESENTATION_UI_ASSETS = {
     "/": ("docs/demos/pycon-2026/web/index.html", "text/html; charset=utf-8"),
     "/web/styles.css": ("docs/demos/pycon-2026/web/styles.css", "text/css; charset=utf-8"),
     "/web/app.js": ("docs/demos/pycon-2026/web/app.js", "text/javascript; charset=utf-8"),
+    "/web/run-state.mjs": ("docs/demos/pycon-2026/web/run-state.mjs", "text/javascript; charset=utf-8"),
 }
 
 

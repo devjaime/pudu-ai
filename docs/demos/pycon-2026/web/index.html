@@ -7,7 +7,7 @@
   <meta name="description" content="Una exploración interactiva y local de evidencia estática en Transformers.">
   <title>LLMs frente a repositorios gigantes — PyCon 2026</title>
   <link rel="stylesheet" href="/web/styles.css">
-  <script src="/web/app.js" defer></script>
+  <script type="module" src="/web/app.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -56,6 +56,7 @@
         <div class="field"><label for="model-select">Modelo instalado y verificado</label><select id="model-select" disabled><option value="">Actualizá el inventario para elegir</option></select></div>
         <button id="refresh-models" class="button secondary" type="button">Actualizar modelos</button>
         <button id="run-button" class="button primary" type="button" disabled>Iniciar una corrida</button>
+        <button id="resume-run" class="button secondary" type="button" hidden>Continuar consultando la corrida activa</button>
       </div>
       <div id="run-status" class="run-status" role="status" aria-live="polite">No hay una corrida activa.</div>
       <div id="run-error" class="error-box" role="alert" hidden></div>

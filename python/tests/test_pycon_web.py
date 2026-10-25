@@ -83,6 +83,7 @@ class WebApiTests(unittest.TestCase):
             "docs/demos/pycon-2026/web/index.html": "<!doctype html><title>Presentation</title>",
             "docs/demos/pycon-2026/web/styles.css": "body { color: white; }",
             "docs/demos/pycon-2026/web/app.js": "'use strict';",
+            "docs/demos/pycon-2026/web/run-state.mjs": "export {};",
             "docs/demos/pycon-2026/evidence/report.json": '{"schema":"pudu.report/v1"}',
             "docs/demos/pycon-2026/evidence/report.md": "# Deterministic report\n",
             "docs/demos/pycon-2026/DEMO_RUNBOOK.es.md": "# Guía de demostración\n",
@@ -246,7 +247,7 @@ class WebApiTests(unittest.TestCase):
             self.request(f"/api/manifests/{self.manifest_id}")
 
     def test_presentation_asset_routes_use_only_the_fixed_allowlist(self):
-        for route in ("/", "/web/styles.css", "/web/app.js"):
+        for route in ("/", "/web/styles.css", "/web/app.js", "/web/run-state.mjs"):
             with self.subTest(route=route):
                 response = self.request(route)
                 self.assertIn(response.headers.get_content_type(), {"text/html", "text/css", "text/javascript"})

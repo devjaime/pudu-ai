@@ -31,11 +31,23 @@ class Landmarks(HTMLParser):
 
 class PresentationUiTests(unittest.TestCase):
     def test_fixed_ui_routes_are_exact_and_traversal_is_not_routed(self):
-        self.assertEqual(set(PRESENTATION_UI_ASSETS), {"/", "/web/styles.css", "/web/app.js"})
+        self.assertEqual(set(PRESENTATION_UI_ASSETS), {"/", "/web/styles.css", "/web/app.js", "/web/run-state.mjs"})
         self.assertEqual(set(PRESENTATION_UI_ASSETS["/"]),
                          {"docs/demos/pycon-2026/web/index.html", "text/html; charset=utf-8"})
         self.assertNotIn("/web/../../etc/passwd", PRESENTATION_UI_ASSETS)
         self.assertNotIn("/web/other.js", PRESENTATION_UI_ASSETS)
+
+    def test_stage_status_is_not_rendered_as_evidence_or_marked_confirmed(self):
+        script = (WEB / "app.js").read_text(encoding="utf-8")
+        self.assertIn("presentStage(stage)", script)
+        self.assertIn("${stageView.label} · ${stageView.status}", script)
+        self.assertNotIn('"status confirmed", stage.status', script)
+
+    def test_pending_poll_keeps_run_and_resume_action(self):
+        script = (WEB / "app.js").read_text(encoding="utf-8")
+        self.assertRegex(script, r"if \(outcome\.kind === \"pending\"\) \{[\s\S]*?return;\s*\}\s*activeRunId = null;")
+        self.assertIn('resumeButton.addEventListener("click", () => pollActiveRun(activeRunId))', script)
+        self.assertIn("Boolean(activeRunId)", script)
 
     def test_html_has_accessible_presentation_and_run_landmarks(self):
         html = (WEB / "index.html").read_text(encoding="utf-8")
@@ -45,6 +57,7 @@ class PresentationUiTests(unittest.TestCase):
             self.assertIn(landmark, parser.tags)
         for element_id in ("report", "run-status", "model-select", "run-button", "findings", "artifacts"):
             self.assertIn(element_id, parser.ids)
+        self.assertIn("resume-run", parser.ids)
         self.assertIn('aria-live="polite"', html)
         self.assertIn('role="alert"', html)
         self.assertIn("skip-link", html)

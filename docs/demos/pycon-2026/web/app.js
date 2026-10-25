@@ -1,5 +1,7 @@
 "use strict";
 
+import { pollRunStatus, presentStage } from "/web/run-state.mjs";
+
 const byId = (id) => document.getElementById(id);
 const reportRoot = byId("report");
 const reportState = byId("report-state");
@@ -7,6 +9,7 @@ const preflight = byId("preflight");
 const modelSelect = byId("model-select");
 const refreshButton = byId("refresh-models");
 const runButton = byId("run-button");
+const resumeButton = byId("resume-run");
 const runStatus = byId("run-status");
 const runError = byId("run-error");
 const eventList = byId("run-events");
@@ -16,6 +19,8 @@ const video = byId("demo-video");
 const videoFallback = byId("video-fallback");
 let installedModels = [];
 let activeRun = false;
+let activeRunId = null;
+let pollingRun = false;
 let preflightReady = false;
 
 function element(tag, className, text) {
@@ -37,6 +42,13 @@ function statusClass(value) {
   return "unresolved";
 }
 
+function updateRunControls() {
+  runButton.disabled = !installedModels.length || !preflightReady || activeRun || Boolean(activeRunId);
+  refreshButton.disabled = activeRun || pollingRun;
+  resumeButton.hidden = !activeRunId;
+  resumeButton.disabled = !activeRunId || pollingRun;
+}
+
 function renderReport(report) {
   reportRoot.replaceChildren();
   for (const claim of Array.isArray(report.claims) ? report.claims : []) {
@@ -54,7 +66,8 @@ function renderReport(report) {
   }
   for (const stage of Array.isArray(report.stages) ? report.stages : []) {
     const card = element("article", "claim");
-    card.append(element("span", "status confirmed", stage.status || "ETAPA"));
+    const stageView = presentStage(stage);
+    card.append(element("span", `stage-state ${stageView.className}`, `${stageView.label} · ${stageView.status}`));
     card.append(element("h3", "", stage.name || "Etapa"));
     card.append(element("p", "", stage.detail || "Sin detalle."));
     reportRoot.append(card);
@@ -110,7 +123,7 @@ async function refreshModels() {
       modelSelect.append(new Option(`${model.tag} · ${model.digest}`, String(index)));
     });
     modelSelect.disabled = installedModels.length === 0;
-    runButton.disabled = installedModels.length === 0 || activeRun || !preflightReady;
+    updateRunControls();
     runStatus.textContent = installedModels.length
       ? `${installedModels.length} identidad(es) instalada(s), obtenida(s) del inventario local.`
       : "No hay modelos instalados disponibles para seleccionar.";
@@ -120,7 +133,7 @@ async function refreshModels() {
     modelSelect.replaceChildren(new Option("Inventario no disponible", ""));
     runStatus.textContent = "No fue posible actualizar los modelos instalados.";
   } finally {
-    refreshButton.disabled = false;
+    updateRunControls();
   }
 }
 
@@ -158,15 +171,56 @@ function renderRunResult(run) {
   runResult.hidden = false;
 }
 
+async function pollActiveRun(runId) {
+  if (!runId || pollingRun || runId !== activeRunId) return;
+  pollingRun = true;
+  activeRun = true;
+  runError.hidden = true;
+  updateRunControls();
+  try {
+    const outcome = await pollRunStatus(
+      runId,
+      (id) => getJson(`/api/runs/${encodeURIComponent(id)}`),
+      (id) => getJson(`/api/runs/${encodeURIComponent(id)}/events`),
+      {
+        onUpdate(state, events) {
+          appendEvents(events);
+          runStatus.textContent = state.status === "running" ? "Análisis en ejecución…" : "Corrida en cola…";
+        },
+      },
+    );
+    if (outcome.kind === "pending") {
+      runStatus.textContent = `La consulta de ${runId} alcanzó su límite local. El servidor puede seguir trabajando; continúa consultando esta misma corrida.`;
+      return;
+    }
+    activeRunId = null;
+    activeRun = false;
+    if (outcome.state.status === "completed") {
+      runStatus.textContent = "Corrida completada. La corrección factual no fue verificada.";
+      renderRunResult(outcome.state);
+    } else {
+      runStatus.textContent = "La corrida terminó con error.";
+      runError.textContent = outcome.state.error || "La corrida falló.";
+      runError.hidden = false;
+    }
+  } catch (error) {
+    runError.textContent = `No se pudo consultar ${runId}: ${error.message}. Se conserva la corrida para reanudar la consulta.`;
+    runError.hidden = false;
+    runStatus.textContent = "No hay un estado terminal confirmado; no se iniciará otra corrida.";
+  } finally {
+    pollingRun = false;
+    updateRunControls();
+  }
+}
+
 async function startRun() {
   const model = installedModels[Number(modelSelect.value)];
-  if (!model || activeRun || !preflightReady) return;
+  if (!model || activeRun || activeRunId || !preflightReady) return;
   activeRun = true;
-  runButton.disabled = true;
-  refreshButton.disabled = true;
   runError.hidden = true;
   runResult.hidden = true;
   eventList.replaceChildren();
+  updateRunControls();
   runStatus.textContent = "Enviando la identidad exacta al servidor local…";
   try {
     const response = await fetch("/api/runs", {
@@ -177,31 +231,21 @@ async function startRun() {
     });
     const accepted = await response.json();
     if (!response.ok) throw new Error(accepted.error || `HTTP ${response.status}`);
-    runStatus.textContent = "Corrida en cola…";
-    for (let attempt = 0; attempt < 300; attempt += 1) {
-      const [state, activity] = await Promise.all([
-        getJson(`/api/runs/${accepted.run_id}`),
-        getJson(`/api/runs/${accepted.run_id}/events`),
-      ]);
-      appendEvents(activity.events);
-      if (state.status === "completed") {
-        runStatus.textContent = "Corrida completada. La corrección factual no fue verificada.";
-        renderRunResult(state);
-        return;
-      }
-      if (state.status === "failed") throw new Error(state.error || "La corrida falló.");
-      runStatus.textContent = state.status === "running" ? "Análisis en ejecución…" : "Corrida en cola…";
-      await new Promise((resolve) => window.setTimeout(resolve, 1200));
+    if (typeof accepted.run_id !== "string" || !/^[0-9a-f]{32}$/.test(accepted.run_id)) {
+      throw new Error("El servidor devolvió un identificador de corrida no válido.");
     }
-    throw new Error("Se agotó el tiempo de espera de la interfaz. El estado del servidor puede seguir consultándose.");
+    activeRunId = accepted.run_id;
+    runStatus.textContent = `Corrida ${activeRunId} en cola…`;
+    await pollActiveRun(activeRunId);
   } catch (error) {
-    runError.textContent = `No se completó la corrida: ${error.message}`;
+    if (!activeRunId) activeRun = false;
+    runError.textContent = `No se pudo iniciar la corrida: ${error.message}`;
     runError.hidden = false;
-    runStatus.textContent = "Estado de corrida con error o sin confirmación.";
+    runStatus.textContent = activeRunId
+      ? "No hay un estado terminal confirmado; se conserva la corrida para reanudar."
+      : "No hay una corrida activa.";
   } finally {
-    activeRun = false;
-    refreshButton.disabled = false;
-    runButton.disabled = !installedModels.length || !preflightReady;
+    updateRunControls();
   }
 }
 
@@ -210,6 +254,7 @@ refreshButton.addEventListener("click", async () => {
   await refreshModels();
 });
 runButton.addEventListener("click", startRun);
+resumeButton.addEventListener("click", () => pollActiveRun(activeRunId));
 video.addEventListener("error", () => { video.hidden = true; videoFallback.hidden = false; });
 
 loadReport();
