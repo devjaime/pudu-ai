@@ -25,7 +25,7 @@ class PyConWebDocumentationTests(unittest.TestCase):
         text = RUNBOOK.read_text(encoding="utf-8")
         for required in ("Terminal 1", "Terminal 2", "OLLAMA_HOST=127.0.0.1:11435 OLLAMA_NO_CLOUD=1 ollama serve",
                          "OLLAMA_HOST=127.0.0.1:11435 ollama list", WEB_COMMAND,
-                         "http://127.0.0.1:8765", "Actualizar modelos", "Iniciar una corrida", "NOT_RUN",
+                         "http://127.0.0.1:8765", "--port 8766", "Actualizar modelos", "Iniciar una corrida", "NOT_RUN",
                          "horizonte de polling no cancela", "no demuestra que sus afirmaciones sean ciertas",
                          "Ctrl-C", "ollama pull",
                          "pudu_agent.transformers_ollama_demo --ollama-url http://127.0.0.1:11435"):

@@ -152,6 +152,8 @@ OLLAMA_HOST=127.0.0.1:11435 ollama list
 PYTHONPATH=python python3 -m pudu_agent.pycon_web --ollama-url http://127.0.0.1:11435 --port 8765
 ```
 
+Si el puerto `8765` está ocupado, no detenga el proceso existente: repita solo el comando web con `--port 8766` (u otro puerto libre de loopback) y abra la URL correspondiente.
+
 `ollama list` debe devolver el inventario de esta instancia; reutilice solo modelos ya presentes. La web valida que `--ollama-url` sea un endpoint HTTP de loopback sin ruta, credenciales, query ni fragmento. No admite URL arbitraria. El preflight de la interfaz comprueba la presencia del directorio del fixture y consulta el inventario de modelos, sin ejecutar una generación. Al iniciar una corrida, el demo valida la etiqueta y el commit fijados antes de invocar el modelo.
 
 Abra `http://127.0.0.1:8765` en el navegador. La página carga el informe y sus estados deterministas; revise la secuencia, los límites de evidencia y los enlaces al runbook, informe, subtítulos y video. Si el video no está en este checkout, use el fallback visible y confirme antes de la charla que el MP4 está disponible en el equipo de presentación.
