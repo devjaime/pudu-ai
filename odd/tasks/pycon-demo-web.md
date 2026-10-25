@@ -37,11 +37,11 @@ The current CLI, runbook, manifest, and video are individually reproducible, but
 
 ## Tasks
 
-- [ ] **PDW-001 — Add safe web orchestration and loopback API**
+- [x] **PDW-001 — Add safe web orchestration and loopback API**
   - Route: delegated (multiple non-trivial Python files and security-sensitive server behavior).
   - Add a stdlib local server with fixed routes for preflight, installed models, single-run start/status/events, redacted manifests, and presentation assets.
   - Reuse the existing demo through direct Python calls and explicit progress callbacks; do not expose subprocess or shell execution.
-  - Acceptance: strict TDD covers loopback binding, Host/Origin checks, body/output/event limits, exact model allowlisting, single-run exclusion, traversal rejection, stage order, and failure states with fake clients only.
+  - Acceptance: strict TDD covers loopback binding, Host/Origin checks, body/output/event limits, exact model allowlisting, single-run exclusion, traversal rejection, stage order, and failure states with fake clients only. **Observed:** API binds literal `127.0.0.1`; fixed GET routes expose preflight/models/run status/bounded events; POST accepts only exact installed tag+digest; mutations validate Host and reject mismatched Origin; request body cap is 4 KiB; event buffer is 100 entries; result cap is 16 KiB; error/event text is bounded; one run is active at a time. Manifest exposure is reduced to its basename. The demo invokes Python directly and receives additive progress callbacks; existing callers remain compatible.
   - Forecast: 220–340 authored lines.
 
 - [ ] **PDW-002 — Build the Spanish presentation interface**
@@ -60,7 +60,7 @@ The current CLI, runbook, manifest, and video are individually reproducible, but
 
 | Task | Status | Commit | Verification | Review state |
 |---|---|---|---|---|
-| PDW-001 | Planned | — | Pending strict TDD | RDD clone-local state to be verified before delivery assessment |
+| PDW-001 | Complete | `COMMIT_TO_FILL` | Strict TDD RED observed (missing module/import failure); GREEN and refactor verified by focused and full suites below | RDD disabled/unmanaged |
 | PDW-002 | Planned | — | Pending UI/browser checks | RDD clone-local state to be verified before delivery assessment |
 | PDW-003 | Planned | — | Pending complete rehearsal | RDD clone-local state to be verified before delivery assessment |
 
@@ -68,6 +68,15 @@ The current CLI, runbook, manifest, and video are individually reproducible, but
 
 Repository exploration required more than four files and found no existing Python web runtime or framework dependency. A delegated mapping established that a stdlib loopback server is sufficient and that the current synchronous Ollama flow requires explicit progress callbacks for honest stage updates.
 
+## PDW-001 evidence
+
+- **Route:** delegated writer; this is a multi-file, security-sensitive API addition. Repository mapping found no existing web runtime. `tgrep` was unavailable, so the bounded exploration used direct inspection of the existing demo and its tests instead.
+- **TDD:** RED — `PYTHONPATH=python python3 -m unittest python.tests.test_pycon_web -v` failed at import with `ModuleNotFoundError: No module named 'pudu_agent.pycon_web'`. GREEN — implemented the API and callback contract; focused web API tests passed (9 tests), then existing demo tests passed (15 tests). REFACTOR — path and URL redaction, manifest basename projection, and boundary cleanup were followed by the same focused checks and full suite.
+- **Verification:** `PYTHONPATH=python python3 -m unittest python.tests.test_pycon_web -v` — PASS, 9 tests; `PYTHONPATH=python python3 -m unittest python.tests.test_transformers_ollama_demo -v` — PASS, 15 tests; `PYTHONPATH=python python3 -m unittest discover -s python/tests -v` — PASS, 75 tests, 1 expected live-Ollama skip; `PYTHONPATH=python python3 -m pudu_agent.pycon_web --help` — PASS; `git diff --check` — PASS; `git -C /Volumes/KINGSTON/pudu-pycon-2026/transformers status --porcelain` — PASS, clean output. No live Ollama or inference was used; the runtime harness is intentionally N/A for this API unit because testing it would invoke shared local service state.
+- **Rollback boundary:** revert commit `COMMIT_TO_FILL`; it removes only the loopback API, its API tests, and the optional callback/digest-check extension with its regression tests. It does not change the pinned Transformers fixture, Ollama daemon, or later UI/docs tasks.
+- **Authored changed lines:** 473 additions plus deletions (all are source, tests, or task evidence; no generated artifacts). The security-boundary tests and task evidence justify exceeding the 400-line planning heuristic; no tests or security checks were cut.
+- **RDD:** clone-local disabled; delivery state is disabled/unmanaged. No review lifecycle started.
+
 ## Next step
 
-Implement PDW-001 with strict TDD, keeping all runtime calls fake/offline during tests.
+Implement PDW-002, keeping the UI limited to the fixed local API and preserving the structural-validity/factual-correctness distinction.

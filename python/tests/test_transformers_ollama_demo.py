@@ -88,6 +88,35 @@ class TransformersOllamaDemoTests(unittest.TestCase):
             "name": "huggingface/transformers", "tag": "v5.20.2",
             "revision": "18329f1065382e54db698e242cf98bd3f3e5a766"}, "evidence": {"definition": []}}, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest())
 
+    def test_progress_callback_reports_only_observed_pipeline_milestones(self):
+        events = []
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        evidence = {"schema": "pudu.transformers-evidence/v1", "repository": {
+            "name": "huggingface/transformers", "tag": "v5.20.2",
+            "revision": "18329f1065382e54db698e242cf98bd3f3e5a766"}, "evidence": {"definition": []}}
+        args = SimpleNamespace(repository=Path(temp.name), ollama_url="http://127.0.0.1:11434",
+                               ollama_timeout_seconds=120, model="qwen2.5:7b", interactive=False)
+        with patch("pudu_agent.transformers_ollama_demo.PROJECT_ROOT", Path(temp.name)), \
+             patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(temp.name)), \
+             patch("pudu_agent.transformers_ollama_demo.collect_evidence", return_value=evidence):
+            run_demo(args, client_factory=lambda *a, **kw: FakeClient(), progress_callback=lambda *event: events.append(event),
+                     expected_model_digest="sha256:abc")
+        self.assertEqual([event[0] for event in events], ["evidence", "model", "ollama", "generation", "validation", "manifest"])
+
+    def test_web_digest_expectation_is_checked_before_generation(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        args = SimpleNamespace(repository=Path(temp.name), ollama_url="http://127.0.0.1:11434",
+                               ollama_timeout_seconds=120, model="qwen2.5:7b", interactive=False)
+        with patch("pudu_agent.transformers_ollama_demo.PROJECT_ROOT", Path(temp.name)), \
+             patch("pudu_agent.transformers_ollama_demo.FIXTURE_ROOT", Path(temp.name)), \
+             patch("pudu_agent.transformers_ollama_demo.collect_evidence", return_value={"repository": {
+                 "name": "huggingface/transformers", "tag": "v5.20.2",
+                 "revision": "18329f1065382e54db698e242cf98bd3f3e5a766"}}):
+            with self.assertRaisesRegex(ValueError, "digest changed"):
+                run_demo(args, client_factory=lambda *a, **kw: FakeClient(), expected_model_digest="sha256:old")
+
     def test_automatic_mode_never_selects_first_model(self):
         status, client, _, _, _ = self.run_demo([])
         self.assertNotEqual(status, 0)

@@ -188,13 +188,19 @@ def _write_manifest(directory, manifest):
     return expected_directory / destination
 
 
-def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
+def run_demo(args, *, client_factory=OllamaClient, input_fn=input, progress_callback=None,
+             expected_model_digest=None):
+    def report(stage, message):
+        if progress_callback is not None:
+            progress_callback(stage, message)
+
     endpoint = validate_endpoint(args.ollama_url)
     timeout_seconds = _validate_timeout(getattr(args, "ollama_timeout_seconds", DEFAULT_OLLAMA_TIMEOUT_SECONDS))
     if Path(args.repository).resolve() != FIXTURE_ROOT.resolve():
         raise ValueError(f"fixture root must be exactly {FIXTURE_ROOT}")
     evidence = collect_evidence(args.repository)
     _validate_fixture(evidence)
+    report("evidence", "Pinned fixture evidence collected")
     evidence_bytes = _canonical_bytes(evidence)
     if len(evidence_bytes) > MAX_EVIDENCE_BYTES:
         raise ValueError("deterministic evidence exceeds the configured size limit")
@@ -206,17 +212,23 @@ def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
     schema = json.loads(schema_bytes)
     model_client = client_factory(endpoint, timeout=timeout_seconds)
     model = _choose_model(model_client, args, input_fn)
+    if expected_model_digest is not None and model.digest != expected_model_digest:
+        raise ValueError("selected model digest changed before execution")
+    report("model", "Installed model identity verified")
     server_version = model_client.server_version()
+    report("ollama", "Loopback Ollama version observed")
     started = time.monotonic()
     result = model_client.generate(model.tag, prompt + "\n\nVERSIONED JSON RESPONSE CONTRACT:\n"
                                   + schema_bytes.decode("utf-8") + "\n\nBOUNDED DETERMINISTIC EVIDENCE:\n"
                                   + evidence_bytes.decode("utf-8"),
                                   format="json", options=dict(GENERATION_OPTIONS))
+    report("generation", "Ollama generation completed")
     wall_latency_ms = max(0, int((time.monotonic() - started) * 1000))
     if result.model != model.tag:
         raise ValueError("Ollama response model identity does not match the selected exact tag")
     response_bytes = result.content.encode("utf-8")
     response = _validate_response(result.content, schema)
+    report("validation", "Response passed structural schema validation")
     metrics = _observed_metrics(result)
     manifest = {
         "schema": "pudu.transformers-ollama-manifest/v1",
@@ -237,6 +249,7 @@ def run_demo(args, *, client_factory=OllamaClient, input_fn=input):
         "response": {"sha256": _sha256(response_bytes), "bytes": len(response_bytes)},
     }
     manifest_path = _write_manifest(PROJECT_ROOT / MANIFEST_RELATIVE, manifest)
+    report("manifest", "Redacted run manifest written")
     return response, manifest_path
 
 
