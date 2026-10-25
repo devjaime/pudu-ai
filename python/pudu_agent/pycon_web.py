@@ -44,7 +44,8 @@ SENSITIVE_PAIR_RE = re.compile(
 )
 POSIX_PATH_RE = re.compile(r"(?<![\w.])/(?:[^/\s<>,;:'\"]+/)*[^/\s<>,;:'\"]*")
 WINDOWS_PATH_RE = re.compile(
-    r"(?i)(?<![A-Za-z0-9])(?:[A-Z]:[\\/]|\\\\[^\\/\s]+[\\/][^\\/\s]+[\\/])(?:[^\\/\s<>\"']+[\\/])*[^\\/\s<>\"']*"
+    r"(?i)(?<![A-Za-z0-9])(?:[A-Z]:[\\/](?:[^\\/\s<>\"']+[\\/])*[^\\/\s<>\"']*|"
+    r"\\\\[^\\/\s]+[\\/][^\\/\s]+(?:[\\/][^\\/\s<>\"']*)*)"
 )
 PRESENTATION_ASSETS = {
     "report.json": ("docs/demos/pycon-2026/evidence/report.json", "application/json", 512 * 1024),
@@ -70,7 +71,7 @@ def _safe_relative_reference(value):
         return False
     if value.startswith(("/", "\\")) or "\\" in value or re.match(r"(?i)^[a-z]:", value):
         return False
-    if value.endswith("/") or any(part in {"", ".", ".."} for part in value.split("/")[:-1]):
+    if value.endswith("/") or any(part in {"", ".", ".."} for part in value.split("/")):
         return False
     return not any(ord(character) < 32 for character in value) and not re.match(r"(?i)^https?://", value)
 

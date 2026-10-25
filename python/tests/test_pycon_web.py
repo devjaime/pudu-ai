@@ -10,7 +10,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from pudu_agent.model_client import ModelInfo
-from pudu_agent.pycon_web import DemoService, create_server
+from pudu_agent.pycon_web import DemoService, _bounded_text, _safe_relative_reference, create_server
 
 
 class FakeClient:
@@ -19,6 +19,23 @@ class FakeClient:
 
     def list_model_details(self):
         return self.models
+
+
+class TextSafetyTests(unittest.TestCase):
+    def test_bounded_text_redacts_unc_roots_and_absolute_windows_paths(self):
+        text = _bounded_text(r"UNC \\server\share \\server\share\private\file.txt C:\Users\Jane\secret.txt D:/private/file", 400)
+        self.assertNotIn("server", text)
+        self.assertNotIn("share", text)
+        self.assertNotIn("Users", text)
+        self.assertNotIn("private", text)
+        self.assertNotIn("secret.txt", text)
+        self.assertGreaterEqual(text.count("[local path]"), 4)
+
+    def test_safe_relative_reference_rejects_dot_components_everywhere(self):
+        for reference in (".", "..", "docs/.", "docs/..", "docs/../secret"):
+            with self.subTest(reference=reference):
+                self.assertFalse(_safe_relative_reference(reference))
+        self.assertTrue(_safe_relative_reference("python/pudu_agent/demo.py:23"))
 
 
 class WebApiTests(unittest.TestCase):
