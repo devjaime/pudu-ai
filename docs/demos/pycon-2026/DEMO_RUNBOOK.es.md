@@ -129,7 +129,49 @@ Medición registrada: **3.682 / 816.502 bytes**, 13 archivos citados, **99,55 %*
 | 7:15–8:15 | Presentar los límites | No se ejecutó ripgrep ni ast-grep como medición comparativa; no se hizo traversal completo de grafo, prueba de runtime ni llamada a modelo. La siguiente capa puede entregar esta evidencia acotada a modelos locales o de frontera. |
 | 8:15–9:00 | Cerrar o activar fallback | Si la demo en vivo sigue disponible, abrir el [MP4 verificado](pycon-2026-transformers-demo.mp4); resumir que la evidencia reduce contexto inspeccionable sin cerrar la pregunta de impacto en runtime. |
 
-## Capa opcional de Ollama — 3 minutos, sin descargas
+## Presentación web local — pasos de lanzamiento
+
+Esta interfaz agrega una navegación de navegador al informe determinista y una ejecución opcional con modelos que ya estén instalados. No requiere cambios en el fixture ni en los informes guardados. El servidor web no inicia ni detiene Ollama y tampoco descarga modelos.
+
+### Terminal 1 — Ollama aislado
+
+Confirme primero que el puerto `11435` esté libre. En la Terminal 1, inicie una instancia separada; no reconfigure ni detenga el daemon compartido:
+
+```sh
+OLLAMA_HOST=127.0.0.1:11435 OLLAMA_NO_CLOUD=1 ollama serve
+```
+
+`OLLAMA_NO_CLOUD=1` es configuración solicitada por el operador, no una atestación de la API. No ejecute `ollama pull`; esta instancia solo sirve para comprobar los modelos que ya estén disponibles para ella.
+
+### Terminal 2 — preflight y servidor web
+
+Desde la raíz `$PUDU_ROOT`, compruebe la instancia aislada y arranque la web apuntándola explícitamente al puerto `11435`:
+
+```sh
+OLLAMA_HOST=127.0.0.1:11435 ollama list
+PYTHONPATH=python python3 -m pudu_agent.pycon_web --ollama-url http://127.0.0.1:11435 --port 8765
+```
+
+`ollama list` debe devolver el inventario de esta instancia; reutilice solo modelos ya presentes. La web valida que `--ollama-url` sea un endpoint HTTP de loopback sin ruta, credenciales, query ni fragmento. No admite URL arbitraria. El preflight de la propia interfaz consulta el fixture fijado y el inventario de modelos, sin ejecutar una generación.
+
+Abra `http://127.0.0.1:8765` en el navegador. La página carga el informe y sus estados deterministas; revise la secuencia, los límites de evidencia y los enlaces al runbook, informe, subtítulos y video. Si el video no está en este checkout, use el fallback visible y confirme antes de la charla que el MP4 está disponible en el equipo de presentación.
+
+### Recorrido del navegador y corrida local
+
+1. En **Evidencia determinista**, recorra las etapas del informe: identidad `VERIFIED`; recolección acotada de AST e informe `COMPLETED`; `RUNTIME_TESTS` y el análisis del modelo del snapshot como `NOT_RUN`.
+2. En el panel de análisis local, pulse **Actualizar modelos**. El preflight debe indicar disponibilidad y el selector debe mostrar tags instalados con sus digests; el servidor revalida la identidad exacta antes de aceptar la corrida.
+3. Seleccione un modelo de esa lista y pulse **Iniciar análisis local**. La interfaz muestra eventos observados (recolección de evidencia, verificación de modelo/servidor, generación y validación estructural), estado, resumen y hallazgos proyectados/redactados. Una respuesta estructuralmente válida no demuestra que sus afirmaciones sean ciertas.
+4. Si el sondeo llega a su horizonte sin estado terminal, la corrida queda pendiente y puede reanudarse con el mismo ID desde el control de continuación. El horizonte de polling no cancela ni termina el trabajo del servidor.
+
+En éxito, el endpoint ofrece un enlace a un manifiesto redactado dentro de `.pudu-ai/pycon-demo/`, ignorado por Git. Los snapshots deterministas no se reescriben: el estado guardado `MODEL_ANALYSIS: NOT_RUN` sigue describiendo esa captura, no la corrida viva.
+
+### Fallback, cierre y salida directa
+
+Si el navegador, el preflight o la ejecución falla, vuelva al [informe Markdown](evidence/report.md), al [JSON](evidence/report.json), al [video verificado](pycon-2026-transformers-demo.mp4) si está disponible, o al CLI directo de la sección siguiente. No instale dependencias, no descargue modelos ni altere servicios para rescatar la presentación.
+
+Para cerrar la web, use `Ctrl-C` en la Terminal 2. Cierre la instancia Ollama de la Terminal 1 con `Ctrl-C` solo si corresponde al proceso aislado que usted acaba de iniciar; no detenga el daemon compartido. El servidor web no administra el ciclo de vida de Ollama.
+
+## Fallback: Ollama por CLI directa — 3 minutos, sin descargas
 
 El guion de nueve minutos anterior sigue siendo el demo determinista completo. Si ya hay un servidor Ollama local activo y un modelo instalado, se puede sumar esta capa al bloque de demostración; no instale ni descargue nada durante la charla. Si no están disponibles, conserve los snapshots `MODEL_ANALYSIS: NOT_RUN` y el MP4 como fallback.
 

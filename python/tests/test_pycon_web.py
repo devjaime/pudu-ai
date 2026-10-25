@@ -1,9 +1,12 @@
 import json
+import io
 import os
 import threading
 import tempfile
 import time
 import unittest
+from contextlib import redirect_stdout
+from unittest.mock import patch
 from pathlib import Path
 import uuid
 from urllib.error import HTTPError
@@ -11,6 +14,7 @@ from urllib.request import Request, urlopen
 
 from pudu_agent.model_client import ModelInfo
 from pudu_agent.pycon_web import DemoService, _bounded_text, _safe_relative_reference, create_server
+from pudu_agent import pycon_web
 
 
 class FakeClient:
@@ -30,6 +34,54 @@ class TextSafetyTests(unittest.TestCase):
         self.assertNotIn("private", text)
         self.assertNotIn("secret.txt", text)
         self.assertGreaterEqual(text.count("[local path]"), 4)
+
+
+class WebCliTests(unittest.TestCase):
+    def test_help_exposes_ollama_url(self):
+        output = io.StringIO()
+        with self.assertRaises(SystemExit) as raised, redirect_stdout(output):
+            pycon_web.main(["--help"])
+        self.assertEqual(raised.exception.code, 0)
+        self.assertIn("--ollama-url OLLAMA_URL", output.getvalue())
+
+    def test_custom_endpoint_is_validated_and_forwarded_to_service(self):
+        server = unittest.mock.Mock()
+        server.server_port = 8765
+        with patch.object(pycon_web, "DemoService") as service_factory, \
+             patch.object(pycon_web, "create_server", return_value=server) as create:
+            self.assertEqual(pycon_web.main(["--ollama-url", " http://127.0.0.1:11435/ "]), 0)
+        service_factory.assert_called_once_with(endpoint="http://127.0.0.1:11435")
+        create.assert_called_once_with(service=service_factory.return_value, host="127.0.0.1", port=8765)
+        server.serve_forever.assert_called_once()
+        server.server_close.assert_called_once()
+
+    def test_default_endpoint_is_preserved(self):
+        server = unittest.mock.Mock()
+        server.server_port = 8765
+        with patch.object(pycon_web, "DemoService") as service_factory, \
+             patch.object(pycon_web, "create_server", return_value=server):
+            self.assertEqual(pycon_web.main([]), 0)
+        service_factory.assert_called_once_with(endpoint=pycon_web.DEFAULT_OLLAMA_URL)
+
+    def test_custom_endpoint_is_used_by_service_preflight(self):
+        seen = []
+        service = DemoService(endpoint="http://127.0.0.1:11435/",
+                              client_factory=lambda endpoint, **kwargs: seen.append(endpoint) or FakeClient(),
+                              fixture_exists=lambda: True)
+        preflight = service.preflight()
+        self.assertEqual(preflight["ollama_endpoint"], "http://127.0.0.1:11435")
+        self.assertTrue(preflight["ready"])
+        self.assertEqual(seen, ["http://127.0.0.1:11435"])
+
+    def test_invalid_endpoint_is_rejected_before_service_or_bind(self):
+        for endpoint in ("http://example.com", "http://localhost:11435", "http://127.0.0.1:11435/path"):
+            with self.subTest(endpoint=endpoint), \
+                 patch.object(pycon_web, "DemoService") as service_factory, \
+                 patch.object(pycon_web, "create_server") as create:
+                with self.assertRaises(ValueError):
+                    pycon_web.main(["--ollama-url", endpoint])
+                service_factory.assert_not_called()
+                create.assert_not_called()
 
     def test_safe_relative_reference_rejects_dot_components_everywhere(self):
         for reference in (".", "..", "docs/.", "docs/..", "docs/../secret"):

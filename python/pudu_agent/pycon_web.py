@@ -432,8 +432,12 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Serve the local PyCon Transformers demo API on loopback.")
     parser.add_argument("--host", default="127.0.0.1", help="literal loopback bind address (default: %(default)s)")
     parser.add_argument("--port", type=int, default=8765, help="local HTTP port (default: %(default)s)")
+    parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL,
+                        help="literal loopback Ollama endpoint (default: %(default)s)")
     args = parser.parse_args(argv)
-    server = create_server(host=args.host, port=args.port)
+    endpoint = validate_endpoint(args.ollama_url)
+    service = DemoService(endpoint=endpoint)
+    server = create_server(service=service, host=args.host, port=args.port)
     try:
         print(f"PyCon demo API listening at http://127.0.0.1:{server.server_port}")
         server.serve_forever()
