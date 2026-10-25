@@ -116,7 +116,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Correction rollback boundaries: revert `589540b` only to restore the prior PTD-007 imperatives; revert the tracker-only evidence correction separately to restore the prior task-record wording. Neither touches Python behavior, snapshots, Remotion source, MP4, or the fixture.
 
 
-- [ ] **PTD-008 — Rehearse against an isolated local-only Ollama endpoint**
+- [x] **PTD-008 — Rehearse against an isolated local-only Ollama endpoint**
   - Route: delegated (CLI contract, tests, bilingual operational docs, and live runtime verification).
   - Add an explicit loopback-only Ollama endpoint option so the demo can target a separate server started with `OLLAMA_NO_CLOUD=1` without stopping or reconfiguring the shared daemon.
   - Acceptance: strict TDD observes RED then GREEN for endpoint forwarding/rejection; automatic and interactive modes use the selected endpoint; docs show the isolated-server preparation; a live run uses an already installed model and records a redacted manifest; no model is pulled and no shared service is stopped.
@@ -128,10 +128,14 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
   - Commit: `2b96299 feat(pycon): support isolated Ollama endpoint` (68 authored changed lines: 54 additions, 14 deletions; includes module, tests, README, and runbook).
   - Schema/manifest decision: retained manifest schema v1 and added the normalized endpoint as `ollama_endpoint`; endpoint is bounded by the existing literal-loopback validator, without introducing a new dependency or response contract.
   - Rollback boundary: revert `2b96299` to remove endpoint selection/manifest field and associated documentation/tests; prior default-endpoint behavior and PTD-006 manifest confinement return. Deterministic snapshots and external fixture are untouched.
-  - Risks/pending acceptance: configuration intent is documented but not API-attested; only a live rehearsal on the separately started local-only server can complete PTD-008. Port availability and model visibility are operator preflight responsibilities.
+  - Remaining limits: startup logs report cloud disabled, but this is operational evidence rather than an API attestation. Port availability and installed-model visibility remain operator preflight responsibilities; the successful pilot does not establish model quality or comparative superiority.
   - Failed live attempt: the authorized isolated run selected `qwen3.5:4b`; cold load took approximately 6.6 seconds and prompt evaluation approximately 3.5 seconds, exceeding the inherited 10-second socket timeout before output. The call exited 2 with `Ollama request failed: timed out`; no manifest was written. No service or model state was changed by the correction.
   - Timeout correction: added `--ollama-timeout-seconds` with default 120 and strict finite `(0, 600]` validation before fixture collection/client creation; the value is passed to the existing client's socket timeout and recorded as `ollama_timeout_seconds` in the redacted manifest. Documentation clarifies cold starts may exceed 10 seconds and this bounds socket operations, not an end-to-end deadline.
   - Correction TDD: RED — focused suite failed 9 assertions and errored once: CLI option was absent, invalid timeout cases (`True`, NaN, infinity, zero, negative, >600, huge integer) reached collection, and timeout forwarding/manifest/default assertions failed. GREEN — focused suite passed 13/13 and full suite passed 64 run, 1 skipped. CLI help, documentation command audit, `git diff --check`, and external fixture clean check also passed. No inference was run for this correction.
+  - Live rehearsal: the isolated server at `http://127.0.0.1:11435` was started with `OLLAMA_HOST=127.0.0.1:11435` and `OLLAMA_NO_CLOUD=1`; startup output recorded cloud disabled and Ollama `0.30.11`. The first explicit pilot, `qwen3.5:4b`, exited 2 because its response was not valid JSON; this was not counted as a successful run. A subsequent explicit `qwen3:8b` run succeeded structurally with `--ollama-timeout-seconds 120`. Its exact digest was `500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41`; manifest run ID `0b61ee89-41f3-4fd8-b99c-637b33943d15`; path `.pudu-ai/pycon-demo/0b61ee89-41f3-4fd8-b99c-637b33943d15.json`; manifest SHA-256 `8854a9534adcfa66207d151b5cab4bf864300bd84b7b030a658f3d48916782aa`.
+  - Live telemetry/validation: application wall latency `84075 ms`; observed Ollama `prompt_tokens=1732`, `completion_tokens=1095`, `total_duration=84050183583 ns`, `load_duration=8077618583 ns`, and `eval_duration=67080778000 ns`. Manifest validation was `structurally_valid` with `factual_correctness_checked=false`. Evidence, prompt, and response were persisted only as hashes and byte counts; their bodies were not included.
+  - Model-selection caveat: `qwen3:8b` was an explicit successful pilot, not a quality winner or recommendation. Pudu's recommendation remained `needs_selection`; this rehearsal supplies no comparative quality evidence.
+  - Completion/rollback: PTD-008 implementation/fix commits are `2b96299` (isolated endpoint), `0bff96b` (operator-documentation correction), and `f1adf62` (bounded timeout). This is a tracker-only closure work unit; reverting it restores the prior pending status without removing implementation or runtime evidence. Delivery strategy remains `auto-chain` / `stacked-to-main`; this local work is not pushed and no PR was opened.
 
 ## Progress and evidence
 
@@ -144,7 +148,7 @@ The PyCon talk needs a recognizable, practical Python AI case that proves how de
 | PTD-005 | Complete | `790abac` + `fix(ollama): harden response metadata validation` | Initial RED/GREEN 20/20; correction RED reproduced both verifier findings; correction GREEN focused 21/21, full suite 51 run, 1 skipped; diff check clean; external fixture porcelain empty | Initial RDD state not queried by executor; parent verifier found two P2s, both corrected in a separate scoped commit |
 | PTD-006 | Complete | `9cfc869`, `881393f` | Original RED/GREEN; P1 confinement RED reproduced arbitrary and symlink writes, then focused GREEN 10/10; full suite 61 run, 1 skipped; fixture clean; diff check passed | Writer did not query RDD state; parent to assess/route correction commit |
 | PTD-007 | Complete | `8bd2d24`, `589540b` | CLI help; focused 10/10; full 61 run, 1 skipped; added links/paths; diff check; fixture clean. Live Ollama unavailable (client 0.30.11; no local server/model verified; no live inference claimed). Independent documentation correction: stale commit reference and regional imperatives fixed. | RDD disabled/unmanaged; documentation-only structural readback |
-| PTD-008 | Pending live acceptance | `2b96299`, `6e5d735` | Implementation and strict TDD complete: focused 11/11; full suite 62 run, 1 skipped; CLI help, docs command audit, diff check, and fixture clean passed. No live Ollama rehearsal claimed. | Offline fake-client evidence complete; live rehearsal against separate local-only endpoint remains pending |
+| PTD-008 | Complete | `2b96299`, `0bff96b`, `f1adf62` | Strict TDD correction focused 13/13; full suite 64 run, 1 skipped; live isolated-server rehearsal succeeded structurally with `qwen3:8b`, manifest SHA-256 `8854a9534adcfa66207d151b5cab4bf864300bd84b7b030a658f3d48916782aa`; first `qwen3.5:4b` attempt failed JSON validation. CLI/docs/diff/fixture checks passed. | Explicit successful pilot only; no model-quality winner claim; `needs_selection` remains |
 
 ## Capability boundary
 
@@ -152,11 +156,11 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## External synchronization
 
-- Kingston Pudu worktree fast-forwarded through `47157ab` on `codex/pycon-transformers-demo`.
+- Kingston Pudu worktree was last recorded fast-forwarded through `47157ab`; PTD-008 commits remain local to `codex/pycon-ollama-local-only` and have not been externally synchronized. No branch was pushed and no PR was opened.
 - Pinned Transformers fixture remains clean at `18329f1065382e54db698e242cf98bd3f3e5a766` (`v5.20.2`).
 - Ignored MP4 copied to the external worktree and verified as SHA-256 `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3`.
 - No branch was pushed and no pull request was opened.
 
 ## Next step
 
-Implement PTD-008, then rehearse against a separate loopback Ollama server configured with `OLLAMA_NO_CLOUD=1` and an already installed model. Push or pull-request creation still requires explicit authorization.
+PTD-008 is complete, including the isolated live rehearsal. Preserve `auto-chain` / `stacked-to-main` for any later delivery planning. External synchronization, push, and pull-request creation remain separate actions and require explicit authorization.
