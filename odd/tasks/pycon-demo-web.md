@@ -62,7 +62,7 @@ The current CLI, runbook, manifest, and video are individually reproducible, but
 |---|---|---|---|---|
 | PDW-001 | Complete (hardened) | `91163e7adac344c908437abea8fa35a615da20d5` + `b1306785164a5309da74bf945f0c5d6ac875fd3d` + `ab5b688f90b2d8899f053e62880e3eefdf83d6a1` | Path-redaction RED reproduced and GREEN/full verification recorded below; this tracker update is the path-correction task-evidence follow-up | RDD disabled/unmanaged |
 | PDW-002 | Complete (review correction applied) | `b0a0407` + `05807e1` + tracker evidence follow-ups | Latest: 22 focused UI/API tests, 2 Node state tests, 15 demo tests, full suite 88 passed (1 expected live-Ollama skip); syntax, CLI help, diff check and fixture cleanliness passed | RDD clone-local disabled/unmanaged |
-| PDW-003 | Planned | — | Pending complete rehearsal | RDD clone-local state to be verified before delivery assessment |
+| PDW-003 | Implementation prepared; rehearsal pending | — | Documentation, endpoint wiring, and automated contracts prepared; browser and local/live rehearsal still pending | RDD clone-local state to be verified before delivery assessment |
 
 ## Route evidence
 
@@ -98,6 +98,16 @@ Repository exploration required more than four files and found no existing Pytho
 - **Verification:** focused UI/API tests — PASS, 22; Ollama demo regression — PASS, 15; full Python suite — PASS, 88 tests, 1 expected live-Ollama skip; Node run-state tests — PASS, 2; `node --check` for `app.js` and `run-state.mjs` — PASS; CLI help — PASS; `git diff --check 188523f..HEAD` — PASS; pinned fixture clean. No live Ollama or browser rehearsal was performed.
 - **Rollback:** revert `05807e1` to restore the prior PDW-002 UI/run-state behavior. Reverting the full PDW-002 implementation additionally requires reverting `b0a0407`; this tracker update is recorded separately and PDW-003 remains pending.
 
+## PDW-003 implementation prepared — rehearsal pending
+
+- **Route:** direct focused implementation in one work unit. The endpoint wiring is a bounded addition to the already-understood `pycon_web` entry point; docs and contract tests ship with that behavior.
+- **TDD:** RED — the new CLI tests failed because `--ollama-url` was not recognized and default `DemoService` construction was not forwarded. GREEN — five endpoint tests pass: custom normalized `11435` reaches service and preflight, the default `11434` remains, invalid/non-loopback endpoints fail before service or bind, and help exposes the option. REFACTOR — reused the existing `validate_endpoint` canonicalizer; no new URL policy or endpoint handling path was added.
+- **Documentation:** bilingual English/Spanish root quick paths now launch the web UI; the Spanish runbook covers separate Ollama and web terminals, model inventory/preflight, browser stages and expected results, manifest behavior, polling horizon, factual-correctness boundary, shutdown, video/report/runbook fallback, and direct CLI fallback. Documentation contract tests check exact commands and key local links/paths.
+- **Work-unit commit:** `bdb4d09f80fc52bcf108b70bc8581df4c8f1af34` (`feat(pycon): document local demo web launch`). Rollback boundary: revert this commit to remove the CLI option, its tests, and the accompanying launch documentation; no fixture files or other behavior are changed.
+- **Verification:** focused UI/API/documentation suite — PASS, 29 tests; Ollama demo regression — PASS, 15 tests; full Python suite — PASS, 95 tests, 1 expected live-Ollama skip; Node run-state tests — PASS, 2; `node --check` on `app.js` and `run-state.mjs` — PASS; CLI help includes `--ollama-url`; documentation contract audit — PASS; `git diff --check c89c7c6..HEAD` — PASS; pinned Transformers fixture status — clean. The focused HTTP tests bind only `127.0.0.1`; their run required the authorized loopback execution permission. Runtime harness/inference and browser rehearsal are pending and were not run.
+- **RDD:** clone-local disabled/unmanaged (`gentle-ai review mode status`); no review lifecycle was started.
+- **Status:** keep PDW-003 unchecked and pending until the parent records browser and local/live rehearsal evidence. No service was started/stopped, no model was pulled, and no publish/push/PR occurred.
+
 ## Next step
 
-Implement PDW-003: update the runbook/root quick path and perform the authorized local browser rehearsal. Keep PDW-003 pending until its documentation and rehearsal evidence are complete.
+The PDW-003 implementation unit adds the bounded web endpoint option and launch documentation. Keep the task unchecked until browser and local/live rehearsal evidence is recorded. The parent must perform those checks; this worker did not launch services, open a browser, or run inference.
