@@ -14,21 +14,33 @@
   <header class="masthead">
     <a class="wordmark" href="#inicio" aria-label="PyCon 2026, inicio">PYCON <span>2026</span></a>
     <nav aria-label="Navegación de la presentación">
-      <a href="#metodo">Método</a><a href="#evidencia">Evidencia</a><a href="#demostracion">Demostración</a>
+      <a href="#impacto">Valor</a><a href="#metodo">Cómo funciona</a><a href="#demostracion">Demostración</a>
     </nav>
     <span class="local-badge"><span aria-hidden="true"></span> Solo en este equipo</span>
   </header>
   <main id="contenido">
     <section class="intro" id="inicio" aria-labelledby="titulo">
-      <p class="eyebrow">Exploración estática · Transformers v5.20.2</p>
-      <h1 id="titulo">LLMs frente a<br><em>repositorios gigantes</em></h1>
-      <p class="lede">Del primer símbolo encontrado a una conclusión con límites explícitos. Una ruta para reducir contexto sin confundir candidatos con impacto en ejecución.</p>
-      <a class="text-link" href="#metodo">Seguir la evidencia <span aria-hidden="true">↓</span></a>
-      <div class="intro-note"><span class="rule"></span><p>Un modelo no reemplaza la búsqueda. Llega después, con evidencia elegida y acotada.</p></div>
+      <p class="eyebrow">Decisión de cambio · Transformers v5.20.2</p>
+      <h1 id="titulo">¿Qué puede romper<br><em>este cambio?</em></h1>
+      <p class="lede">Un pull request modifica <code>GenerationMixin.generate</code>. Esta demo convierte “preguntarle al LLM” en una decisión revisable: qué código mirar, qué pruebas ejecutar y qué todavía no sabemos.</p>
+      <a class="text-link" href="#impacto">Ver el valor <span aria-hidden="true">↓</span></a>
+      <div class="intro-note"><span class="rule"></span><p>Objetivo: decidir qué revisar antes de aprobar, sin fingir que el análisis estático conoce todo el comportamiento en ejecución.</p></div>
+    </section>
+
+    <section class="impact evidence section-wrap" id="impacto" aria-labelledby="impact-title">
+      <div class="section-heading"><p class="eyebrow">01 / El valor</p><h2 id="impact-title">De una respuesta plausible<br>a una decisión auditable.</h2></div>
+      <p class="demo-lede">El valor no es “usar un LLM”. Es impedir que una afirmación convincente se convierta en una decisión de ingeniería sin evidencia verificable.</p>
+      <div class="report-grid">
+        <article class="claim"><span class="status inferred">RESPUESTA NO VERIFICADA</span><h3>“600+ clases podrían verse afectadas”</h3><p>En una corrida local observada, el modelo produjo esta magnitud. La afirmación no estaba respaldada por el paquete determinista y no puede usarse para aprobar el cambio.</p></article>
+        <article class="claim"><span class="status confirmed">EVIDENCIA ACOTADA</span><h3>8 candidatos, 1 caller y 8 referencias de pruebas</h3><p>El AST entrega ubicaciones concretas para inspeccionar. Son candidatos trazables, no una promesa de cobertura completa.</p></article>
+        <article class="claim"><span class="status confirmed">SUPERFICIE REVISABLE</span><h3>3.682 bytes en lugar de 816.502</h3><p>El agente recibe metadatos citados un 99,55 % más pequeños que los archivos completos. Es una comparación de bytes, no de tokens ni comprensión.</p></article>
+        <article class="claim"><span class="status unresolved">LÍMITE EXPLÍCITO</span><h3>El runtime sigue abierto</h3><p>Despacho dinámico, registros, extensiones nativas y caminos de ejecución todavía requieren verificación adicional.</p></article>
+      </div>
+      <div class="boundary"><span class="status unresolved">DECISIÓN</span><p>Antes de aprobar: revisar el caller, inspeccionar los 8 candidatos y ejecutar pruebas dirigidas. El impacto completo en tiempo de ejecución sigue sin demostrarse.</p></div>
     </section>
 
     <section class="method section-wrap" id="metodo" aria-labelledby="method-title">
-      <div class="section-heading"><p class="eyebrow">01 / La progresión</p><h2 id="method-title">Cada paso responde<br>una pregunta distinta.</h2></div>
+      <div class="section-heading"><p class="eyebrow">02 / Cómo se consigue</p><h2 id="method-title">Después, cómo se construye<br>la evidencia.</h2></div>
       <ol class="steps">
         <li><span class="step-no">01</span><div><h3>Búsqueda literal</h3><p>¿Dónde aparece el nombre o símbolo?</p></div><span class="step-mark">Texto</span></li>
         <li><span class="step-no">02</span><div><h3>AST</h3><p>¿Qué definiciones y llamadas reconoce la sintaxis?</p></div><span class="step-mark">Estructura</span></li>
@@ -41,7 +53,7 @@
     </section>
 
     <section class="evidence section-wrap" id="evidencia" aria-labelledby="evidence-title">
-      <div class="section-heading"><p class="eyebrow">02 / El registro determinista</p><h2 id="evidence-title">Primero, lo que<br>el informe sí dice.</h2></div>
+      <div class="section-heading"><p class="eyebrow">03 / El registro determinista</p><h2 id="evidence-title">Primero, lo que<br>el informe sí dice.</h2></div>
       <div id="report-state" class="notice" aria-live="polite">Cargando informe local…</div>
       <div id="report" class="report-grid" aria-live="polite"></div>
       <div class="boundary"><span class="status unresolved">UNRESOLVED</span><p>El grafo no demuestra el impacto completo en tiempo de ejecución. El despacho dinámico, los registros y las extensiones nativas quedan fuera de esta evidencia.</p></div>
@@ -49,7 +61,7 @@
     </section>
 
     <section class="demo section-wrap" id="demostracion" aria-labelledby="demo-title">
-      <div class="section-heading"><p class="eyebrow">03 / Análisis opcional</p><h2 id="demo-title">Una corrida local,<br>con límites visibles.</h2></div>
+      <div class="section-heading"><p class="eyebrow">04 / Análisis opcional</p><h2 id="demo-title">Una corrida local,<br>con límites visibles.</h2></div>
       <p class="demo-lede">La exploración estática ya está documentada. Si Ollama está disponible, puede solicitar una síntesis local de esa evidencia; el modelo no ejecuta código del repositorio.</p>
       <div class="preflight" id="preflight" aria-live="polite"><span class="spinner" aria-hidden="true"></span><span>Comprobando disponibilidad…</span></div>
       <div class="run-controls">
@@ -66,7 +78,7 @@
     </section>
 
     <section class="artifacts section-wrap" id="artifacts" aria-labelledby="artifact-title">
-      <div class="section-heading"><p class="eyebrow">04 / Para continuar</p><h2 id="artifact-title">Material de la charla.</h2></div>
+      <div class="section-heading"><p class="eyebrow">05 / Para continuar</p><h2 id="artifact-title">Material de la charla.</h2></div>
       <ul class="artifact-links">
         <li><a href="/api/presentation/runbook.es.md">Runbook en español <span>↗</span></a></li>
         <li><a href="/api/presentation/report.md">Informe determinista <span>↗</span></a></li>

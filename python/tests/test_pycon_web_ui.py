@@ -78,6 +78,22 @@ class PresentationUiTests(unittest.TestCase):
         self.assertIn("/events", script)
         self.assertIn("factual", joined.lower())
 
+    def test_value_precedes_method_and_names_decision_outcome(self):
+        html = (WEB / "index.html").read_text(encoding="utf-8")
+        visible_text = re.sub(r"<[^>]+>", " ", html)
+        visible_text = re.sub(r"\s+", " ", visible_text).casefold()
+        self.assertLess(html.index("id=\"impacto\""), html.index("id=\"metodo\""))
+        for phrase in ("¿Qué puede romper este cambio?", "antes de aprobar", "3.682", "816.502",
+                       "8 candidatos", "600+", "no estaba respaldada", "impacto completo en tiempo de ejecución sigue sin demostrarse"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.casefold(), visible_text)
+        self.assertIn("href=\"#impacto\"", html)
+
+    def test_mobile_report_grid_can_shrink_without_horizontal_overflow(self):
+        css = (WEB / "styles.css").read_text(encoding="utf-8")
+        self.assertIn(".report-grid{grid-template-columns:minmax(0,1fr)}", css)
+        self.assertIn(".claim,.notice{overflow-wrap:anywhere}", css)
+
     def test_static_assets_have_no_remote_or_unsafe_rendering_patterns(self):
         html = (WEB / "index.html").read_text(encoding="utf-8")
         script = (WEB / "app.js").read_text(encoding="utf-8")
