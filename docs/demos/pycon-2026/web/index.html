@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101b20">
-  <meta name="description" content="Una exploración interactiva y local de evidencia estática en Transformers.">
+  <meta name="description" content="Una demostración PyCon sobre cómo analizar un repositorio Python grande con AST, grafos, CLIs y un LLM local.">
   <title>LLMs frente a repositorios gigantes — PyCon 2026</title>
   <link rel="stylesheet" href="/web/styles.css">
   <script type="module" src="/web/app.js"></script>
@@ -14,7 +14,7 @@
   <header class="masthead">
     <a class="wordmark" href="#inicio" aria-label="PyCon 2026, inicio">PYCON <span>2026</span></a>
     <nav aria-label="Navegación de la presentación">
-      <a href="#impacto">Valor</a><a href="#metodo">Cómo funciona</a><a href="#demostracion">Demostración</a>
+      <a href="#impacto">Valor</a><a href="#repositorio">Repositorio</a><a href="#metodo">Método</a><a href="#demostracion">Demo</a>
     </nav>
     <span class="local-badge"><span aria-hidden="true"></span> Solo en este equipo</span>
   </header>
@@ -39,8 +39,21 @@
       <div class="boundary"><span class="status unresolved">DECISIÓN</span><p>Antes de aprobar: revisar el caller, inspeccionar los 8 candidatos y ejecutar pruebas dirigidas. El impacto completo en tiempo de ejecución sigue sin demostrarse.</p></div>
     </section>
 
+    <section class="repository section-wrap" id="repositorio" aria-labelledby="repository-title">
+      <div class="section-heading"><p class="eyebrow">02 / El repositorio Python</p><h2 id="repository-title">Qué hace Transformers<br>y por qué es un buen caso.</h2></div>
+      <p class="demo-lede">Antes de recorrer el grafo hay que entender el sistema: Hugging Face Transformers no es un único modelo, sino el punto de integración Python que define cómo cargar, configurar, entrenar y ejecutar familias completas de modelos.</p>
+      <div class="report-grid">
+        <article class="claim"><span class="status confirmed">QUÉ HACE</span><h3>Framework de definición de modelos</h3><p>Unifica modelos de texto, visión, audio, video y multimodales para inferencia y entrenamiento. Su API <code>pipeline</code> conecta preprocesamiento, un modelo y posprocesamiento detrás de una interfaz Python.</p></article>
+        <article class="claim"><span class="status confirmed">ESCALA DEL CHECKOUT</span><h3>2.764 archivos Python de producto</h3><p>La versión fijada contiene además 1.709 archivos Python de pruebas y 531 directorios de modelos. El problema no es abrir un archivo: es reconstruir relaciones entre miles de unidades.</p></article>
+        <article class="claim"><span class="status confirmed">DEPENDENCIAS</span><h3>Python 3.10+ en el centro</h3><p>La instalación base declara <code>huggingface-hub</code>, NumPy, packaging, PyYAML, regex, <code>tokenizers</code>, Typer, <code>safetensors</code> y tqdm. <strong>PyTorch 2.6+</strong> y accelerate son el backend opcional <code>torch</code>; visión, audio y video agregan sus propios extras.</p></article>
+        <article class="claim"><span class="status inferred">POR QUÉ ES DIFÍCIL</span><h3>Código Python, comportamiento dinámico</h3><p>El camino visible es <code>pipeline → model.generate → GenerationMixin.generate</code>, pero mixins, registros, mappings generados, backends opcionales y extensiones nativas impiden deducir todo el runtime desde texto.</p></article>
+      </div>
+      <div class="boundary"><span class="status confirmed">PYTHON EN LA DEMO</span><p><code>http.server</code> sirve la interfaz; <code>ast</code> analiza los archivos <code>.py</code>; Git fija versión y commit; un contrato JSON limita la salida; Ollama sintetiza la evidencia. El colector no importa ni ejecuta Transformers: produce candidatos reproducibles antes de consultar al modelo.</p></div>
+      <details class="measure"><summary>¿A qué otros repositorios se aplica?</summary><p>A repositorios Python grandes con APIs compartidas, mixins o herencia, plugins, backends opcionales, CLIs y suites extensas: librerías científicas, plataformas MLOps, monolitos web y pipelines de datos. Si el comportamiento depende de generación de código, extensiones nativas o despacho dinámico, el AST necesita complementarse con trazas y pruebas de ejecución.</p></details>
+    </section>
+
     <section class="method section-wrap" id="metodo" aria-labelledby="method-title">
-      <div class="section-heading"><p class="eyebrow">02 / Cómo se consigue</p><h2 id="method-title">Después, cómo se construye<br>la evidencia.</h2></div>
+      <div class="section-heading"><p class="eyebrow">03 / Cómo se consigue</p><h2 id="method-title">Después, cómo se construye<br>la evidencia.</h2></div>
       <ol class="steps">
         <li><span class="step-no">01</span><div><h3>Búsqueda literal</h3><p>¿Dónde aparece el nombre o símbolo?</p></div><span class="step-mark">Texto</span></li>
         <li><span class="step-no">02</span><div><h3>AST</h3><p>¿Qué definiciones y llamadas reconoce la sintaxis?</p></div><span class="step-mark">Estructura</span></li>
@@ -53,7 +66,7 @@
     </section>
 
     <section class="evidence section-wrap" id="evidencia" aria-labelledby="evidence-title">
-      <div class="section-heading"><p class="eyebrow">03 / El registro determinista</p><h2 id="evidence-title">Primero, lo que<br>el informe sí dice.</h2></div>
+      <div class="section-heading"><p class="eyebrow">04 / El registro determinista</p><h2 id="evidence-title">Primero, lo que<br>el informe sí dice.</h2></div>
       <div id="report-state" class="notice" aria-live="polite">Cargando informe local…</div>
       <div id="report" class="report-grid" aria-live="polite"></div>
       <div class="boundary"><span class="status unresolved">UNRESOLVED</span><p>El grafo no demuestra el impacto completo en tiempo de ejecución. El despacho dinámico, los registros y las extensiones nativas quedan fuera de esta evidencia.</p></div>
@@ -61,7 +74,7 @@
     </section>
 
     <section class="demo section-wrap" id="demostracion" aria-labelledby="demo-title">
-      <div class="section-heading"><p class="eyebrow">04 / Análisis opcional</p><h2 id="demo-title">Una corrida local,<br>con límites visibles.</h2></div>
+      <div class="section-heading"><p class="eyebrow">05 / Análisis opcional</p><h2 id="demo-title">Una corrida local,<br>con límites visibles.</h2></div>
       <p class="demo-lede">La exploración estática ya está documentada. Si Ollama está disponible, puede solicitar una síntesis local de esa evidencia; el modelo no ejecuta código del repositorio.</p>
       <div class="preflight" id="preflight" aria-live="polite"><span class="spinner" aria-hidden="true"></span><span>Comprobando disponibilidad…</span></div>
       <div class="run-controls">
@@ -78,7 +91,7 @@
     </section>
 
     <section class="artifacts section-wrap" id="artifacts" aria-labelledby="artifact-title">
-      <div class="section-heading"><p class="eyebrow">05 / Para continuar</p><h2 id="artifact-title">Material de la charla.</h2></div>
+      <div class="section-heading"><p class="eyebrow">06 / Para continuar</p><h2 id="artifact-title">Material de la charla.</h2></div>
       <ul class="artifact-links">
         <li><a href="/api/presentation/runbook.es.md">Runbook en español <span>↗</span></a></li>
         <li><a href="/api/presentation/report.md">Informe determinista <span>↗</span></a></li>

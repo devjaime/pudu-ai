@@ -89,6 +89,20 @@ class PresentationUiTests(unittest.TestCase):
                 self.assertIn(phrase.casefold(), visible_text)
         self.assertIn("href=\"#impacto\"", html)
 
+    def test_repository_context_precedes_method_and_explains_python_stack(self):
+        html = (WEB / "index.html").read_text(encoding="utf-8")
+        visible_text = re.sub(r"<[^>]+>", " ", html)
+        visible_text = re.sub(r"\s+", " ", visible_text).casefold()
+        self.assertLess(html.index("id=\"impacto\""), html.index("id=\"repositorio\""))
+        self.assertLess(html.index("id=\"repositorio\""), html.index("id=\"metodo\""))
+        for phrase in ("framework de definición de modelos", "2.764 archivos python",
+                       "1.709 archivos python de pruebas", "531 directorios de modelos",
+                       "python 3.10+", "pytorch 2.6+", "huggingface-hub", "tokenizers",
+                       "safetensors", "http.server", "ast", "repositorios python grandes"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.casefold(), visible_text)
+        self.assertIn("href=\"#repositorio\"", html)
+
     def test_mobile_report_grid_can_shrink_without_horizontal_overflow(self):
         css = (WEB / "styles.css").read_text(encoding="utf-8")
         self.assertIn(".report-grid{grid-template-columns:minmax(0,1fr)}", css)

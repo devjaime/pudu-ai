@@ -62,6 +62,12 @@ The current CLI, runbook, manifest, and video are individually reproducible, but
   - Acceptance: value section precedes method; deterministic counts and byte measurement are accurate; the observed model/evidence mismatch is framed as an unsupported claim rather than fact; navigation and section numbering match the new progression; focused UI contracts and browser QA pass.
   - Forecast: 50–90 authored lines.
 
+- [ ] **PDW-005 — Explain the Python repository and applicability**
+  - Route: inline (one substantive presentation section plus mechanical UI contract and tracker updates).
+  - Explain what the pinned Hugging Face Transformers repository does, its Python scale and dependency layers, how the demo itself uses Python, and which repository shapes this technique applies to.
+  - Acceptance: repository explanation appears after value and before method; claims match the pinned v5.20.2 checkout; core versus optional dependencies are distinguished; Python execution path and applicability boundary are explicit; focused UI contracts and desktop/mobile browser QA pass.
+  - Forecast: 55–95 authored lines.
+
 ## Progress and evidence
 
 | Task | Status | Commit | Verification | Review state |
@@ -70,6 +76,7 @@ The current CLI, runbook, manifest, and video are individually reproducible, but
 | PDW-002 | Complete (review correction applied) | `b0a0407` + `05807e1` + tracker evidence follow-ups | Latest: 22 focused UI/API tests, 2 Node state tests, 15 demo tests, full suite 88 passed (1 expected live-Ollama skip); syntax, CLI help, diff check and fixture cleanliness passed | RDD clone-local disabled/unmanaged |
 | PDW-003 | Complete | `bdb4d09` + `3a59027` + `be85550` + final evidence follow-up | 29 focused tests, 2 Node tests, full suite 95 passed (1 expected live-Ollama skip), desktop/mobile browser QA, clean console, and one completed isolated `qwen3:8b` run | RDD clone-local disabled/unmanaged |
 | PDW-004 | Complete | `ad8dd8d` | Value-first contract, 8 UI tests, full 97-test suite (1 expected live-Ollama skip), 2 Node tests, JavaScript/diff checks, and desktop/mobile browser QA | RDD clone-local disabled/unmanaged |
+| PDW-005 | Implemented; visual QA pending | Pending work-unit commit | 9 UI contracts, full 98-test suite (1 expected live-Ollama skip), 2 Node tests, JavaScript/diff checks, and clean pinned fixture | RDD clone-local disabled/unmanaged |
 
 ## Route evidence
 
@@ -130,6 +137,15 @@ Repository exploration required more than four files and found no existing Pytho
 - **Verification:** full Python suite — PASS, 97 tests with 1 expected live-Ollama skip; Node run-state suite — PASS, 2 tests; JavaScript syntax — PASS; `git diff --check` — PASS. Desktop QA confirmed the value section precedes method, viewport width equals document width, and the browser console has no warnings or errors. Mobile QA at `390x844` confirmed all impact/report cards fit and document `scrollWidth` equals 390 px.
 - **Work-unit commit:** `ad8dd8d` (`feat(pycon): lead demo with change impact`). Revert this commit to restore the previous method-first narrative, UI contract, and responsive behavior. RDD remained clone-locally disabled/unmanaged; no push or pull request was performed.
 
+
+## PDW-005 evidence
+
+- **Repository facts:** verified against pinned `huggingface/transformers` tag `v5.20.2`, revision `18329f1065382e54db698e242cf98bd3f3e5a766`. The checkout contains 2,764 Python source files, 1,709 Python test files, and 531 first-level model directories.
+- **Dependency facts:** `setup.py` requires Python 3.10+ and generates classifiers for 3.10–3.14. Base dependencies include huggingface-hub, NumPy, packaging, PyYAML, regex, tokenizers, Typer, safetensors, and tqdm; the `torch` extra adds PyTorch 2.6+ and accelerate.
+- **Python path:** the presentation now distinguishes repository code from demo tooling: `http.server` serves the page, stdlib `ast` scans `.py` files, Git verifies the fixture, a versioned JSON contract bounds model output, and Ollama synthesizes evidence. The collector neither imports nor executes Transformers.
+- **TDD:** RED — the repository-context contract failed because `#repositorio` did not exist. GREEN — 9 focused UI tests pass after adding the section and renumbering the presentation.
+- **Verification:** full Python suite — PASS, 98 tests with 1 expected live-Ollama skip; Node run-state suite — PASS, 2 tests; JavaScript syntax and `git diff --check` — PASS; pinned Transformers fixture — clean. Browser automation could not attach to the already-open loopback tab because the browser URL policy rejected the operation, so visual readback remains pending rather than being claimed.
+
 ## Next step
 
-Use the value-first local web flow from `/Volumes/KINGSTON/pudu-pycon-2026/pudu-ai` for the talk. Push and pull-request creation remain separate user decisions.
+Reload the local web page and visually confirm the new repository section on desktop/mobile; then close PDW-005. Push and pull-request creation remain separate user decisions.
