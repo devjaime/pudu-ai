@@ -156,11 +156,12 @@ Pudu can locate literal references, inspect Python AST structure, extract direct
 
 ## External synchronization
 
-- Kingston Pudu worktree was last recorded fast-forwarded through `47157ab`; PTD-008 commits remain local to `codex/pycon-ollama-local-only` and have not been externally synchronized. No branch was pushed and no PR was opened.
+- Kingston Pudu checkout is synchronized on `codex/pycon-ollama-local-only`; PTD-008 implementation and live evidence through `b548bbf` are present.
 - Pinned Transformers fixture remains clean at `18329f1065382e54db698e242cf98bd3f3e5a766` (`v5.20.2`).
 - Ignored MP4 copied to the external worktree and verified as SHA-256 `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3`.
+- The redacted live manifest is preserved at `.pudu-ai/pycon-demo/0b61ee89-41f3-4fd8-b99c-637b33943d15.json` with SHA-256 `8854a9534adcfa66207d151b5cab4bf864300bd84b7b030a658f3d48916782aa`; it remains ignored and is not part of Git history.
 - No branch was pushed and no pull request was opened.
 
 ## Next step
 
-PTD-008 is complete, including the isolated live rehearsal. Preserve `auto-chain` / `stacked-to-main` for any later delivery planning. External synchronization, push, and pull-request creation remain separate actions and require explicit authorization.
+PTD-008 is complete, including the isolated live rehearsal and Kingston synchronization. Preserve `auto-chain` / `stacked-to-main` for any later delivery planning. Push and pull-request creation remain separate actions and require explicit authorization.
