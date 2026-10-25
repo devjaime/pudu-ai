@@ -80,6 +80,9 @@ class WebApiTests(unittest.TestCase):
 
     def _write_assets(self):
         assets = {
+            "docs/demos/pycon-2026/web/index.html": "<!doctype html><title>Presentation</title>",
+            "docs/demos/pycon-2026/web/styles.css": "body { color: white; }",
+            "docs/demos/pycon-2026/web/app.js": "'use strict';",
             "docs/demos/pycon-2026/evidence/report.json": '{"schema":"pudu.report/v1"}',
             "docs/demos/pycon-2026/evidence/report.md": "# Deterministic report\n",
             "docs/demos/pycon-2026/DEMO_RUNBOOK.es.md": "# Guía de demostración\n",
@@ -243,6 +246,14 @@ class WebApiTests(unittest.TestCase):
             self.request(f"/api/manifests/{self.manifest_id}")
 
     def test_presentation_asset_routes_use_only_the_fixed_allowlist(self):
+        for route in ("/", "/web/styles.css", "/web/app.js"):
+            with self.subTest(route=route):
+                response = self.request(route)
+                self.assertIn(response.headers.get_content_type(), {"text/html", "text/css", "text/javascript"})
+                self.assertGreater(len(response.read()), 0)
+        for route in ("/web/../../etc/passwd", "/web/other.js"):
+            with self.subTest(route=route), self.assertRaises(HTTPError):
+                self.request(route)
         routes = ("report.json", "report.md", "runbook.es.md", "captions.es.vtt", "video.mp4")
         for route in routes:
             with self.subTest(route=route):

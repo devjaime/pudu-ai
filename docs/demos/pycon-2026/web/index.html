@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101b20">
+  <meta name="description" content="Una exploración interactiva y local de evidencia estática en Transformers.">
+  <title>LLMs frente a repositorios gigantes — PyCon 2026</title>
+  <link rel="stylesheet" href="/web/styles.css">
+  <script src="/web/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="masthead">
+    <a class="wordmark" href="#inicio" aria-label="PyCon 2026, inicio">PYCON <span>2026</span></a>
+    <nav aria-label="Navegación de la presentación">
+      <a href="#metodo">Método</a><a href="#evidencia">Evidencia</a><a href="#demostracion">Demostración</a>
+    </nav>
+    <span class="local-badge"><span aria-hidden="true"></span> Solo en este equipo</span>
+  </header>
+  <main id="contenido">
+    <section class="intro" id="inicio" aria-labelledby="titulo">
+      <p class="eyebrow">Exploración estática · Transformers v5.20.2</p>
+      <h1 id="titulo">LLMs frente a<br><em>repositorios gigantes</em></h1>
+      <p class="lede">Del primer símbolo encontrado a una conclusión con límites explícitos. Una ruta para reducir contexto sin confundir candidatos con impacto en ejecución.</p>
+      <a class="text-link" href="#metodo">Seguir la evidencia <span aria-hidden="true">↓</span></a>
+      <div class="intro-note"><span class="rule"></span><p>Un modelo no reemplaza la búsqueda. Llega después, con evidencia elegida y acotada.</p></div>
+    </section>
+
+    <section class="method section-wrap" id="metodo" aria-labelledby="method-title">
+      <div class="section-heading"><p class="eyebrow">01 / La progresión</p><h2 id="method-title">Cada paso responde<br>una pregunta distinta.</h2></div>
+      <ol class="steps">
+        <li><span class="step-no">01</span><div><h3>Búsqueda literal</h3><p>¿Dónde aparece el nombre o símbolo?</p></div><span class="step-mark">Texto</span></li>
+        <li><span class="step-no">02</span><div><h3>AST</h3><p>¿Qué definiciones y llamadas reconoce la sintaxis?</p></div><span class="step-mark">Estructura</span></li>
+        <li><span class="step-no">03</span><div><h3>Grafo</h3><p>¿Qué relaciones candidatas conectan los hallazgos?</p></div><span class="step-mark">Relaciones</span></li>
+        <li><span class="step-no">04</span><div><h3>Evidencia acotada</h3><p>¿Qué fragmentos y referencias justifican cada afirmación?</p></div><span class="step-mark">Contexto</span></li>
+        <li><span class="step-no">05</span><div><h3>Modelo local</h3><p>¿Qué síntesis propone a partir de ese contexto?</p></div><span class="step-mark">Hipótesis</span></li>
+        <li><span class="step-no">06</span><div><h3>Verificación</h3><p>¿Qué evidencia adicional confirma o deja abierto el resultado?</p></div><span class="step-mark">Límites</span></li>
+      </ol>
+      <p class="method-foot">La amplitud aparente del repositorio no cambia la calidad de una afirmación: importan su fuente, su alcance y lo que todavía no se observó.</p>
+    </section>
+
+    <section class="evidence section-wrap" id="evidencia" aria-labelledby="evidence-title">
+      <div class="section-heading"><p class="eyebrow">02 / El registro determinista</p><h2 id="evidence-title">Primero, lo que<br>el informe sí dice.</h2></div>
+      <div id="report-state" class="notice" aria-live="polite">Cargando informe local…</div>
+      <div id="report" class="report-grid" aria-live="polite"></div>
+      <div class="boundary"><span class="status unresolved">UNRESOLVED</span><p>El grafo no demuestra el impacto completo en tiempo de ejecución. El despacho dinámico, los registros y las extensiones nativas quedan fuera de esta evidencia.</p></div>
+      <details class="measure"><summary>Cómo leer la medición de contexto</summary><p>El informe compara bytes de metadatos con los bytes completos de los archivos citados. No mide tokens ni equivalencia semántica: es una reducción de tamaño, no una medida de comprensión.</p></details>
+    </section>
+
+    <section class="demo section-wrap" id="demostracion" aria-labelledby="demo-title">
+      <div class="section-heading"><p class="eyebrow">03 / Análisis opcional</p><h2 id="demo-title">Una corrida local,<br>con límites visibles.</h2></div>
+      <p class="demo-lede">La exploración estática ya está documentada. Si Ollama está disponible, puedes pedir una síntesis local de esa evidencia; el modelo no ejecuta código del repositorio.</p>
+      <div class="preflight" id="preflight" aria-live="polite"><span class="spinner" aria-hidden="true"></span><span>Comprobando disponibilidad…</span></div>
+      <div class="run-controls">
+        <div class="field"><label for="model-select">Modelo instalado y verificado</label><select id="model-select" disabled><option value="">Actualizá el inventario para elegir</option></select></div>
+        <button id="refresh-models" class="button secondary" type="button">Actualizar modelos</button>
+        <button id="run-button" class="button primary" type="button" disabled>Iniciar una corrida</button>
+      </div>
+      <div id="run-status" class="run-status" role="status" aria-live="polite">No hay una corrida activa.</div>
+      <div id="run-error" class="error-box" role="alert" hidden></div>
+      <ol id="run-events" class="event-list" aria-label="Progreso de la corrida"></ol>
+      <div id="run-result" class="run-result" hidden><div id="findings"></div></div>
+      <p class="truth-boundary"><strong>Validez estructural ≠ veracidad.</strong> Una respuesta aceptada como JSON puede estar equivocada. Esta interfaz muestra hallazgos proyectados y redactados; no verifica su exactitud factual ni la calidad del modelo.</p>
+    </section>
+
+    <section class="artifacts section-wrap" id="artifacts" aria-labelledby="artifact-title">
+      <div class="section-heading"><p class="eyebrow">04 / Para continuar</p><h2 id="artifact-title">Material de la charla.</h2></div>
+      <ul class="artifact-links">
+        <li><a href="/api/presentation/runbook.es.md">Runbook en español <span>↗</span></a></li>
+        <li><a href="/api/presentation/report.md">Informe determinista <span>↗</span></a></li>
+        <li><a href="/api/presentation/captions.es.vtt">Subtítulos en español <span>↗</span></a></li>
+        <li><a href="/api/presentation/report.json">Informe JSON <span>↗</span></a></li>
+      </ul>
+      <div class="video-block"><h3>Recorrido grabado</h3><video id="demo-video" controls preload="metadata" aria-label="Video de demostración de Transformers"><source src="/api/presentation/video.mp4" type="video/mp4">Tu navegador no puede reproducir este video.</video><p id="video-fallback" class="muted" role="status" hidden>El video no está disponible en este checkout. El runbook y los subtítulos siguen disponibles.</p></div>
+    </section>
+  </main>
+  <footer><span>PyCon 2026 · Demostración local</span><a href="#inicio">Volver al inicio ↑</a></footer>
+</body>
+</html>

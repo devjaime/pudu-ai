@@ -54,6 +54,11 @@ PRESENTATION_ASSETS = {
     "captions.es.vtt": ("docs/demos/pycon-2026/transformers-demo.captions.es.vtt", "text/vtt; charset=utf-8", 256 * 1024),
     "video.mp4": ("docs/demos/pycon-2026/pycon-2026-transformers-demo.mp4", "video/mp4", MAX_ASSET_BYTES),
 }
+PRESENTATION_UI_ASSETS = {
+    "/": ("docs/demos/pycon-2026/web/index.html", "text/html; charset=utf-8"),
+    "/web/styles.css": ("docs/demos/pycon-2026/web/styles.css", "text/css; charset=utf-8"),
+    "/web/app.js": ("docs/demos/pycon-2026/web/app.js", "text/javascript; charset=utf-8"),
+}
 
 
 def _bounded_text(value, limit):
@@ -340,6 +345,17 @@ def create_server(service=None, host="127.0.0.1", port=0):
             return value
 
         def do_GET(self):
+            if self.path in PRESENTATION_UI_ASSETS:
+                relative_path, content_type = PRESENTATION_UI_ASSETS[self.path]
+                try:
+                    raw = _read_confined_file(service.project_root, relative_path, 256 * 1024)
+                except (OSError, ValueError):
+                    raw = None
+                if raw is None:
+                    self._json(404, {"error": "presentation interface asset not found"})
+                else:
+                    self._bytes(200, raw, content_type)
+                return
             if self.path == "/api/preflight":
                 self._json(200, service.preflight())
                 return
