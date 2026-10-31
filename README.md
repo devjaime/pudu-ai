@@ -10,6 +10,8 @@ npx pudu-ai
 
 English is the default UI language. Use `--lang es` for Spanish. Docs: [English](README.md) · [Español](README.es.md).
 
+> **PyCon 2026:** a standard-library Python tool (`python/pudu_agent`) uses the AST to collect bounded, citable impact evidence for `GenerationMixin.generate` in a pinned `huggingface/transformers` checkout. Local models are an optional second layer. See [the demo section](#pycon-2026-transformers--ollama-demo) and the [presentation runbook (Spanish)](docs/demos/pycon-2026/DEMO_RUNBOOK.es.md).
+
 The npm name `pudu` is taken by an empty stub. This CLI is **`pudu-ai`**.
 
 ## Install
@@ -177,6 +179,8 @@ npx pudu-ai task run --task "Summarize the authentication flow" --repo . --model
 The live Ollama integration test is opt-in (`PUDU_INTEGRATION=1`). See the [English guide](docs/agent-lab-usage.md), [Spanish guide](docs/agent-lab-usage.es.md), and [workflow diagram](docs/diagrams/local-task-worker-flow.html).
 
 ## PyCon 2026 Transformers + Ollama demo
+
+**What it shows:** before changing `GenerationMixin.generate`, a deterministic collector (`pudu_agent.transformers_evidence`) checks the pinned fixture (`v5.20.2`, `18329f10…`) and uses Python's `ast` module to find the definition, a caller, inheritance candidates, public configuration, and test references. The [evidence report](docs/demos/pycon-2026/evidence/report.md) cites 13 files: 3,682 bytes of metadata versus 816,502 bytes of full files. Those are byte counts, not tokens. Runtime impact is not proven: `RUNTIME_TESTS` and `MODEL_ANALYSIS` stay `NOT_RUN` in the snapshot. A local Ollama model can then interpret the bounded evidence, and its answer is treated as unverified. If the fixture is not at `/Volumes/KINGSTON/pudu-pycon-2026/transformers`, export `PUDU_TRANSFORMERS_FIXTURE` with its absolute path.
 
 **English quick path — web:** In Terminal 1, confirm port `11435` is unused and start a separate local-only Ollama process: `OLLAMA_HOST=127.0.0.1:11435 OLLAMA_NO_CLOUD=1 ollama serve`. In Terminal 2, from the repository root, run `OLLAMA_HOST=127.0.0.1:11435 ollama list` and reuse only a model already visible there, then start the web app with `PYTHONPATH=python python3 -m pudu_agent.pycon_web --ollama-url http://127.0.0.1:11435 --port 8765`. Open [http://127.0.0.1:8765](http://127.0.0.1:8765), refresh preflight and installed models, select a model, and start the run. The web server does not start/stop Ollama or pull models. `OLLAMA_NO_CLOUD=1` is operator configuration, not API attestation; polling exhaustion does not stop a run, and structural validity does not establish factual correctness. For the direct CLI fallback and full walkthrough, see the [Spanish runbook](docs/demos/pycon-2026/DEMO_RUNBOOK.es.md).
 
