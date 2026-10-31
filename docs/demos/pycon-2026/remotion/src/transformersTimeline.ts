@@ -29,7 +29,7 @@ export const CAPTIONS: CaptionCue[] = [
   {startSeconds:54,endSeconds:64,sceneId:"model-roles",text:"Ejecución de tests y análisis de modelo: NOT_RUN. No medimos esas etapas."},
   {startSeconds:64,endSeconds:74,sceneId:"verification",text:"Identidad y reporte verificados; el análisis AST quedó acotado a conjuntos configurados."},
   {startSeconds:74,endSeconds:83,sceneId:"limitations",text:"Reducción de bytes del 99,55%; no son tokens ni equivalencia semántica. AST no prueba impacto completo."},
-  {startSeconds:83,endSeconds:90,sceneId:"takeaway",text:"Las relaciones candidatas orientan la investigación; no certifican causalidad. Validá rutas concretas antes de concluir."},
+  {startSeconds:83,endSeconds:90,sceneId:"takeaway",text:"Las relaciones candidatas orientan la investigación; no certifican causalidad. Valide rutas concretas antes de concluir."},
 ];
 export const STORYBOARD_DURATION = SCENES.reduce((total, scene) => total + scene.durationSeconds, 0);
 export const getSceneAtTime = (seconds:number) => {

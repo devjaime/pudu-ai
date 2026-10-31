@@ -90,7 +90,7 @@ npm exec -- remotion studio src/index.tsx --no-open
 npm run render-transformers
 ```
 
-Los primeros tres comandos son las comprobaciones registradas para la composición. `npm exec ... studio` abre la vista previa local; `--no-open` evita abrir el navegador automáticamente. El último comando vuelve a renderizar y sobrescribe `../pycon-2026-transformers-demo.mp4`; ejecutarlo solo si se decidió regenerar el video. El paquete define el script `render-transformers` para la composición `PyConTransformersDemo`.
+Los primeros tres comandos son las comprobaciones registradas para la composición. `npm exec ... studio` abre la vista previa local; `--no-open` evita abrir el navegador automáticamente. El último comando vuelve a renderizar y sobrescribe `../pycon-2026-transformers-demo.mp4`; ejecutarlo solo si se decidió regenerar el video. El paquete define el script `render-transformers` para la composición `PyConTransformersDemo`. Si `compositions` o el render fallan con `Target closed`, repita el comando usando Chrome del sistema: `npm run render-transformers -- --browser-executable='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'`. El MP4 actual se renderizó así.
 
 ### 6. Verificar artefactos
 
@@ -102,7 +102,7 @@ shasum -a 256 "$PUDU_ROOT/docs/demos/pycon-2026/pycon-2026-transformers-demo.mp4
 ffprobe -v error -show_entries format=duration -show_entries stream=codec_name,width,height,r_frame_rate -of default=noprint_wrappers=1 "$PUDU_ROOT/docs/demos/pycon-2026/pycon-2026-transformers-demo.mp4"
 ```
 
-SHA-256 verificado del MP4: `16d4295188f1fca85bbaa11e1b7e116c70261d9617f971d1340f5fcd7d4e26d3`. Características verificadas: H.264, 1920×1080, 30/1 fps y 90 segundos. SHA-256 de los snapshots: JSON `e2bfdb94a2616dbc4cb13077d5cb7a1cec210db685bc6ad58879b6d95aaff5bb`; Markdown `90729d713d2f420150a0703a28cadc95112c7aed6fc24f0f14707cd992f70282`.
+SHA-256 verificado del MP4: `485fa4edfab28ce5ce39d16c6b9c982811fa50a59a98052f0c4e092e57eb4c00`. Características verificadas: H.264, 1920×1080, 30/1 fps y 90 segundos. SHA-256 de los snapshots: JSON `e2bfdb94a2616dbc4cb13077d5cb7a1cec210db685bc6ad58879b6d95aaff5bb`; Markdown `90729d713d2f420150a0703a28cadc95112c7aed6fc24f0f14707cd992f70282`.
 
 ## Resultados observados
 

@@ -25,4 +25,4 @@ Identidad y reporte verificados; el análisis AST quedó acotado a conjuntos con
 Reducción de bytes del 99,55%; no son tokens ni equivalencia semántica. AST no prueba impacto completo.
 
 00:01:23.000 --> 00:01:30.000
-Las relaciones candidatas orientan la investigación; no certifican causalidad. Validá rutas concretas antes de concluir.
+Las relaciones candidatas orientan la investigación; no certifican causalidad. Valide rutas concretas antes de concluir.

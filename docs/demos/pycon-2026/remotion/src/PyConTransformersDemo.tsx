@@ -15,7 +15,7 @@ const facts:Record<string,string[]>={
   "model-roles":["Modelo local: NOT_RUN","Modelo frontier: NOT_RUN","Roles de arquitectura no equivalen a resultados observados"],
   verification:["Identidad exacta de checkout, tag y commit · VERIFIED","Escaneo AST en conjuntos acotados · COMPLETED","Reporte y medición sobre 13 fuentes citadas · COMPLETED"],
   limitations:["AST no resuelve dispatch dinámico, registros ni extensiones nativas","Candidatos no prueban participación real en runtime","Sin tests ejecutados ni garantía de impacto completo"],
-  takeaway:["Las relaciones candidatas orientan la investigación; no certifican causalidad","Validá rutas concretas en el contexto de ejecución antes de concluir"],
+  takeaway:["Las relaciones candidatas orientan la investigación; no certifican causalidad","Valide rutas concretas en el contexto de ejecución antes de concluir"],
 };
 
 const Scene=({scene,index}:{scene:SceneSpec;index:number})=>{

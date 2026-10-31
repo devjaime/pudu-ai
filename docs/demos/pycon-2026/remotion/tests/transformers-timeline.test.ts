@@ -63,4 +63,12 @@ describe("Transformers PyCon timeline contract", () => {
     const timestamp = (seconds:number) => `00:${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}.000`;
     expect(cues.map((cue) => [cue[1], cue[2]])).toEqual(CAPTIONS.map(({startSeconds, endSeconds}) => [timestamp(startSeconds), timestamp(endSeconds)]));
   });
+
+  it("uses neutral Spanish in captions and on-screen copy", async () => {
+    const {readFile} = await import("node:fs/promises");
+    const component = await readFile(new URL("../src/PyConTransformersDemo.tsx", import.meta.url), "utf8");
+    const copy = [component, ...CAPTIONS.map((cue) => cue.text), ...SCENES.map(({title, subtitle}) => `${title} ${subtitle}`)].join("\n");
+    expect(copy).not.toMatch(/Validá/);
+    expect(CAPTIONS.at(-1)?.text).toContain("Valide rutas concretas");
+  });
 });
