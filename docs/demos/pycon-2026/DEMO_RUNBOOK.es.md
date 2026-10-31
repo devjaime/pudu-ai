@@ -15,7 +15,10 @@ Al sincronizar el proyecto para la demostración, el fixture queda en `$DEMO_ROO
 ```sh
 export DEMO_ROOT=/Volumes/KINGSTON/pudu-pycon-2026
 export PUDU_ROOT="$(git rev-parse --show-toplevel)"
+export PUDU_TRANSFORMERS_FIXTURE="$DEMO_ROOT/transformers"
 ```
+
+`PUDU_TRANSFORMERS_FIXTURE` indica a la web y al CLI de Ollama cuál es la raíz exacta del fixture; debe ser una ruta absoluta. Si no se define, se usa `/Volumes/KINGSTON/pudu-pycon-2026/transformers`. Si el disco se monta con otro nombre, ajuste `DEMO_ROOT` y exporte esta variable en cada terminal que ejecute la web o el CLI.
 
 - Fixture de lectura únicamente: `$DEMO_ROOT/transformers`.
 - Repositorio de la demostración: raíz Git detectada en `$PUDU_ROOT`.
@@ -210,7 +213,7 @@ O interactivo, para revisar tag y digest antes de seleccionar:
 PYTHONPATH=python python3 -m pudu_agent.transformers_ollama_demo --ollama-url http://127.0.0.1:11435 --ollama-timeout-seconds 120 --interactive
 ```
 
-Ambas modalidades exigen el fixture fijado en `$DEMO_ROOT/transformers`, que es la ruta predeterminada del CLI. El comando valida identidad/commit/etiqueta, prepara evidencia acotada, selecciona un modelo local elegible, consulta la versión del servidor, genera con formato JSON y valida el contrato estructural. El timeout predeterminado es 120 segundos (`--ollama-timeout-seconds`, rango `>0` a `600`); los arranques en frío pueden superar los 10 segundos. Este valor limita operaciones de socket, no garantiza una duración total máxima. En éxito muestra el resumen interpretativo, la ruta del manifiesto y una advertencia de que validez JSON no significa corrección factual. `temperature=0` y `seed=20260520` fijan opciones, pero no garantizan texto idéntico entre versiones o hardware.
+Ambas modalidades exigen el fixture fijado en `$DEMO_ROOT/transformers`, que el CLI toma de `PUDU_TRANSFORMERS_FIXTURE` (o de su valor predeterminado). El comando valida identidad/commit/etiqueta, prepara evidencia acotada, selecciona un modelo local elegible, consulta la versión del servidor, genera con formato JSON y valida el contrato estructural. El timeout predeterminado es 120 segundos (`--ollama-timeout-seconds`, rango `>0` a `600`); los arranques en frío pueden superar los 10 segundos. Este valor limita operaciones de socket, no garantiza una duración total máxima. En éxito muestra el resumen interpretativo, la ruta del manifiesto y una advertencia de que validez JSON no significa corrección factual. `temperature=0` y `seed=20260520` fijan opciones, pero no garantizan texto idéntico entre versiones o hardware.
 
 El manifiesto redactado se escribe atómicamente en `.pudu-ai/pycon-demo/` (ignorado por Git). Registra hashes y metadatos —incluidos tag, digest, versiones, opciones, métricas observadas y estado de validación—, no el prompt, la evidencia ni la respuesta completos. Los informes deterministas comprometidos siguen diciendo `MODEL_ANALYSIS: NOT_RUN`: una corrida viva crea un registro separado e ignorado y **no reescribe esos snapshots**.
 

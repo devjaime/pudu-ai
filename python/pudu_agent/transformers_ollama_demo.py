@@ -20,7 +20,22 @@ FIXTURE = {
     "tag": "v5.20.2",
     "revision": "18329f1065382e54db698e242cf98bd3f3e5a766",
 }
-FIXTURE_ROOT = Path("/Volumes/KINGSTON/pudu-pycon-2026/transformers")
+DEFAULT_FIXTURE_ROOT = Path("/Volumes/KINGSTON/pudu-pycon-2026/transformers")
+FIXTURE_ROOT_ENV = "PUDU_TRANSFORMERS_FIXTURE"
+
+
+def resolve_fixture_root(environ=None):
+    """Return the exact fixture root, optionally overridden by an absolute path in the environment."""
+    value = (os.environ if environ is None else environ).get(FIXTURE_ROOT_ENV, "").strip()
+    if not value:
+        return DEFAULT_FIXTURE_ROOT
+    root = Path(value).expanduser()
+    if not root.is_absolute():
+        raise ValueError(f"{FIXTURE_ROOT_ENV} must be an absolute path")
+    return root
+
+
+FIXTURE_ROOT = resolve_fixture_root()
 PROMPT_VERSION = "prompt-v1"
 SCHEMA_VERSION = "pudu.transformers-ollama-analysis/v1"
 GENERATION_OPTIONS = {"temperature": 0, "seed": 20260520}

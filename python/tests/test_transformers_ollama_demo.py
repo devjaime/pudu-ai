@@ -181,6 +181,19 @@ class TransformersOllamaDemoTests(unittest.TestCase):
         collect.assert_not_called()
         self.assertEqual(client.calls, [])
 
+    def test_fixture_root_defaults_to_pinned_mount_without_override(self):
+        self.assertEqual(demo_module.resolve_fixture_root({}), demo_module.DEFAULT_FIXTURE_ROOT)
+        self.assertEqual(demo_module.resolve_fixture_root({"PUDU_TRANSFORMERS_FIXTURE": "  "}),
+                         demo_module.DEFAULT_FIXTURE_ROOT)
+
+    def test_fixture_root_override_comes_from_environment(self):
+        root = demo_module.resolve_fixture_root({"PUDU_TRANSFORMERS_FIXTURE": "/Volumes/Demo/transformers"})
+        self.assertEqual(root, Path("/Volumes/Demo/transformers"))
+
+    def test_fixture_root_override_must_be_absolute(self):
+        with self.assertRaises(ValueError):
+            demo_module.resolve_fixture_root({"PUDU_TRANSFORMERS_FIXTURE": "transformers"})
+
     def test_cli_rejects_arbitrary_manifest_path_without_creating_it(self):
         with tempfile.TemporaryDirectory() as tmp:
             arbitrary = Path(tmp) / "outside"
