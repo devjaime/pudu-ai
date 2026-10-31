@@ -77,7 +77,7 @@ PYTHONPATH=python python3 -m unittest python.tests.test_transformers_evidence py
 PYTHONPATH=python python3 -m unittest discover -s python/tests -v
 ```
 
-Resultado registrado: pruebas focalizadas del recolector/informe **8/8**; suite Python **45 pruebas, 1 omitida** por requerir `PUDU_INTEGRATION=1` y Ollama activo. Remotion: pruebas de timeline **11/11**, typecheck aprobado y dos composiciones descubiertas. La prueba de integración omitida no forma parte de la verificación de impacto del fixture.
+Resultado registrado: pruebas focalizadas del recolector/informe **8/8**; suite Python **101 pruebas, 1 omitida** por requerir `PUDU_INTEGRATION=1` y Ollama activo. Remotion: pruebas de timeline **12/12**, typecheck aprobado y dos composiciones descubiertas. La prueba de integración omitida no forma parte de la verificación de impacto del fixture.
 
 ### 5. Vista previa y render Remotion
 
